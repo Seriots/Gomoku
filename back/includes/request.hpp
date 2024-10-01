@@ -1,9 +1,14 @@
 #pragma once
-
+#include <httplib.h>
 enum e_color {
     WHITESTONE,
     BLACKSTONE
 };
+
+typedef struct s_stone {
+    int         pos;
+    std::string color;
+}   t_stone;
 
 typedef struct s_request {
     int                 pos;
@@ -12,9 +17,11 @@ typedef struct s_request {
     e_color             color;
     std::vector<int>    white;
     std::vector<int>    black;
-} t_request;
+    std::vector<int>    blocked;
+}   t_request;
 
 
 void    r_game(const httplib::Request &req, httplib::Response &res);
 void    r_end(const httplib::Request &req, httplib::Response &res);
 void    r_action(const httplib::Request &req, httplib::Response &res);
+void    r_ia(const httplib::Request &req, httplib::Response &res);

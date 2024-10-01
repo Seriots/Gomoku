@@ -15,38 +15,81 @@ function Game() {
 		return res.join(',');
 	}
 
+    const handleBackData = (res: any) => {
+        const board = document.getElementById('board');
+        if (!board)
+            return;
+
+        // remove blocked stone
+        while (document.getElementsByClassName('blocked-stone').length > 0) {
+            board.removeChild(document.getElementsByClassName('blocked-stone')[0]);
+        }
+
+        // add new stone
+        for (let i = 0; i < res.data.added.length; i++) {
+            let newStone = document.createElement('div');
+            newStone.className = res.data.added[i].color + '-stone';
+            newStone.style.left = (res.data.added[i].pos % 19) * 48 + 21 + 'px';
+            newStone.style.top = Math.floor(res.data.added[i].pos / 19) * 48 + 21 + 'px';
+            newStone.id = "stone-" + res.data.added[i].pos;
+            board.appendChild(newStone);
+        }
+
+        // remove captured stone
+        for (let i = 0; i < res.data.removed.length; i++) {
+            let capturedStone = document.getElementById('stone-' + res.data.removed[i]);
+            if (capturedStone) {
+                board.removeChild(capturedStone);
+            }
+        }
+    }
+
 	let color = 'white';
+    let is_processing = 0;
+
+    const placeIAStone = async () => {
+        const listWhite = getPositionList(document.getElementsByClassName('white-stone'));
+		const listBlack = getPositionList(document.getElementsByClassName('black-stone'));
+        
+        is_processing = is_processing + 1
+		await axios.get('http://localhost:6325/ia/' + color + '/' + listWhite + '/' + listBlack + '/')
+			.then((res) => {
+                handleBackData(res);
+                color = color === 'white' ? 'black' : 'white';
+                is_processing = is_processing - 1
+			})
+			.catch((err) => {
+				console.log(err);
+                is_processing = is_processing - 1
+			});
+    }
+
 	const placeStone = async () => {
+        if (is_processing > 0)
+            return;
 		const shadowStone = document.getElementById('shadow-stone');
-		if (!shadowStone) {
+		if (!shadowStone)
 			return;
-		}
 		const pos = computePositionFromPx(shadowStone.style.left, shadowStone.style.top);
 
 		const listWhite = getPositionList(document.getElementsByClassName('white-stone'));
 		const listBlack = getPositionList(document.getElementsByClassName('black-stone'));
+		const listBlocked = getPositionList(document.getElementsByClassName('blocked-stone'));
 
-		await axios.get('http://localhost:6325/action/' + pos + '/' + color + '/' + listWhite + '/' + listBlack)
+        is_processing = is_processing + 1
+		await axios.get('http://localhost:6325/action/' + pos + '/' + color + '/' + listWhite + '/' + listBlack + '/' + listBlocked)
 			.then((res) => {
-                if (res.data.error != undefined) 
-                    return;
-				const board = document.getElementById('board');
-				if (!board)
-					return;
-				let newStone = document.createElement('div');
-				newStone.className = color + '-stone';
-				newStone.style.left = shadowStone.style.left;
-				newStone.style.top = shadowStone.style.top;
-				board.appendChild(newStone);
-				if (color === 'white') {
-					color = 'black';
-				} else {
-					color = 'white';
-				}
-				shadowStone.className = color + "-shadow-stone";
+                if (res.data.error === undefined) {
+                    handleBackData(res);
+                    shadowStone.className = color + "-shadow-stone";
+                    color = color === 'white' ? 'black' : 'white';
+                    placeIAStone();
+                }
+                is_processing = is_processing - 1
 			})
 			.catch((err) => {
 				console.log(err);
+                is_processing = is_processing - 1
 			});
 
 	}

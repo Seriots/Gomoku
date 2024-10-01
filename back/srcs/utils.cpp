@@ -40,14 +40,14 @@ std::vector<int> parse_board_input(std::string input) {
 }
 
 std::string build_json_content(std::vector<std::string> key, std::vector<std::string> value) {
-    std::string out = "{\n";
+    std::string out = "";
     for (size_t i = 0; i < key.size(); i++) {
         if (i == 0)
             out += ("\"" + key[i] + "\":\"" + value[i] + "\"");
         else
             out += ",\n\"" + key[i] + "\":\"" + value[i] + "\"";
     }
-    return out + "\n}";   
+    return out;   
 }
 
 t_request create_new_request(const httplib::Request &req) {
@@ -58,5 +58,34 @@ t_request create_new_request(const httplib::Request &req) {
     e_color color = req.path_params.at("color") == "white" ? WHITESTONE : BLACKSTONE;
     std::vector<int> white = parse_board_input(req.path_params.at("white"));
     std::vector<int> black = parse_board_input(req.path_params.at("black"));
-    return {pos, x, y, color, white, black};
+    std::vector<int> blocked = parse_board_input(req.path_params.at("blocked"));
+    return {pos, x, y, color, white, black, blocked};
+}
+
+t_request create_new_ia_request(const httplib::Request &req) {
+    e_color color = req.path_params.at("color") == "white" ? WHITESTONE : BLACKSTONE;
+    std::vector<int> white = parse_board_input(req.path_params.at("white"));
+    std::vector<int> black = parse_board_input(req.path_params.at("black"));
+    return {0, 0, 0, color, white, black, {}};
+}
+
+std::string build_action_response(std::vector<t_stone> added, std::vector<int> removed, std::vector<std::string> key, std::vector<std::string> value) {
+    std::string out = "{\n" + build_json_content(key, value);
+    if (!key.empty())
+        out += ",\n";
+    out += "\"added\":[";
+    for (size_t i = 0; i < added.size(); i++) {
+        if (i == 0)
+            out += "{\"pos\":" + std::to_string(added[i].pos) + ",\"color\":\"" + added[i].color + "\"}";
+        else
+            out += ",\n{\"pos\":" + std::to_string(added[i].pos) + ",\"color\":\"" + added[i].color + "\"}";
+    }
+    out += "],\n\"removed\":[";
+    for (size_t i = 0; i < removed.size(); i++) {
+        if (i == 0)
+            out += std::to_string(removed[i]);
+        else
+            out += ",\n" + std::to_string(removed[i]);
+    }
+    return out + "]\n}";
 }

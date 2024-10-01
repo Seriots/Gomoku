@@ -39,6 +39,20 @@
     user-select: none; /* Tout les autres navigateurs */
 }
 
+.blocked-stone {
+    background-image: url('../assets/blockedStone.png');
+    background-size: cover;
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+    -moz-user-select: none; /* Firefox */
+    -webkit-user-select: none; /* Chrome, Safari, Opéra depuis la version 15 */
+    -ms-user-select: none; /* Internet explorer depuis la version 10 et Edge */
+    user-select: none; /* Tout les autres navigateurs */
+}
+
 #shadow-stone {
     background-size: cover;
     width: 40px;

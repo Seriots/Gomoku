@@ -10,7 +10,7 @@ class Board {
 
     public:
         Board();
-        Board(std::vector <int> white, std::vector <int> black, std::vector <int> blocked);
+        Board(std::vector <int> white, std::vector <int> black);
         Board(const Board &b);
         ~Board();
 

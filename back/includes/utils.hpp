@@ -12,6 +12,9 @@ std::string generate_cookie(size_t len = 16, std::string chars = "abcdefghijklmn
 std::string get_game_id(std::string &cookies);
 
 std::vector<int> parse_board_input(std::string input);
+
 std::string build_json_content(std::vector<std::string> key, std::vector<std::string> value);
+std::string build_action_response(std::vector<t_stone> added, std::vector<int> removed, std::vector<std::string> key, std::vector<std::string> value);
 
 t_request create_new_request(const httplib::Request &req);
+t_request create_new_ia_request(const httplib::Request &req);

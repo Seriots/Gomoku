@@ -12,15 +12,13 @@ Board::Board() {
     }
 }
 
-Board::Board(std::vector <int> white, std::vector <int> black, std::vector <int> blocked) {
+Board::Board(std::vector <int> white, std::vector <int> black) {
     for (int i = 0; i < 19; i++) {
         for (int j = 0; j < 19; j++) {
             if(std::find(white.begin(), white.end(), i * 19 + j) != white.end()) {
                 _board[i][j] = Cell(WHITE);
             } else if(std::find(black.begin(), black.end(), i * 19 + j) != black.end()) {
                 _board[i][j] = Cell(BLACK);
-            } else if(std::find(blocked.begin(), blocked.end(), i * 19 + j) != blocked.end()) {
-                _board[i][j] = Cell(BLOCKED);
             } else {
                 _board[i][j] = Cell();
             }
