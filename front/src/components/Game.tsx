@@ -50,9 +50,10 @@ function Game() {
     const placeIAStone = async () => {
         const listWhite = getPositionList(document.getElementsByClassName('white-stone'));
 		const listBlack = getPositionList(document.getElementsByClassName('black-stone'));
+        const listBlocked = getPositionList(document.getElementsByClassName('blocked-stone'));
         
         is_processing = is_processing + 1
-		await axios.get('http://localhost:6325/ia/' + color + '/' + listWhite + '/' + listBlack + '/')
+		await axios.get('http://localhost:6325/ia/' + color + '/' + listWhite + '/' + listBlack + '/' + listBlocked)
 			.then((res) => {
                 handleBackData(res);
                 color = color === 'white' ? 'black' : 'white';
@@ -79,6 +80,7 @@ function Game() {
         is_processing = is_processing + 1
 		await axios.get('http://localhost:6325/action/' + pos + '/' + color + '/' + listWhite + '/' + listBlack + '/' + listBlocked)
 			.then((res) => {
+                console.log(res.data.removed);
                 if (res.data.error === undefined) {
                     handleBackData(res);
                     shadowStone.className = color + "-shadow-stone";

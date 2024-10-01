@@ -21,3 +21,21 @@ e_cell Cell::get() const {
 void Cell::set(e_cell value) {
     _value = value;
 }
+
+std::ostream& operator<<(std::ostream &os, const Cell &c) {
+    switch (c.get()) {
+        case WHITE:
+            os << "o";
+            break;
+        case BLACK:
+            os << "*";
+            break;
+        case BLOCKED:
+            os << "x";
+            break;
+        case NONE:
+            os << "_";
+            break;
+    }
+    return os;
+}

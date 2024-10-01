@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "request.hpp"
+#include "utils.hpp"
 
 /*
     Check if the request is valid
@@ -70,8 +71,8 @@ std::string build_json_content(std::vector<std::string> key, std::vector<std::st
 t_request create_new_request(const httplib::Request &req) {
 
     int pos = std::stoi(req.path_params.at("pos"));
-    int x = (pos) / 19;
-    int y = (pos) % 19;
+    int x = (pos) % 19;
+    int y = (pos) / 19;
     e_color color = req.path_params.at("color") == "white" ? WHITESTONE : BLACKSTONE;
     std::vector<int> white = parse_board_input(req.path_params.at("white"));
     std::vector<int> black = parse_board_input(req.path_params.at("black"));
@@ -88,7 +89,8 @@ t_request create_new_ia_request(const httplib::Request &req) {
     e_color color = req.path_params.at("color") == "white" ? WHITESTONE : BLACKSTONE;
     std::vector<int> white = parse_board_input(req.path_params.at("white"));
     std::vector<int> black = parse_board_input(req.path_params.at("black"));
-    return {0, 0, 0, color, white, black, {}};
+    std::vector<int> blocked = parse_board_input(req.path_params.at("blocked"));
+    return {0, 0, 0, color, white, black, blocked};
 }
 
 /*

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+
 enum e_cell {
     WHITE,
     BLACK,
@@ -21,3 +23,5 @@ class Cell {
         e_cell get() const;
         void set(e_cell value);
 };
+
+std::ostream& operator<<(std::ostream &os, const Cell &c); 

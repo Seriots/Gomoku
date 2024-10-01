@@ -1,5 +1,6 @@
 #include <vector>
 #include <algorithm>
+#include <iostream>
 
 #include "Board.hpp"
 #include "Cell.hpp"
@@ -29,7 +30,7 @@ Board::Board(std::vector <int> white, std::vector <int> black) {
 Board::Board(const Board &b) {
     for (int i = 0; i < 19; i++) {
         for (int j = 0; j < 19; j++) {
-            _board[i][j] = b.get(i, j);
+            _board[i][j] = b.get(j, i);
         }
     }
 }
@@ -39,11 +40,24 @@ Board::~Board() { }
 void Board::operator= (const Board &b) {
     for (int i = 0; i < 19; i++) {
         for (int j = 0; j < 19; j++) {
-            _board[i][j] = b.get(i, j);
+            _board[i][j] = b.get(j, i);
         }
     }
 }
 
 Cell Board::get(int x, int y) const {
-    return _board[x][y];
+    return _board[y][x];
+}
+
+void Board::set(int x, int y, e_cell cell) {
+    _board[y][x].set(cell);
+}
+
+void Board::print() {
+    for (int i = 0; i < 19; i++) {
+        for (int j = 0; j < 19; j++) {
+            std::cout << _board[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
 }
