@@ -22,21 +22,22 @@ function Game() {
 			return;
 		}
 		const pos = computePositionFromPx(shadowStone.style.left, shadowStone.style.top);
+
 		const listWhite = getPositionList(document.getElementsByClassName('white-stone'));
 		const listBlack = getPositionList(document.getElementsByClassName('black-stone'));
 
-		const res = await axios.get('http://localhost:6325/action/' + pos + '/' + color[0] + '/' + listWhite + '/' + listBlack + '//')
+		await axios.get('http://localhost:6325/action/' + pos + '/' + color + '/' + listWhite + '/' + listBlack)
 			.then((res) => {
+                if (res.data.error != undefined) 
+                    return;
 				const board = document.getElementById('board');
-				if (!board) {
+				if (!board)
 					return;
-				}
 				let newStone = document.createElement('div');
 				newStone.className = color + '-stone';
 				newStone.style.left = shadowStone.style.left;
 				newStone.style.top = shadowStone.style.top;
 				board.appendChild(newStone);
-				console.log(res.data);
 				if (color === 'white') {
 					color = 'black';
 				} else {
@@ -47,6 +48,7 @@ function Game() {
 			.catch((err) => {
 				console.log(err);
 			});
+
 	}
 
 	const handleMouseMove = (e: any) => {
