@@ -33,32 +33,82 @@ void    Game::set(int pos, e_cell cell) {
     _board.set(x, y, cell);
 }
 
+void Game::unset(std::vector<int> pos) {
+    for (size_t i = 0; i < pos.size(); i++) {
+        int x = pos[i] % 19;
+        int y = pos[i] / 19;
+        _board.set(x, y, NONE);
+    }
+}
+
 Board Game::get_board() const {
     return _board;
 }
 
-std::vector<int> Game::get_blocked(e_color color) {
-    (void)color;
+bool Game::check_free_three(int x, int y, int ax, int ay, e_cell color) {
+    int inv_color = (color == WHITE) ? BLACK : WHITE;
+    std::vector<e_cell> axis_values;
+
+    for (int i = -4; i <= 4; i++) {
+        if (i == 0)
+            axis_values.push_back(color);
+        else if (x + (i * ax) >= 0 && x + (i * ax) < 19 && y + (i * ay) >= 0 && y + (i * ay) < 19)
+            axis_values.push_back(this->_board.get(x + (i * ax), y + (i * ay)).get());
+    }
+    size_t i = 1;
+    while (i < axis_values.size()) {
+        if (axis_values[i] == color && axis_values[i - 1] == NONE) {
+            i++;
+            int nb_colored = 1;
+            int nb_none = 0;
+            while (i < axis_values.size()) {
+                if (axis_values[i] == inv_color)
+                    break;
+                else if (axis_values[i] == color)
+                    nb_colored++;
+                else {
+                    if (nb_colored == 3)
+                        return true;
+                    nb_none++;
+                }
+                if (nb_none > 1 || nb_colored > 3)
+                    break;
+                i++;
+            }
+        }
+        i++;
+    }
+
+
+    return false;
+}
+
+
+bool Game::check_double_free_three(int x, int y, e_cell color) {
+    std::vector<std::vector<int> >  axis;
+
+    axis = {{1, 1}, {0, 1}, {1, -1}, {1, 0}};
+
+    int nb_three = 0;
+    for (size_t i = 0; i < axis.size(); i++) {
+        int ax = axis[i][0];
+        int ay = axis[i][1];
+        nb_three += this->check_free_three(x, y, ax, ay, color);
+        
+    }
+    return (nb_three >= 2);
+}
+
+std::vector<int> Game::get_new_blocked_pos(e_color color) {
     std::vector<int> blocked;
-    //for (int y = 0; y < 19; y++) {
-    //    for (int x = 0; x < 19; x++) {
-    //        if (_board.get(x, y).get_color() == color) {
-    //            if (x > 0 && _board.get(x - 1, y).get_color() == EMPTY)
-    //                blocked.push_back((x - 1) * 19 + y);
-    //            if (x < 18 && _board.get(x + 1, y).get_color() == EMPTY)
-    //                blocked.push_back((x + 1) * 19 + y);
-    //            if (y > 0 && _board.get(x, y - 1).get_color() == EMPTY)
-    //                blocked.push_back(x * 19 + y - 1);
-    //            if (y < 18 && _board.get(x, y + 1).get_color() == EMPTY)
-    //                blocked.push_back(x * 19 + y + 1);
-    //        }
-    //    }
-    //}
-    //blocked.push_back(rand() % 361);
-    //blocked.push_back(rand() % 361);
-    //blocked.push_back(rand() % 361);
-    //blocked.push_back(rand() % 361);
-    //blocked.push_back(rand() % 361);
+
+    for (int place = 0; place < 360; place++) {
+        int x = place % 19;
+        int y = place / 19;
+        if (_board.get(x, y).get() == NONE && this->check_double_free_three(x, y, color == WHITESTONE ? WHITE : BLACK)) {
+            blocked.push_back(place);
+        }
+    }
     return blocked;
 }
 
@@ -97,7 +147,7 @@ std::vector<int> Game::get_captured(int pos) {
     for (size_t i = 0; i < directions.size(); i++) {
         int dx = directions[i][0];
         int dy = directions[i][1];
-        if (check_sequence(x, y, dx, dy, sequence)) {
+        if (this->check_sequence(x, y, dx, dy, sequence)) {
             captured.push_back((x + dx) + (y + dy) * 19);
             captured.push_back((x + 2 * dx) + (y + 2 * dy) * 19);
         }

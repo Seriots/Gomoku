@@ -45,15 +45,20 @@ void    r_action(const httplib::Request &req, httplib::Response &res) {
     game.print_board();
 
     removed = game.get_captured(request.pos);
+    game.unset(removed);
+    
+    //removed.push_back(rand() % 10);
+    blocked_list = game.get_new_blocked_pos(request.color == WHITESTONE ? BLACKSTONE : WHITESTONE);
 
-    // check if you captured something
+    for (size_t i = 0; i < blocked_list.size(); i++)
+        std::cout << blocked_list[i] << " ";
+    std::cout << std::endl; 
+    std::cout << true << std::endl;
 
     added.push_back({request.pos, request.color == WHITESTONE ? "white" : "black"});
     for (size_t i = 0; i < blocked_list.size(); i++)
         added.push_back({blocked_list[i], "blocked"});
     
-    //removed.push_back(rand() % 10);
-    blocked_list = game.get_blocked(request.color);
     
     //everything is send in a nicely formated json
     res.set_content(build_action_response(added, removed, {}, {}), "application/json");
@@ -70,6 +75,8 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     t_request               request;
     std::vector<t_stone>    added;
     std::vector<int>        removed;
+    std::vector<int>        blocked_list;
+    Game                    game;
 
     res.set_header("Access-Control-Allow-Origin", "*");
     
@@ -81,7 +88,19 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
         pos = rand() % 361;
     }
 
+    game = Game(request.white, request.black);
+
+    game.set(pos, request.color == WHITESTONE ? WHITE : BLACK);
+
+    removed = game.get_captured(pos);
+    game.unset(removed);
+
+    blocked_list = game.get_new_blocked_pos(request.color == WHITESTONE ? BLACKSTONE : WHITESTONE);
+
     added.push_back({pos, request.color == WHITESTONE ? "white" : "black"});
+    for (size_t i = 0; i < blocked_list.size(); i++)
+        added.push_back({blocked_list[i], "blocked"});
+
 
     res.set_content(build_action_response(added, removed, {}, {}), "application/json");
 }
