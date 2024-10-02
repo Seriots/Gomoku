@@ -101,6 +101,7 @@ bool Game::check_double_free_three(int x, int y, e_cell color) {
 
 std::vector<int> Game::get_new_blocked_pos(e_color color) {
     std::vector<int> blocked;
+    std::vector<int> blocked_not_captured;
 
     for (int place = 0; place < 360; place++) {
         int x = place % 19;
@@ -109,7 +110,13 @@ std::vector<int> Game::get_new_blocked_pos(e_color color) {
             blocked.push_back(place);
         }
     }
-    return blocked;
+
+    for (size_t i = 0; i < blocked.size(); i++) {
+        if (this->get_captured(blocked[i]).size() == 0)
+            blocked_not_captured.push_back(blocked[i]);
+    }
+
+    return blocked_not_captured;
 }
 
 bool Game::check_sequence(int x, int y, int dx, int dy, std::vector<e_cell> sequence) {

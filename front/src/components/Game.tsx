@@ -90,7 +90,7 @@ function Game() {
                     handleBackData(res);
                     color = color === 'white' ? 'black' : 'white';
                     shadowStone.className = color + "-shadow-stone";
-                    //placeIAStone();
+                    placeIAStone();
                 }
                 is_processing = is_processing - 1
 			})

@@ -1,6 +1,9 @@
 [X] format the response with a list of added stone and a list of removed stone
-[ ] Make a fonction that detect position of double free-three (double free-three with capture is allowed)
+[X] Make a fonction that detect position of double free-three (double free-three with capture is allowed)
 [X] Make a fonction that capture stone
 [X] Add call for IA search
 [x] add to added stone the blocked pos and make a fonction to get every blocked pos
 [x] add a blocked stone image
+
+[ ] Make a min max tree
+[ ] Make a simple heuristic function for min max tree
