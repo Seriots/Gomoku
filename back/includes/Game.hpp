@@ -22,6 +22,7 @@ class Game {
         void operator= (const Game &g);
 
         void set(int pos, e_cell cell);
+        void set(std::vector<int> pos, e_cell cell);
         void unset(std::vector<int> pos);
 
         Board get_board() const;
@@ -30,4 +31,8 @@ class Game {
         std::vector<int> get_captured(int pos);
 
         void print_board();
+
+        int heuristic(e_color color, int pos);
+
+        std::pair<int, int> compute_best_move(e_color color, int depth, int is_maxi);
 };

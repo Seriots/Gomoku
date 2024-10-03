@@ -5,5 +5,8 @@
 [x] add to added stone the blocked pos and make a fonction to get every blocked pos
 [x] add a blocked stone image
 
-[ ] Make a min max tree
-[ ] Make a simple heuristic function for min max tree
+[X] Make a min max tree
+[x] Make a simple heuristic function for min max tree
+
+[ ] Optimise the min max tree to find until 4depth
+[ ] make a list of DNA for the heuristic

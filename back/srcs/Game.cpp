@@ -33,6 +33,14 @@ void    Game::set(int pos, e_cell cell) {
     _board.set(x, y, cell);
 }
 
+void Game::set(std::vector<int> pos, e_cell cell) {
+    for (size_t i = 0; i < pos.size(); i++) {
+        int x = pos[i] % 19;
+        int y = pos[i] / 19;
+        _board.set(x, y, cell);
+    }
+}
+
 void Game::unset(std::vector<int> pos) {
     for (size_t i = 0; i < pos.size(); i++) {
         int x = pos[i] % 19;
@@ -103,7 +111,7 @@ std::vector<int> Game::get_new_blocked_pos(e_color color) {
     std::vector<int> blocked;
     std::vector<int> blocked_not_captured;
 
-    for (int place = 0; place < 360; place++) {
+    for (int place = 0; place < 361; place++) {
         int x = place % 19;
         int y = place / 19;
         if (_board.get(x, y).get() == NONE && this->check_double_free_three(x, y, color == WHITESTONE ? WHITE : BLACK)) {
@@ -160,6 +168,100 @@ std::vector<int> Game::get_captured(int pos) {
         }
     }
     return captured;
+}
+
+int Game::heuristic(e_color color, int pos) {
+    int x = pos % 19;
+    int y = pos / 19;
+    e_cell my = (color == WHITESTONE) ? WHITE : BLACK;
+    e_cell other = (color == WHITESTONE) ? BLACK : WHITE;
+
+    int score = 0;
+    for (int j = y - 4; j <= y + 4; j++) {
+        for (int i = x - 4; i <= x + 4; i++) {
+            if (i >= 0 && i < 19 && j >= 0 && j < 19) {
+                if (_board.get(i, j).get() ==  my)
+                    score += (100 - abs(y - j) * abs(x - i) * 2);
+                else if (_board.get(i, j).get() == other)
+                    score += (100 - abs(y - j) * abs(x - i));
+            }
+        }
+    }
+    return score;
+}
+
+bool maximum(const std::pair<int, int>& a, const std::pair<int, int>& b) {
+    return a.second < b.second;
+}
+
+bool minimum(const std::pair<int, int>& a, const std::pair<int, int>& b) {
+    return a.second > b.second;
+}
+
+std::vector<int> get_interesting_pos(Game &game) {
+    std::set<int> interesting_pos;
+
+    for (int pos = 0; pos < 361; pos++) {
+        if (pos != NONE && pos != BLOCKED) {
+            int x = pos % 19;
+            int y = pos / 19;
+            if (game.get_board().get(x, y).get() != NONE) {
+                for (int j = y - 1; j <= y + 1; j++) {
+                    for (int i = x - 1; i <= x + 1; i++) {
+                        if (i >= 0 && i < 19 && j >= 0 && j < 19) {
+                            if (game.get_board().get(i, j).get() == NONE)
+                                interesting_pos.insert(i + j * 19);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return std::vector<int>(interesting_pos.begin(), interesting_pos.end());
+}
+
+std::pair<int, int> Game::compute_best_move(e_color color, int depth, int is_maxi) {
+    std::map<int, int>  moves;
+    Game new_base_game = Game(*this);
+    new_base_game.unset(new_base_game.get_new_blocked_pos(color == WHITESTONE ? WHITESTONE : BLACKSTONE));
+
+    std::vector<int> interesting_pos = get_interesting_pos(*this); 
+    
+    for (std::vector<int>::iterator it = interesting_pos.begin(); it != interesting_pos.end(); it++) {
+        int pos = *it;
+        int x = pos % 19;
+        int y = pos / 19;
+        if (_board.get(x, y).get() == NONE) {
+            if (depth == 0)
+            {
+                int score = this->heuristic(color, pos);
+                moves[pos] = score;
+            }
+            else
+            {
+                Game new_game = Game(new_base_game);
+                new_game.set(pos, color == WHITESTONE ? WHITE : BLACK);
+                new_game.set(new_game.get_new_blocked_pos(color == WHITESTONE ? BLACKSTONE : WHITESTONE), BLOCKED);
+                int score = new_game.compute_best_move(color == WHITESTONE ? BLACKSTONE : WHITESTONE, depth - 1, !is_maxi).second;
+                moves[pos] = score; 
+            }
+        }
+    }
+    
+    if (depth == 2){
+        std::cout << "depth: " << depth<< (color == WHITESTONE ? "WHITE" : "BLACK") << std::endl;
+        for (int y = 0; y < 19; y++) {
+            for (int x = 0; x < 19; x++) {
+                std::cout<<std::setfill('0')<<std::setw(3)<<moves[x + y * 19]<<" ";
+            }
+            std::cout<<std::endl;
+        }
+        std::cout << "----------------" << std::endl;
+    }
+    if (is_maxi)
+        return std::make_pair(std::max_element(moves.begin(), moves.end(), maximum)->first, std::max_element(moves.begin(), moves.end(), maximum)->second);
+    else
+        return std::make_pair(std::min_element(moves.begin(), moves.end(), maximum)->first, std::min_element(moves.begin(), moves.end(), maximum)->second);
 }
 
 void Game::print_board() {

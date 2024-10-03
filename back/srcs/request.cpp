@@ -40,6 +40,7 @@ void    r_action(const httplib::Request &req, httplib::Response &res) {
         return;
     
     game = Game(request.white, request.black);
+    game.set(request.blocked, BLOCKED);
     
     game.set(request.pos, request.color == WHITESTONE ? WHITE : BLACK);
     game.print_board();
@@ -82,13 +83,18 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     
     request = create_new_ia_request(req);
 
-    int pos = rand() % 361;
-    while (std::find(request.white.begin(), request.white.end(), pos) != request.white.end()
-        || std::find(request.black.begin(), request.black.end(), pos) != request.black.end()) {
-        pos = rand() % 361;
-    }
+    // int pos = rand() % 361;
+    // while (std::find(request.white.begin(), request.white.end(), pos) != request.white.end()
+    //     || std::find(request.black.begin(), request.black.end(), pos) != request.black.end()
+    //     || std::find(request.blocked.begin(), request.blocked.end(), pos) != request.blocked.end()
+    //     ) {
+    //     pos = rand() % 361;
+    // }
+
 
     game = Game(request.white, request.black);
+    int pos = game.compute_best_move(request.color, 2, 1).first;
+    game.set(request.blocked, BLOCKED);
 
     game.set(pos, request.color == WHITESTONE ? WHITE : BLACK);
 

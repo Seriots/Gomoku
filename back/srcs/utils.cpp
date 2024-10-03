@@ -13,7 +13,7 @@
     @return true if the request is invalid, false otherwise
 */
 bool check_error_request(t_request &request,  httplib::Response &res) {
-    if (request.pos < 0 || request.pos > 360) {
+    if (request.pos < 0 || request.pos >= 361) {
         res.set_content("{"+build_json_content({"error"}, {"outOfBound"})+"}", "application/json");
         return true;
     }
