@@ -272,9 +272,9 @@ std::vector<int> Game::get_interesting_pos() {
 
 std::pair<int, int> Game::compute_best_move(e_color color, int depth, int is_maxi, int alpha, int beta) {
     std::map<int, int>  moves;
-    Game new_base_game(*this);
+    // Game new_base_game(*this);
     
-    new_base_game.unset_blocked_pos();
+    // new_base_game.unset_blocked_pos();
 
     for (std::vector<int>::iterator it = this->_interesting_pos.begin(); it != this->_interesting_pos.end(); it++) {
         int pos = *it;
@@ -290,9 +290,9 @@ std::pair<int, int> Game::compute_best_move(e_color color, int depth, int is_max
             }
             else
             {
-                Game new_game = Game(new_base_game);
-                new_game.set(pos, color == WHITESTONE ? WHITE : BLACK);
-                new_game.set(new_game.get_new_blocked_pos(color == WHITESTONE ? BLACKSTONE : WHITESTONE), BLOCKED);
+                // Game new_game = Game(new_base_game);
+                // new_game.set(pos, color == WHITESTONE ? WHITE : BLACK);
+                // new_game.set(new_game.get_new_blocked_pos(color == WHITESTONE ? BLACKSTONE : WHITESTONE), BLOCKED);
                 int score = this->compute_best_move(color == WHITESTONE ? BLACKSTONE : WHITESTONE, depth - 1, !is_maxi, alpha, beta).second;
                 moves[pos] = score;
                 if (is_maxi)

@@ -9,7 +9,9 @@
 [x] Make a simple heuristic function for min max tree
 
 [ ] Optimise the min max tree to find until 4depth
-    [ ] alppha beta cut
+    [X] alppha beta cut
+    [ ] Find how to modify game data during process (big big opti)
+    [ ] Maybe try to add mnemoisation
     [ ] add loseMove, winMove
 [ ] make a list of DNA for the heuristic
 
