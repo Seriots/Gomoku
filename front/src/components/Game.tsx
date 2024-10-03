@@ -2,6 +2,15 @@ import axios from 'axios';
 import './Game.css';
 
 function Game() {
+
+    const build_request = (base: string, lst: any) => {
+        let res = base;
+        for (let i = 0; i < lst.length; i++) {
+            res += '/' + lst[i];
+        }
+        return res;
+    }
+
 	const computePositionFromPx = (x: string, y: string) => {
 		const posX = (parseInt(x, 10) - 21) / 48;
 		const posY = (parseInt(y, 10) - 21) / 48;
@@ -46,6 +55,7 @@ function Game() {
 
 	let color = 'white';
     let is_processing = 0;
+    let captured_count = {white: 0, black: 0};
 
     const placeIAStone = async () => {
         const shadowStone = document.getElementById('shadow-stone');
@@ -56,12 +66,17 @@ function Game() {
         const listBlocked = getPositionList(document.getElementsByClassName('blocked-stone'));
         
         is_processing = is_processing + 1
-		await axios.get('http://localhost:6325/ia/' + color + '/' + listWhite + '/' + listBlack + '/' + listBlocked)
+		await axios.get(build_request('http://localhost:6325/ia', [color, listWhite, listBlack, listBlocked, captured_count.white, captured_count.black]))
 			.then((res) => {
                 console.log(res.data);
                 handleBackData(res);
+                if (color === 'white')
+                    captured_count.white += res.data.removed.length;
+                else
+                    captured_count.black += res.data.removed.length;
                 color = color === 'white' ? 'black' : 'white';
                 shadowStone.className = color + "-shadow-stone";
+                console.log(captured_count);
                 is_processing = is_processing - 1
 			})
 			.catch((err) => {
@@ -83,13 +98,18 @@ function Game() {
 		const listBlocked = getPositionList(document.getElementsByClassName('blocked-stone'));
 
         is_processing = is_processing + 1
-		await axios.get('http://localhost:6325/action/' + pos + '/' + color + '/' + listWhite + '/' + listBlack + '/' + listBlocked)
+		await axios.get(build_request('http://localhost:6325/action', [pos, color, listWhite, listBlack, listBlocked]))
 			.then((res) => {
                 console.log(res.data);
                 if (res.data.error === undefined) {
                     handleBackData(res);
+                    if (color === 'white')
+                        captured_count.white += res.data.removed.length;
+                    else
+                        captured_count.black += res.data.removed.length;
                     color = color === 'white' ? 'black' : 'white';
                     shadowStone.className = color + "-shadow-stone";
+                    console.log(captured_count);
                     placeIAStone();
                 }
                 is_processing = is_processing - 1

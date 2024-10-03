@@ -77,7 +77,7 @@ t_request create_new_request(const httplib::Request &req) {
     std::vector<int> white = parse_board_input(req.path_params.at("white"));
     std::vector<int> black = parse_board_input(req.path_params.at("black"));
     std::vector<int> blocked = parse_board_input(req.path_params.at("blocked"));
-    return {pos, x, y, color, white, black, blocked};
+    return {pos, x, y, color, white, black, blocked, 0, 0};
 }
 
 /*
@@ -90,7 +90,15 @@ t_request create_new_ia_request(const httplib::Request &req) {
     std::vector<int> white = parse_board_input(req.path_params.at("white"));
     std::vector<int> black = parse_board_input(req.path_params.at("black"));
     std::vector<int> blocked = parse_board_input(req.path_params.at("blocked"));
-    return {0, 0, 0, color, white, black, blocked};
+    int white_captured = std::stoi(req.path_params.at("whiteCaptured"));
+    int black_captured = std::stoi(req.path_params.at("blackCaptured"));
+    return {0, 0, 0, color, white, black, blocked, white_captured, black_captured};
+}
+
+int get_captured_count(t_request request, e_color color) {
+    if (color == WHITESTONE)
+        return request.white_captured;
+    return request.black_captured;
 }
 
 /*

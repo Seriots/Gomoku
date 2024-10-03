@@ -5,9 +5,31 @@
 
 #include "Board.hpp"
 
+enum e_dna {
+    ALIGN_FIVE,
+    FREE_FOUR,
+    FREE_THREE,
+    ANY_ALIGNEMENT,
+    CAPTURE_TOTAL_2,
+    CAPTURE_TOTAL_4,
+    CAPTURE_TOTAL_6,
+    CAPTURE_TOTAL_8,
+    CAPTURE_TOTAL_10,
+    BLOCK_FREE_THREE,
+    BLOCK_FREE_FOUR,
+    BLOCK_CAPTURE,
+    BLOCK_WIN,
+    SETUP_CAPTURE,
+    IS_CAPTURABLE
+};
+
+
 class Game {
     private:
-        Board       _board;
+        Board                   _board;
+        std::map<e_dna, int>    _dna;
+
+        void init_dna();
 
         bool check_sequence(int x, int y, int dx, int dy, std::vector<e_cell> cell);
         bool check_double_free_three(int x, int y, e_cell color);
@@ -32,7 +54,7 @@ class Game {
 
         void print_board();
 
-        int heuristic(e_color color, int pos);
+        int heuristic(t_request &request, e_color color, int pos);
 
-        std::pair<int, int> compute_best_move(e_color color, int depth, int is_maxi);
+        std::pair<int, int> compute_best_move(t_request &request, e_color color, int depth, int is_maxi, int alpha, int beta);
 };

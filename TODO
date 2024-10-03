@@ -9,4 +9,27 @@
 [x] Make a simple heuristic function for min max tree
 
 [ ] Optimise the min max tree to find until 4depth
+    [ ] alppha beta cut
+    [ ] add loseMove, winMove
 [ ] make a list of DNA for the heuristic
+
+
+DNA:
+
+FREE_FIVE
+FREE_FOUR
+FREE_THREE
+ANY_ALIGNEMENT
+CAPTURE_TOTAL_2
+CAPTURE_TOTAL_4
+CAPTURE_TOTAL_6
+CAPTURE_TOTAL_8
+CAPTURE_TOTAL_10
+BLOCK_FREE_THREE
+BLOCK_FREE_FOUR
+BLOCK_CAPTURE
+SETUP_CAPTURE
+IS_CAPTURABLE
+SYMETRIE_FACTOR
+DUMB_FACTOR
+

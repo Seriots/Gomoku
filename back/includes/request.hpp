@@ -18,6 +18,8 @@ typedef struct s_request {
     std::vector<int>    white;
     std::vector<int>    black;
     std::vector<int>    blocked;
+    int                 white_captured;
+    int                 black_captured;
 }   t_request;
 
 

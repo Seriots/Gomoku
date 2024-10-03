@@ -16,7 +16,7 @@ int main() {
 	svr.Get("/end", r_end);
 
     svr.Get("/action/:pos/:color/:white/:black/:blocked", r_action);
-    svr.Get("/ia/:color/:white/:black/:blocked", r_ia);
+    svr.Get("/ia/:color/:white/:black/:blocked/:whiteCaptured/:blackCaptured", r_ia);
 
 	svr.listen("localhost", 6325);
 }

@@ -3,28 +3,52 @@
 #include <vector>
 
 #include "request.hpp"
+#include "utils.hpp"
 
 #include "Game.hpp"
 #include "Board.hpp"
 
+
+void Game::init_dna() {
+    _dna[ALIGN_FIVE] = 100000;
+    _dna[FREE_FOUR] = 10000;
+    _dna[FREE_THREE] = 1000;
+    _dna[ANY_ALIGNEMENT] = 25;
+    _dna[CAPTURE_TOTAL_2] = 400;
+    _dna[CAPTURE_TOTAL_4] = 800;
+    _dna[CAPTURE_TOTAL_6] = 2500;
+    _dna[CAPTURE_TOTAL_8] = 5000;
+    _dna[CAPTURE_TOTAL_10] = 100000;
+    _dna[BLOCK_FREE_THREE] = 1900;
+    _dna[BLOCK_FREE_FOUR] = 5900;
+    _dna[BLOCK_CAPTURE] = 6000;
+    _dna[BLOCK_WIN] = 89000;
+    _dna[SETUP_CAPTURE] = 200;
+    _dna[IS_CAPTURABLE] = -3000;
+}
+
 Game::Game()
 {
     _board = Board();
+    this->init_dna();
 }
 
 Game::Game(std::vector <int> white, std::vector <int> black)
 {
     _board = Board(white, black);
+    this->init_dna();
 }
 
 Game::Game(const Game &g) {
     _board = g.get_board();
+    _dna = g._dna;
 }
 
 Game::~Game() { }
 
 void Game::operator= (const Game &g) {
     _board = g.get_board();
+    _dna = g._dna;
 }
 
 void    Game::set(int pos, e_cell cell) {
@@ -170,7 +194,8 @@ std::vector<int> Game::get_captured(int pos) {
     return captured;
 }
 
-int Game::heuristic(e_color color, int pos) {
+int Game::heuristic(t_request &request, e_color color, int pos) {
+    (void)request;
     int x = pos % 19;
     int y = pos / 19;
     e_cell my = (color == WHITESTONE) ? WHITE : BLACK;
@@ -206,8 +231,8 @@ std::vector<int> get_interesting_pos(Game &game) {
             int x = pos % 19;
             int y = pos / 19;
             if (game.get_board().get(x, y).get() != NONE) {
-                for (int j = y - 1; j <= y + 1; j++) {
-                    for (int i = x - 1; i <= x + 1; i++) {
+                for (int j = y - 2; j <= y + 2; j++) {
+                    for (int i = x - 2; i <= x + 2; i++) {
                         if (i >= 0 && i < 19 && j >= 0 && j < 19) {
                             if (game.get_board().get(i, j).get() == NONE)
                                 interesting_pos.insert(i + j * 19);
@@ -220,21 +245,30 @@ std::vector<int> get_interesting_pos(Game &game) {
     return std::vector<int>(interesting_pos.begin(), interesting_pos.end());
 }
 
-std::pair<int, int> Game::compute_best_move(e_color color, int depth, int is_maxi) {
+std::pair<int, int> Game::compute_best_move(t_request &request, e_color color, int depth, int is_maxi, int alpha, int beta) {
     std::map<int, int>  moves;
-    Game new_base_game = Game(*this);
+    std::vector<int> interesting_pos;
+    Game new_base_game;
+    
+    new_base_game = (*this);
     new_base_game.unset(new_base_game.get_new_blocked_pos(color == WHITESTONE ? WHITESTONE : BLACKSTONE));
 
-    std::vector<int> interesting_pos = get_interesting_pos(*this); 
+    interesting_pos = get_interesting_pos(*this); 
     
     for (std::vector<int>::iterator it = interesting_pos.begin(); it != interesting_pos.end(); it++) {
         int pos = *it;
         int x = pos % 19;
         int y = pos / 19;
-        if (_board.get(x, y).get() == NONE) {
+        int v;
+        if (is_maxi)
+            v = alpha;
+        else
+            v = beta;
+        if (_board.get(x, y).get() == NONE)
+        {
             if (depth == 0)
             {
-                int score = this->heuristic(color, pos);
+                int score = this->heuristic(request, color, pos);
                 moves[pos] = score;
             }
             else
@@ -242,21 +276,30 @@ std::pair<int, int> Game::compute_best_move(e_color color, int depth, int is_max
                 Game new_game = Game(new_base_game);
                 new_game.set(pos, color == WHITESTONE ? WHITE : BLACK);
                 new_game.set(new_game.get_new_blocked_pos(color == WHITESTONE ? BLACKSTONE : WHITESTONE), BLOCKED);
-                int score = new_game.compute_best_move(color == WHITESTONE ? BLACKSTONE : WHITESTONE, depth - 1, !is_maxi).second;
-                moves[pos] = score; 
+                int score = new_game.compute_best_move(request, color == WHITESTONE ? BLACKSTONE : WHITESTONE, depth - 1, !is_maxi, alpha, beta).second;
+                moves[pos] = score;
+                if (!is_maxi)
+                {
+                    v = std::min(v, score);
+                    if (alpha >= v) {
+                        std::cout << "elagage alpha" << std::endl;
+                        break;
+                    }
+                    beta = std::min(beta, v);
+                }
+                else
+                {
+                    v = std::max(v, score);
+                    if (v >= beta) {
+                        std::cout << "elagage beta" << std::endl;
+                        break;
+
+                    }
+                    alpha = std::max(alpha, v);
+                }
+                 
             }
         }
-    }
-    
-    if (depth == 2){
-        std::cout << "depth: " << depth<< (color == WHITESTONE ? "WHITE" : "BLACK") << std::endl;
-        for (int y = 0; y < 19; y++) {
-            for (int x = 0; x < 19; x++) {
-                std::cout<<std::setfill('0')<<std::setw(3)<<moves[x + y * 19]<<" ";
-            }
-            std::cout<<std::endl;
-        }
-        std::cout << "----------------" << std::endl;
     }
     if (is_maxi)
         return std::make_pair(std::max_element(moves.begin(), moves.end(), maximum)->first, std::max_element(moves.begin(), moves.end(), maximum)->second);
