@@ -1,4 +1,5 @@
 #include <httplib.h>
+#include <time.h>
 
 #include "utils.hpp"
 #include "request.hpp"
@@ -27,7 +28,6 @@ void    r_game(const httplib::Request &req, httplib::Response &res) {
 void    r_action(const httplib::Request &req, httplib::Response &res) {
     
     t_request               request;
-    Game                    game;
     std::vector<t_stone>    added;
     std::vector<int>        removed;
     std::vector<int>        blocked_list;
@@ -39,7 +39,7 @@ void    r_action(const httplib::Request &req, httplib::Response &res) {
     if (check_error_request(request, res))
         return;
     
-    game = Game(request.white, request.black);
+    Game game(request);
     game.set(request.blocked, BLOCKED);
     
     game.set(request.pos, request.color == WHITESTONE ? WHITE : BLACK);
@@ -71,14 +71,16 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     std::vector<t_stone>    added;
     std::vector<int>        removed;
     std::vector<int>        blocked_list;
-    Game                    game;
 
     res.set_header("Access-Control-Allow-Origin", "*");
     
     request = create_new_ia_request(req);
 
-    game = Game(request.white, request.black);
-    int pos = game.compute_best_move(request, request.color, 2, 1, -2147483647, 2147483647).first;
+    Game game(request);
+    auto time = std::chrono::high_resolution_clock::now();
+    int pos = game.compute_best_move(request.color, 2, 1, -2147483647, 2147483647).first;
+    
+    std::cout << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - time).count() << std::endl;
     game.set(request.blocked, BLOCKED);
 
     game.set(pos, request.color == WHITESTONE ? WHITE : BLACK);

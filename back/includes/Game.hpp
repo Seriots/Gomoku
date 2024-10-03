@@ -28,16 +28,20 @@ class Game {
     private:
         Board                   _board;
         std::map<e_dna, int>    _dna;
+        t_request               _request;
+        std::vector<int>        _interesting_pos;
+        std::vector<int>        _blocked_pos;
+
 
         void init_dna();
 
         bool check_sequence(int x, int y, int dx, int dy, std::vector<e_cell> cell);
         bool check_double_free_three(int x, int y, e_cell color);
         bool check_free_three(int x, int y, int ax, int ay, e_cell color);
-
+        void unset_blocked_pos();
+    
     public:
-        Game();
-        Game(std::vector <int> white, std::vector <int> black);
+        Game(t_request &request);
         Game(const Game &g);
         ~Game();
 
@@ -54,7 +58,7 @@ class Game {
 
         void print_board();
 
-        int heuristic(t_request &request, e_color color, int pos);
-
-        std::pair<int, int> compute_best_move(t_request &request, e_color color, int depth, int is_maxi, int alpha, int beta);
+        int heuristic(e_color color, int pos);
+        std::vector<int> get_interesting_pos();
+        std::pair<int, int> compute_best_move(e_color color, int depth, int is_maxi, int alpha, int beta);
 };

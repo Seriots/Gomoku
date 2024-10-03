@@ -27,21 +27,19 @@ void Game::init_dna() {
     _dna[IS_CAPTURABLE] = -3000;
 }
 
-Game::Game()
+Game::Game(t_request &request)
 {
-    _board = Board();
-    this->init_dna();
-}
-
-Game::Game(std::vector <int> white, std::vector <int> black)
-{
-    _board = Board(white, black);
+    _request = request;
+    _board = Board(request.white, request.black);
+    _interesting_pos = this->get_interesting_pos();
     this->init_dna();
 }
 
 Game::Game(const Game &g) {
     _board = g.get_board();
     _dna = g._dna;
+    _request = g._request;
+    _interesting_pos = g._interesting_pos;
 }
 
 Game::~Game() { }
@@ -49,6 +47,8 @@ Game::~Game() { }
 void Game::operator= (const Game &g) {
     _board = g.get_board();
     _dna = g._dna;
+    _request = g._request;
+    _interesting_pos = g._interesting_pos;
 }
 
 void    Game::set(int pos, e_cell cell) {
@@ -71,6 +71,15 @@ void Game::unset(std::vector<int> pos) {
         int y = pos[i] / 19;
         _board.set(x, y, NONE);
     }
+}
+
+void Game::unset_blocked_pos() {
+    for (size_t i = 0; i < _blocked_pos.size(); i++) {
+        int x = _blocked_pos[i] % 19;
+        int y = _blocked_pos[i] / 19;
+        _board.set(x, y, NONE);
+    }
+    _blocked_pos.clear();
 }
 
 Board Game::get_board() const {
@@ -148,6 +157,7 @@ std::vector<int> Game::get_new_blocked_pos(e_color color) {
             blocked_not_captured.push_back(blocked[i]);
     }
 
+    this->_blocked_pos = blocked_not_captured;
     return blocked_not_captured;
 }
 
@@ -194,8 +204,7 @@ std::vector<int> Game::get_captured(int pos) {
     return captured;
 }
 
-int Game::heuristic(t_request &request, e_color color, int pos) {
-    (void)request;
+int Game::heuristic(e_color color, int pos) {
     int x = pos % 19;
     int y = pos / 19;
     e_cell my = (color == WHITESTONE) ? WHITE : BLACK;
@@ -223,52 +232,60 @@ bool minimum(const std::pair<int, int>& a, const std::pair<int, int>& b) {
     return a.second > b.second;
 }
 
-std::vector<int> get_interesting_pos(Game &game) {
-    std::set<int> interesting_pos;
+std::vector<int> Game::get_interesting_pos() {
+    std::map<int, int> interesting_pos;
 
     for (int pos = 0; pos < 361; pos++) {
         if (pos != NONE && pos != BLOCKED) {
             int x = pos % 19;
             int y = pos / 19;
-            if (game.get_board().get(x, y).get() != NONE) {
+            if (this->get_board().get(x, y).get() != NONE) {
                 for (int j = y - 2; j <= y + 2; j++) {
                     for (int i = x - 2; i <= x + 2; i++) {
                         if (i >= 0 && i < 19 && j >= 0 && j < 19) {
-                            if (game.get_board().get(i, j).get() == NONE)
-                                interesting_pos.insert(i + j * 19);
+                            if (this->get_board().get(i, j).get() == NONE) {
+                                if (interesting_pos.find(i + j * 19) == interesting_pos.end())
+                                    interesting_pos[i + j * 19] = 0;
+                                else
+                                    interesting_pos[i + j * 19] += 1;
+                            }
                         }
                     }
                 }
             }
         }
     }
-    return std::vector<int>(interesting_pos.begin(), interesting_pos.end());
+    std::vector<std::pair<int, int> > pairs;
+
+    for (auto& it : interesting_pos) {
+        pairs.push_back(it);
+    }
+    sort(pairs.begin(), pairs.end(), [](auto& a, auto& b) {
+        return a.second > b.second;
+    });
+    std::vector<int> res;
+    for (size_t i = 0; i < pairs.size(); i++) {
+        res.push_back(pairs[i].first);
+    }
+    return res;
 }
 
-std::pair<int, int> Game::compute_best_move(t_request &request, e_color color, int depth, int is_maxi, int alpha, int beta) {
+std::pair<int, int> Game::compute_best_move(e_color color, int depth, int is_maxi, int alpha, int beta) {
     std::map<int, int>  moves;
-    std::vector<int> interesting_pos;
-    Game new_base_game;
+    Game new_base_game(*this);
     
-    new_base_game = (*this);
-    new_base_game.unset(new_base_game.get_new_blocked_pos(color == WHITESTONE ? WHITESTONE : BLACKSTONE));
+    new_base_game.unset_blocked_pos();
 
-    interesting_pos = get_interesting_pos(*this); 
-    
-    for (std::vector<int>::iterator it = interesting_pos.begin(); it != interesting_pos.end(); it++) {
+    for (std::vector<int>::iterator it = this->_interesting_pos.begin(); it != this->_interesting_pos.end(); it++) {
         int pos = *it;
         int x = pos % 19;
         int y = pos / 19;
-        int v;
-        if (is_maxi)
-            v = alpha;
-        else
-            v = beta;
+
         if (_board.get(x, y).get() == NONE)
         {
             if (depth == 0)
             {
-                int score = this->heuristic(request, color, pos);
+                int score = this->heuristic(color, pos);
                 moves[pos] = score;
             }
             else
@@ -276,26 +293,21 @@ std::pair<int, int> Game::compute_best_move(t_request &request, e_color color, i
                 Game new_game = Game(new_base_game);
                 new_game.set(pos, color == WHITESTONE ? WHITE : BLACK);
                 new_game.set(new_game.get_new_blocked_pos(color == WHITESTONE ? BLACKSTONE : WHITESTONE), BLOCKED);
-                int score = new_game.compute_best_move(request, color == WHITESTONE ? BLACKSTONE : WHITESTONE, depth - 1, !is_maxi, alpha, beta).second;
+                int score = this->compute_best_move(color == WHITESTONE ? BLACKSTONE : WHITESTONE, depth - 1, !is_maxi, alpha, beta).second;
                 moves[pos] = score;
-                if (!is_maxi)
+                if (is_maxi)
                 {
-                    v = std::min(v, score);
-                    if (alpha >= v) {
-                        std::cout << "elagage alpha" << std::endl;
+                    beta = std::min(beta, score);
+                    if (alpha >= beta) {
                         break;
                     }
-                    beta = std::min(beta, v);
                 }
                 else
                 {
-                    v = std::max(v, score);
-                    if (v >= beta) {
-                        std::cout << "elagage beta" << std::endl;
+                    alpha = std::max(alpha, score);
+                    if (alpha >= beta) {
                         break;
-
                     }
-                    alpha = std::max(alpha, v);
                 }
                  
             }
