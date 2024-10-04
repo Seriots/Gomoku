@@ -8,7 +8,7 @@
 #include "Game.hpp"
 #include "Board.hpp"
 
-
+/* ************************ Constructors/Destructor ************************** */
 void Game::init_dna() {
     _dna[ALIGN_FIVE] = 100000;
     _dna[FREE_FOUR] = 10000;
@@ -51,6 +51,8 @@ void Game::operator= (const Game &g) {
     _interesting_pos = g._interesting_pos;
 }
 
+
+/* ************************ Data Manipulation ************************** */
 void    Game::set(int pos, e_cell cell) {
     int x = pos % 19;
     int y = pos / 19;
@@ -86,6 +88,7 @@ Board Game::get_board() const {
     return _board;
 }
 
+/* ************************ Algorithme ************************** */
 bool Game::check_free_three(int x, int y, int ax, int ay, e_cell color) {
     int inv_color = (color == WHITE) ? BLACK : WHITE;
     std::vector<e_cell> axis_values;
@@ -204,25 +207,11 @@ std::vector<int> Game::get_captured(int pos) {
     return captured;
 }
 
-int Game::heuristic(e_color color, int pos) {
-    int x = pos % 19;
-    int y = pos / 19;
-    e_cell my = (color == WHITESTONE) ? WHITE : BLACK;
-    e_cell other = (color == WHITESTONE) ? BLACK : WHITE;
-
-    int score = 0;
-    for (int j = y - 4; j <= y + 4; j++) {
-        for (int i = x - 4; i <= x + 4; i++) {
-            if (i >= 0 && i < 19 && j >= 0 && j < 19) {
-                if (_board.get(i, j).get() ==  my)
-                    score += (100 - abs(y - j) * abs(x - i) * 2);
-                else if (_board.get(i, j).get() == other)
-                    score += (100 - abs(y - j) * abs(x - i));
-            }
-        }
-    }
-    return score;
+bool operator==(const t_data &a, const t_data &b) {
+    return a.pos == b.pos && a.color == b.color;
 }
+
+
 
 bool maximum(const std::pair<int, int>& a, const std::pair<int, int>& b) {
     return a.second < b.second;
@@ -270,18 +259,93 @@ std::vector<int> Game::get_interesting_pos() {
     return res;
 }
 
+bool is_cutting_alpha_beta(int *alpha, int *beta, int score, int is_maxi) {
+    if (is_maxi)
+    {
+        *beta = std::min(*beta, score);
+        if (*alpha >= *beta)
+            return true;
+    }
+    else
+    {
+        *alpha = std::max(*alpha, score);
+        if (*alpha >= *beta)
+            return true;
+    }
+    return false;
+}
+
+int Game::heuristic(e_color color, int pos) {
+    int x = pos % 19;
+    int y = pos / 19;
+    e_cell my = (color == WHITESTONE) ? WHITE : BLACK;
+    e_cell other = (color == WHITESTONE) ? BLACK : WHITE;
+    //int current_total_captured = (color == WHITESTONE) ? _request.white_captured : _request.black_captured;
+    int score = 0;
+
+    std::vector<std::vector<int> > dirs = {{0, -1}, {1, -1}, {1, 0}, {1, 1}};
+
+    for (std::vector<int>const & dir: dirs) {
+        int dx = dir[0];
+        int dy = dir[1];
+        bool is_aligment_positif_option = true;
+        bool is_aligment_negatif_option = true;
+        int count_alignement = 1;
+        for (int i = 1; i < 5; i++) {
+            int nx = x + (((i % 2) * i) - i / 2) * dx;
+            int ny = y + (((i % 2) * i) - i / 2) * dy;
+            if (nx < 0 || nx >= 19 || ny < 0 || ny >= 19)
+                continue;
+            if (i % 2 == 1) {
+                if (_board.get(nx, ny).get() == other) {
+                    is_aligment_positif_option = false;
+                } else if (_board.get(nx, ny).get() == my && is_aligment_positif_option) {
+                    count_alignement += 1;
+                } else {
+                    is_aligment_positif_option = false;
+                }
+            } else {
+                if (_board.get(nx, ny).get() == other) {
+                    is_aligment_negatif_option = false;
+                } else if (_board.get(nx, ny).get() == my && is_aligment_negatif_option) {
+                    count_alignement += 1;
+                } else {
+                    is_aligment_negatif_option = false;
+                }
+            }
+        }
+        score += _dna[ANY_ALIGNEMENT] * count_alignement;
+        score += count_alignement == 5 ? _dna[ALIGN_FIVE] : 0;
+        score += count_alignement == 4 ? _dna[FREE_FOUR] : 0;
+        score += count_alignement == 3 ? _dna[FREE_THREE] : 0;
+    }
+    
+    //int x = pos % 19;
+    //int y = pos / 19;
+    //e_cell my = (color == WHITESTONE) ? WHITE : BLACK;
+    //e_cell other = (color == WHITESTONE) ? BLACK : WHITE;
+
+    //int score = 0;
+    //for (int j = y - 4; j <= y + 4; j++) {
+    //    for (int i = x - 4; i <= x + 4; i++) {
+    //        if (i >= 0 && i < 19 && j >= 0 && j < 19) {
+    //            if (_board.get(i, j).get() ==  my)
+    //                score += (100 - abs(y - j) * abs(x - i) * 2);
+    //            else if (_board.get(i, j).get() == other)
+    //                score += (100 - abs(y - j) * abs(x - i));
+    //        }
+    //    }
+    //}
+    return score;
+}
+
 std::pair<int, int> Game::compute_best_move(e_color color, int depth, int is_maxi, int alpha, int beta) {
     std::map<int, int>  moves;
-    // Game new_base_game(*this);
-    
-    // new_base_game.unset_blocked_pos();
 
     for (std::vector<int>::iterator it = this->_interesting_pos.begin(); it != this->_interesting_pos.end(); it++) {
         int pos = *it;
-        int x = pos % 19;
-        int y = pos / 19;
 
-        if (_board.get(x, y).get() == NONE)
+        if (_board.get(pos).get() == NONE)
         {
             if (depth == 0)
             {
@@ -290,28 +354,35 @@ std::pair<int, int> Game::compute_best_move(e_color color, int depth, int is_max
             }
             else
             {
-                // Game new_game = Game(new_base_game);
-                // new_game.set(pos, color == WHITESTONE ? WHITE : BLACK);
-                // new_game.set(new_game.get_new_blocked_pos(color == WHITESTONE ? BLACKSTONE : WHITESTONE), BLOCKED);
+                //int nodescore = this->heuristic(color, pos);
+                //if (is_maxi) {
+                //    if (nodescore > beta)
+                //        break;
+                //} else {
+                //    if (nodescore < alpha)
+                //        break;
+                //}
+
+                this->set(pos, color == WHITESTONE ? WHITE : BLACK);
                 int score = this->compute_best_move(color == WHITESTONE ? BLACKSTONE : WHITESTONE, depth - 1, !is_maxi, alpha, beta).second;
+                this->set(pos, NONE);
                 moves[pos] = score;
-                if (is_maxi)
-                {
-                    beta = std::min(beta, score);
-                    if (alpha >= beta) {
-                        break;
-                    }
-                }
-                else
-                {
-                    alpha = std::max(alpha, score);
-                    if (alpha >= beta) {
-                        break;
-                    }
-                }
-                 
+                if (is_cutting_alpha_beta(&alpha, &beta, score, is_maxi))
+                    break;
             }
         }
+    }
+    if (depth == 2) {
+        for (int y = 0; y < 19; y++) {
+            for (int x = 0; x < 19; x++) {
+                if (moves.count(x + y * 19) > 0)
+                    std::cout << std::setw(4) << std::setfill('0')<< moves[x + y * 19] << " ";
+                else
+                    std::cout << "---- ";
+            }
+            std::cout << std::endl;
+        }
+        std::cout << std::endl;
     }
     if (is_maxi)
         return std::make_pair(std::max_element(moves.begin(), moves.end(), maximum)->first, std::max_element(moves.begin(), moves.end(), maximum)->second);

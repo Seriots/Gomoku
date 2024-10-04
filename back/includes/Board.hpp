@@ -17,6 +17,7 @@ class Board {
         void operator= (const Board &b);
 
         Cell get(int x, int y) const;
+        Cell get(int pos) const;
         void set(int x, int y, e_cell cell);
 
         void print();

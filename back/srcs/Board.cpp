@@ -49,6 +49,12 @@ Cell Board::get(int x, int y) const {
     return _board[y][x];
 }
 
+Cell Board::get(int pos) const {
+    int x = pos % 19;
+    int y = pos / 19;
+    return _board[y][x];
+}
+
 void Board::set(int x, int y, e_cell cell) {
     _board[y][x].set(cell);
 }

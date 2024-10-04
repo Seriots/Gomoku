@@ -23,6 +23,13 @@ enum e_dna {
     IS_CAPTURABLE
 };
 
+typedef struct s_data {
+    int pos;
+    e_cell color;
+} t_data;
+
+bool operator==(const t_data &a, const t_data &b);
+
 
 class Game {
     private:
@@ -32,13 +39,11 @@ class Game {
         std::vector<int>        _interesting_pos;
         std::vector<int>        _blocked_pos;
 
-
         void init_dna();
 
         bool check_sequence(int x, int y, int dx, int dy, std::vector<e_cell> cell);
         bool check_double_free_three(int x, int y, e_cell color);
         bool check_free_three(int x, int y, int ax, int ay, e_cell color);
-        void unset_blocked_pos();
     
     public:
         Game(t_request &request);
@@ -50,6 +55,7 @@ class Game {
         void set(int pos, e_cell cell);
         void set(std::vector<int> pos, e_cell cell);
         void unset(std::vector<int> pos);
+        void unset_blocked_pos();
 
         Board get_board() const;
         
