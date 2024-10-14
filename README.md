@@ -9,3 +9,5 @@ Current Heuristic:
   - Get the current center of the board
   - Add a distance score with the center define previously
   - Add all move score
+
+Algo min max + elagage AlphaBeta
