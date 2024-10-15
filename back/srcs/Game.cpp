@@ -138,7 +138,7 @@ bool Game::check_double_free_three(int x, int y, e_cell color) {
         int ax = axis[i][0];
         int ay = axis[i][1];
         nb_three += this->check_free_three(x, y, ax, ay, color);
-        
+
     }
     return (nb_three >= 2);
 }
@@ -180,7 +180,7 @@ std::vector<int> Game::get_captured(int pos) {
     std::vector<int>                captured;
     std::vector<e_cell>             sequence;
     std::vector<std::vector<int> >  directions;
-    
+
     int x = pos % 19;
     int y = pos / 19;
     Cell baseCell = _board.get(x, y);
@@ -302,7 +302,7 @@ int Game::complex_heuristic(int pos) {
         bool block_capture = false;
 
         bool found_none = false;
-        
+
         int dx = directions[i][0];
         int dy = directions[i][1];
 
@@ -321,7 +321,7 @@ int Game::complex_heuristic(int pos) {
                     if (other_real_alignement == 2)
                         setup_capture = true;
                     break;
-                } 
+                }
                 else
                     found_none = true;
             }
@@ -346,7 +346,7 @@ int Game::complex_heuristic(int pos) {
                     break;
                 }
             }
-                
+
         }
         dir_info.push_back({my_free_alignement, my_real_alignement, other_real_alignement, capture, setup_capture, is_capturable, nothing, block_capture});
     }
@@ -403,7 +403,7 @@ int Game::complex_heuristic(int pos) {
         score += capture * _dna[CAPTURE_TOTAL_8];
     else if (my_captured == 8)
         score += capture * _dna[CAPTURE_TOTAL_10];
-    
+
     score += block_win * _dna[BLOCK_WIN];
     score += block_free_four * _dna[BLOCK_FREE_FOUR];
     score += block_free_three * _dna[BLOCK_FREE_THREE];
@@ -417,7 +417,7 @@ int Game::complex_heuristic(int pos) {
 
 
 int Game::simple_heuristic(int pos) {
-    
+
     int x = pos % 19;
     int y = pos / 19;
     e_cell my = this->get_board().get(x, y).get();
@@ -434,12 +434,55 @@ int Game::simple_heuristic(int pos) {
             }
         }
     }
-    
+
     return score;
 }
 
+using Move = std::vector<int>;
+
+int Game::minimax(const GameState& state,  int alpha, int beta, int depth, bool is_maxi) {
+    // TODO NEED TO ADD A COPY OF THE GAME STATE
+
+    if (depth) {
+        if (is_maxi) {
+            int max_eval = -100000;
+            for (Move::iterator it = this->_interesting_pos.begin(); it != this->_interesting_pos.end(); it++) {
+                int pos = *it;
+                if (_board.get(pos).get() == NONE)
+                {
+                    this->set(pos, is_maxi ? WHITE : BLACK);
+                    int tmp = this->minimax(alpha, beta, depth - 1, false);
+                    max_eval = std::max(max_eval, tmp);
+                    alpha = std::max(alpha, tmp);
+                    if (beta <= alpha)
+                        break;
+                }
+                return max_eval;
+            }
+        } else {
+            int min_eval = 100000;
+            for (Move::iterator it = this->_interesting_pos.begin(); it != this->_interesting_pos.end(); it++) {
+                int pos = *it;
+                if (_board.get(pos).get() == NONE)
+                {
+                    this->set(pos, is_maxi ? WHITE : BLACK);
+                    int tmp = this->minimax(alpha, beta, depth - 1, true);
+                    min_eval = std::min(min_eval, tmp);
+                    beta = std::min(beta, tmp);
+                    if (beta <= alpha)
+                        break;
+                }
+                return min_eval;
+            }
+        }
+    } else {
+        // need to have current state
+        return this->simple_heuristic(0);
+    }
+}
+
 //TODO: Need to add _blocked_pos check for the first iteration
-std::pair<int, int> Game::compute_best_move(e_color color, int depth, bool is_maxi, int alpha, int beta) {
+/* std::pair<int, int> Game::compute_best_move(e_color color, int depth, bool is_maxi, int alpha, int beta) {
     std::map<int, int>  moves;
 
     for (std::vector<int>::iterator it = this->_interesting_pos.begin(); it != this->_interesting_pos.end(); it++) {
@@ -481,7 +524,7 @@ std::pair<int, int> Game::compute_best_move(e_color color, int depth, bool is_ma
         return std::make_pair(std::max_element(moves.begin(), moves.end(), maximum)->first, std::max_element(moves.begin(), moves.end(), maximum)->second);
     else
         return std::make_pair(std::min_element(moves.begin(), moves.end(), maximum)->first, std::min_element(moves.begin(), moves.end(), maximum)->second);
-}
+} */
 
 void Game::print_board() {
     _board.print();

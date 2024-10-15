@@ -55,7 +55,7 @@ class Game {
         bool check_sequence(int x, int y, int dx, int dy, std::vector<e_cell> cell);
         bool check_double_free_three(int x, int y, e_cell color);
         bool check_free_three(int x, int y, int ax, int ay, e_cell color);
-    
+
     public:
         Game(t_request &request);
         Game(const Game &g);
@@ -69,7 +69,7 @@ class Game {
         void unset_blocked_pos();
 
         Board get_board() const;
-        
+
         std::vector<int> get_new_blocked_pos(e_color color);
         std::vector<int> get_captured(int pos);
 
@@ -79,4 +79,5 @@ class Game {
         int complex_heuristic(int pos);
         std::vector<int> get_interesting_pos();
         std::pair<int, int> compute_best_move(e_color color, int depth, bool is_maxi, int alpha, int beta);
+        int minimax(int alpha, int beta, int depth, bool is_maxi);
 };
