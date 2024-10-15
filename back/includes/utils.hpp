@@ -16,4 +16,4 @@ std::string build_action_response(std::vector<t_stone> added, std::vector<int> r
 
 t_request create_new_request(const httplib::Request &req);
 t_request create_new_ia_request(const httplib::Request &req);
-int get_captured_count(t_request request, e_color color);
+int get_captured_count_by_color(t_request request, e_color color);

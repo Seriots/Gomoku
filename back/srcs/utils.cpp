@@ -95,7 +95,13 @@ t_request create_new_ia_request(const httplib::Request &req) {
     return {0, 0, 0, color, white, black, blocked, white_captured, black_captured};
 }
 
-int get_captured_count(t_request request, e_color color) {
+/*
+    Get the number of captured stone by color
+    @param request: the request to get the number of captured stone
+    @param color: the color of the stone
+    @return the number of captured stone
+*/
+int get_captured_count_by_color(t_request request, e_color color) {
     if (color == WHITESTONE)
         return request.white_captured;
     return request.black_captured;
@@ -129,3 +135,4 @@ std::string build_action_response(std::vector<t_stone> added, std::vector<int> r
     }
     return out + "]\n}";
 }
+

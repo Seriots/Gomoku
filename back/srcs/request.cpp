@@ -27,20 +27,21 @@ void    r_game(const httplib::Request &req, httplib::Response &res) {
 */
 void    r_action(const httplib::Request &req, httplib::Response &res) {
     
-    t_request               request;
-    std::vector<t_stone>    added;
-    std::vector<int>        removed;
-    std::vector<int>        blocked_list;
+    t_request               request;        // the request structure
+    std::vector<t_stone>    added;          // the list of added stones returned
+    std::vector<int>        removed;        // the list of removed stones returned
+    std::vector<int>        blocked_list;   // the list of blocked positions returned
     
-    res.set_header("Access-Control-Allow-Origin", "*");
+    res.set_header("Access-Control-Allow-Origin", "*"); // prevent CORS errors
 
-    request = create_new_request(req);
+    request = create_new_request(req); 
 
-    if (check_error_request(request, res))
+    if (check_error_request(request, res)) // check if the request is valid pos on NONE pos and prevent out of bound pos
         return;
     
-    Game game(request);
-    game.set(request.blocked, BLOCKED);
+    Game game(request); // instantiate game object with the request
+
+    // game.set(request.blocked, BLOCKED);
     
     game.set(request.pos, request.color == WHITESTONE ? WHITE : BLACK);
     // game.print_board();
@@ -54,9 +55,7 @@ void    r_action(const httplib::Request &req, httplib::Response &res) {
     for (size_t i = 0; i < blocked_list.size(); i++)
         added.push_back({blocked_list[i], "blocked"});
     
-    
-    //everything is send in a nicely formated json
-    res.set_content(build_action_response(added, removed, {}, {}), "application/json");
+    res.set_content(build_action_response(added, removed, {}, {}), "application/json"); // everything is send in a nicely formated json
 }
 
 /*
@@ -72,21 +71,26 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     std::vector<int>        removed;
     std::vector<int>        blocked_list;
 
-    res.set_header("Access-Control-Allow-Origin", "*");
+    res.set_header("Access-Control-Allow-Origin", "*"); // prevent CORS problems
     
     request = create_new_ia_request(req);
 
-    Game game(request);
-    auto time = std::chrono::high_resolution_clock::now();
+    Game game(request); // instantiate game object with the request
+
+    auto start_time = std::chrono::high_resolution_clock::now();
+    
     std::vector<t_data> data;
     int pos = game.compute_best_move(request.color, 2, 1, -2147483647, 2147483647).first;
     
-    std::cout << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - time).count() << std::endl;
+    auto end_time = std::chrono::high_resolution_clock::now();
+    std::cout << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count() << std::endl;
+    
     game.set(request.blocked, BLOCKED);
 
     game.set(pos, request.color == WHITESTONE ? WHITE : BLACK);
 
     removed = game.get_captured(pos);
+
     game.unset(removed);
 
     blocked_list = game.get_new_blocked_pos(request.color == WHITESTONE ? BLACKSTONE : WHITESTONE);
