@@ -77,15 +77,17 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
 
     Game game(request); // instantiate game object with the request
 
+    game.get_new_blocked_pos(request.color == WHITESTONE ? BLACKSTONE : WHITESTONE);
     auto start_time = std::chrono::high_resolution_clock::now();
     
     std::vector<t_data> data;
-    int pos = game.compute_best_move(request.color, 2, 1, -2147483647, 2147483647).first;
+    int pos = game.compute_best_move(request.color, 2, true, -2147483647, 2147483647).first;
     
     auto end_time = std::chrono::high_resolution_clock::now();
     std::cout << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count() << std::endl;
     
-    game.set(request.blocked, BLOCKED);
+    // game.set(request.blocked, BLOCKED);
+    
 
     game.set(pos, request.color == WHITESTONE ? WHITE : BLACK);
 

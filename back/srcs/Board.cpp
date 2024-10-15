@@ -1,6 +1,7 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include <tgmath.h>
 
 #include "Board.hpp"
 #include "Cell.hpp"
@@ -25,6 +26,7 @@ Board::Board(std::vector <int> white, std::vector <int> black) {
             }
         }
     }
+    compute_board_center();
 }
 
 Board::Board(const Board &b) {
@@ -33,6 +35,7 @@ Board::Board(const Board &b) {
             _board[i][j] = b.get(j, i);
         }
     }
+    _center = b.get_center();
 }
 
 Board::~Board() { }
@@ -42,6 +45,27 @@ void Board::operator= (const Board &b) {
         for (int j = 0; j < 19; j++) {
             _board[i][j] = b.get(j, i);
         }
+    }
+    _center = b.get_center();
+}
+
+void Board::compute_board_center() {
+    int x_cumul = 0;
+    int y_cumul = 0;
+    int counter = 0;
+    for (int i = 0; i < 19; i++) {
+        for (int j = 0; j < 19; j++) {
+            if (_board[i][j].get() != NONE) {
+                x_cumul += j;
+                y_cumul += i;
+                counter++;
+            }
+        }
+    }
+    if (counter == 0) {
+        _center = 9 + 9 * 19;
+    } else {
+        _center = round((float)x_cumul / (float)counter) + round((float)y_cumul / (float)counter) * 19;
     }
 }
 
@@ -53,6 +77,10 @@ Cell Board::get(int pos) const {
     int x = pos % 19;
     int y = pos / 19;
     return _board[y][x];
+}
+
+int Board::get_center() const {
+    return _center;
 }
 
 void Board::set(int x, int y, e_cell cell) {

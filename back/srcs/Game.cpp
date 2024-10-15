@@ -275,7 +275,7 @@ bool is_cutting_alpha_beta(int *alpha, int *beta, int score, int is_maxi) {
     return false;
 }
 
-int Game::heuristic(e_color color, int pos) {
+int Game::heuristic(e_color color, int pos, int board_center) {
     int x = pos % 19;
     int y = pos / 19;
     e_cell my = (color == WHITESTONE) ? WHITE : BLACK;
@@ -339,30 +339,22 @@ int Game::heuristic(e_color color, int pos) {
     return score;
 }
 
-std::pair<int, int> Game::compute_best_move(e_color color, int depth, int is_maxi, int alpha, int beta) {
+//TODO: Need to add _blocked_pos check for the first iteration
+std::pair<int, int> Game::compute_best_move(e_color color, int depth, bool is_maxi, int alpha, int beta) {
     std::map<int, int>  moves;
 
     for (std::vector<int>::iterator it = this->_interesting_pos.begin(); it != this->_interesting_pos.end(); it++) {
         int pos = *it;
 
-        if (_board.get(pos).get() == NONE)
+        if (_board.get(pos).get() == NONE && (!is_maxi))
         {
             if (depth == 0)
             {
-                int score = this->heuristic(color, pos);
+                int score = this->heuristic(color, pos, this->_board.get_center());
                 moves[pos] = score;
             }
             else
             {
-                //int nodescore = this->heuristic(color, pos);
-                //if (is_maxi) {
-                //    if (nodescore > beta)
-                //        break;
-                //} else {
-                //    if (nodescore < alpha)
-                //        break;
-                //}
-
                 this->set(pos, color == WHITESTONE ? WHITE : BLACK);
                 int score = this->compute_best_move(color == WHITESTONE ? BLACKSTONE : WHITESTONE, depth - 1, !is_maxi, alpha, beta).second;
                 this->set(pos, NONE);
@@ -372,18 +364,18 @@ std::pair<int, int> Game::compute_best_move(e_color color, int depth, int is_max
             }
         }
     }
-    if (depth == 2) {
-        for (int y = 0; y < 19; y++) {
-            for (int x = 0; x < 19; x++) {
-                if (moves.count(x + y * 19) > 0)
-                    std::cout << std::setw(4) << std::setfill('0')<< moves[x + y * 19] << " ";
-                else
-                    std::cout << "---- ";
-            }
-            std::cout << std::endl;
-        }
-        std::cout << std::endl;
-    }
+    // if (depth == 2) {
+    //     for (int y = 0; y < 19; y++) {
+    //         for (int x = 0; x < 19; x++) {
+    //             if (moves.count(x + y * 19) > 0)
+    //                 std::cout << std::setw(4) << std::setfill('0')<< moves[x + y * 19] << " ";
+    //             else
+    //                 std::cout << "---- ";
+    //         }
+    //         std::cout << std::endl;
+    //     }
+    //     std::cout << std::endl;
+    // }
     if (is_maxi)
         return std::make_pair(std::max_element(moves.begin(), moves.end(), maximum)->first, std::max_element(moves.begin(), moves.end(), maximum)->second);
     else
