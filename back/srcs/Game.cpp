@@ -449,7 +449,7 @@ std::pair<int, int> Game::compute_best_move(e_color color, int depth, bool is_ma
         {
             if (depth == 0)
             {
-                int score = this->simple_heuristic(pos);
+                int score = this->complex_heuristic(pos);
                 moves[pos] = score;
             }
             else
