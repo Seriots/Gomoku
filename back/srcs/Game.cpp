@@ -19,8 +19,8 @@ void Game::init_dna() {
     _dna[CAPTURE_TOTAL_6] = 2500;
     _dna[CAPTURE_TOTAL_8] = 5000;
     _dna[CAPTURE_TOTAL_10] = 100000;
-    _dna[BLOCK_FREE_THREE] = 1900;
-    _dna[BLOCK_FREE_FOUR] = 5900;
+    _dna[BLOCK_FREE_THREE] = 6900;
+    _dna[BLOCK_FREE_FOUR] = 7900;
     _dna[BLOCK_CAPTURE] = 6000;
     _dna[BLOCK_WIN] = 89000;
     _dna[SETUP_CAPTURE] = 200;
@@ -32,6 +32,7 @@ Game::Game(t_request &request)
     _request = request;
     _board = Board(request.white, request.black);
     _interesting_pos = this->get_interesting_pos();
+    _center = _board.get_center();
     this->init_dna();
 }
 
@@ -39,6 +40,7 @@ Game::Game(const Game &g) {
     _board = g.get_board();
     _dna = g._dna;
     _request = g._request;
+    _center = g.get_board().get_center();
     _interesting_pos = g._interesting_pos;
 }
 
@@ -48,6 +50,7 @@ void Game::operator= (const Game &g) {
     _board = g.get_board();
     _dna = g._dna;
     _request = g._request;
+    _center = g.get_board().get_center();
     _interesting_pos = g._interesting_pos;
 }
 
@@ -249,9 +252,9 @@ std::vector<int> Game::get_interesting_pos() {
     for (auto& it : interesting_pos) {
         pairs.push_back(it);
     }
-    sort(pairs.begin(), pairs.end(), [](auto& a, auto& b) {
-        return a.second > b.second;
-    });
+    //sort(pairs.begin(), pairs.end(), [](auto& a, auto& b) {
+    //    return a.second > b.second;
+    //});
     std::vector<int> res;
     for (size_t i = 0; i < pairs.size(); i++) {
         res.push_back(pairs[i].first);
@@ -275,168 +278,7 @@ bool is_cutting_alpha_beta(int *alpha, int *beta, int score, int is_maxi) {
     return false;
 }
 
-int Game::complex_heuristic(int pos) {
-    std::vector<std::vector<int> >  directions;
 
-    int x = pos % 19;
-    int y = pos / 19;
-    e_cell color =  this->get_board().get(x, y).get();
-    e_cell other_color =  color == WHITE ? BLACK : WHITE;
-
-    int my_captured = get_captured_count_by_color(this->_request, color);
-    //int other_captured = get_captured_count_by_color(this->_request, other_color);
-
-    int linear_distance = get_linear_distance((t_position){x, y}, this->get_board().get_center());
-    int score = 20 - linear_distance;
-
-    directions = {{-1, 0},{1, 0},{0, -1},{0, 1},{-1, -1},{1, 1},{1, -1},{-1, 1}};
-    std::vector<t_direction_info> dir_info;
-    for (size_t i = 0; i < directions.size(); i++) {
-        int my_free_alignement = 0;
-        int my_real_alignement = 0;
-        int other_real_alignement = 0;
-        bool capture = false;
-        bool setup_capture = false;
-        bool is_capturable = false;
-        bool nothing = false;
-        bool block_capture = false;
-
-        bool found_none = false;
-        
-        int dx = directions[i][0];
-        int dy = directions[i][1];
-
-        for (int forward = 1; forward < 5; forward++) {
-            int nx = x + (forward * dx);
-            int ny = y + (forward * dy);
-            if (nx < 0 || nx >= 19 || ny < 0 || ny >= 19)
-                break;
-            e_cell cell = this->get_board().get(nx, ny).get();
-            if (cell == NONE) {
-                if (my_free_alignement == 0 && other_real_alignement == 0)
-                    nothing = true;
-                if (found_none)
-                    break;
-                else if (other_real_alignement != 0) {
-                    if (other_real_alignement == 2)
-                        setup_capture = true;
-                    break;
-                } 
-                else
-                    found_none = true;
-            }
-            else if (cell == color) {
-                if (other_real_alignement != 0) {
-                    if (other_real_alignement == 2)
-                        capture = true;
-                    break;
-                }
-                my_free_alignement++;
-                if (!found_none)
-                    my_real_alignement++;
-            }
-            else if (cell == other_color) {
-                if (my_real_alignement == 0)
-                    other_real_alignement++;
-                else {
-                    if (my_real_alignement == 2)
-                        block_capture = true;
-                    if (my_real_alignement == 1)
-                        is_capturable = true;
-                    break;
-                }
-            }
-                
-        }
-        dir_info.push_back({my_free_alignement, my_real_alignement, other_real_alignement, capture, setup_capture, is_capturable, nothing, block_capture});
-    }
-    int any_alignement = 0;
-    int align_five = 0;
-    int free_four = 0;
-    int free_three = 0;
-    int capture = 0;
-    int block_win = 0;
-    int block_free_four = 0;
-    int block_free_three = 0;
-    int block_capture = 0;
-    int setup_capture = 0;
-    int is_capturable = 0;
-    for (int i = 0; i < 8; i+=2) {
-        any_alignement += dir_info[i].my_free_alignement;
-        any_alignement += dir_info[i+1].my_free_alignement;
-
-        int real_align = dir_info[i].my_real_alignement + dir_info[i+1].my_real_alignement;
-        align_five += real_align >= 5 ? 1 : 0;
-        free_four += real_align == 4 ? 1 : 0;
-        free_three += real_align == 3 ? 1 : 0;
-
-        capture += dir_info[i].capture == true ? 1 : 0;
-        capture += dir_info[i + 1].capture == true ? 1 : 0;
-
-        int other_real_align = dir_info[i].other_real_alignement + dir_info[i+1].other_real_alignement;
-        std::cout << "other_real_align: " << other_real_align << std::endl;
-        block_win += other_real_align >= 5 ? 1 : 0;
-        block_free_four += other_real_align == 4 ? 1 : 0;
-        block_free_three += other_real_align == 3 ? 1 : 0;
-
-        setup_capture += dir_info[i].setup_capture ? 1 : 0;
-        setup_capture += dir_info[i+1].setup_capture ? 1 : 0;
-
-        is_capturable += dir_info[i].is_capturable ? 1 : 0;
-        is_capturable += dir_info[i+1].is_capturable ? 1 : 0;
-
-        block_capture += dir_info[i].block_capture ? 1 : 0;
-        block_capture += dir_info[i+1].block_capture ? 1 : 0;
-    }
-
-    score += any_alignement * _dna[ANY_ALIGNEMENT];
-    score += align_five * _dna[ALIGN_FIVE];
-    score += free_four * _dna[FREE_FOUR];
-    score += free_three * _dna[FREE_THREE];
-    if (my_captured == 0)
-        score += capture * _dna[CAPTURE_TOTAL_2];
-    else if (my_captured == 2)
-        score += capture * _dna[CAPTURE_TOTAL_4];
-    else if (my_captured == 4)
-        score += capture * _dna[CAPTURE_TOTAL_6];
-    else if (my_captured == 6)
-        score += capture * _dna[CAPTURE_TOTAL_8];
-    else if (my_captured == 8)
-        score += capture * _dna[CAPTURE_TOTAL_10];
-    
-    score += block_win * _dna[BLOCK_WIN];
-    score += block_free_four * _dna[BLOCK_FREE_FOUR];
-    score += block_free_three * _dna[BLOCK_FREE_THREE];
-    score += setup_capture * _dna[SETUP_CAPTURE];
-    score += is_capturable * _dna[IS_CAPTURABLE];
-
-    score += block_capture * _dna[BLOCK_CAPTURE];
-
-    return score;
-}
-
-
-int Game::simple_heuristic(int pos) {
-    
-    int x = pos % 19;
-    int y = pos / 19;
-    e_cell my = this->get_board().get(x, y).get();
-    e_cell other = (my == WHITE) ? BLACK : WHITE;
-
-    int score = 0;
-    for (int j = y - 4; j <= y + 4; j++) {
-        for (int i = x - 4; i <= x + 4; i++) {
-            if (i >= 0 && i < 19 && j >= 0 && j < 19) {
-                if (_board.get(i, j).get() ==  my)
-                    score += (100 - abs(y - j) * abs(x - i) * 2);
-                else if (_board.get(i, j).get() == other)
-                    score += (100 - abs(y - j) * abs(x - i));
-            }
-        }
-    }
-    
-    return score;
-}
 
 //TODO: Need to add _blocked_pos check for the first iteration
 std::pair<int, int> Game::compute_best_move(e_color color, int depth, bool is_maxi, int alpha, int beta) {
@@ -449,7 +291,7 @@ std::pair<int, int> Game::compute_best_move(e_color color, int depth, bool is_ma
         {
             if (depth == 0)
             {
-                int score = this->complex_heuristic(pos);
+                int score = this->complex_heuristic(color, pos);
                 moves[pos] = score;
             }
             else
@@ -463,7 +305,7 @@ std::pair<int, int> Game::compute_best_move(e_color color, int depth, bool is_ma
             }
         }
     }
-     if (depth == 0 || depth == 2) {
+     if (depth == 3) {
          for (int y = 0; y < 19; y++) {
              for (int x = 0; x < 19; x++) {
                  if (moves.count(x + y * 19) > 0)
@@ -475,8 +317,6 @@ std::pair<int, int> Game::compute_best_move(e_color color, int depth, bool is_ma
          }
          std::cout << std::endl;
      }
-    if (depth == 2)
-        return std::make_pair(std::min_element(moves.begin(), moves.end(), maximum)->first, std::max_element(moves.begin(), moves.end(), maximum)->second);
     if (is_maxi)
         return std::make_pair(std::max_element(moves.begin(), moves.end(), maximum)->first, std::max_element(moves.begin(), moves.end(), maximum)->second);
     else
