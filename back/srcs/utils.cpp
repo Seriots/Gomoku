@@ -5,6 +5,7 @@
 
 #include "request.hpp"
 #include "utils.hpp"
+#include "Cell.hpp"
 
 /*
     Check if the request is valid
@@ -101,8 +102,8 @@ t_request create_new_ia_request(const httplib::Request &req) {
     @param color: the color of the stone
     @return the number of captured stone
 */
-int get_captured_count_by_color(t_request request, e_color color) {
-    if (color == WHITESTONE)
+int get_captured_count_by_color(t_request request, e_cell color) {
+    if (color == WHITE)
         return request.white_captured;
     return request.black_captured;
 }
@@ -136,3 +137,6 @@ std::string build_action_response(std::vector<t_stone> added, std::vector<int> r
     return out + "]\n}";
 }
 
+int get_linear_distance(t_position a, t_position b) {
+    return std::max(abs(a.x - b.x), abs(a.y - b.y));
+}

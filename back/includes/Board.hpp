@@ -20,7 +20,8 @@ class Board {
         
         void compute_board_center();
 
-        int get_center() const;
+        t_position get_center() const;
+        int get_center_pos() const;
         Cell get(int x, int y) const;
         Cell get(int pos) const;
         void set(int x, int y, e_cell cell);

@@ -3,6 +3,7 @@
 #include <iostream>
 #include <tgmath.h>
 
+#include "utils.hpp"
 #include "Board.hpp"
 #include "Cell.hpp"
 
@@ -35,7 +36,7 @@ Board::Board(const Board &b) {
             _board[i][j] = b.get(j, i);
         }
     }
-    _center = b.get_center();
+    _center = b.get_center_pos();
 }
 
 Board::~Board() { }
@@ -46,7 +47,7 @@ void Board::operator= (const Board &b) {
             _board[i][j] = b.get(j, i);
         }
     }
-    _center = b.get_center();
+    _center = b.get_center_pos();
 }
 
 void Board::compute_board_center() {
@@ -79,9 +80,14 @@ Cell Board::get(int pos) const {
     return _board[y][x];
 }
 
-int Board::get_center() const {
+t_position Board::get_center() const {
+    return {_center % 19, _center / 19};
+}
+
+int Board::get_center_pos() const {
     return _center;
 }
+
 
 void Board::set(int x, int y, e_cell cell) {
     _board[y][x].set(cell);

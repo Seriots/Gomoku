@@ -28,6 +28,17 @@ typedef struct s_data {
     e_cell color;
 } t_data;
 
+typedef struct s_direction_info {
+    int my_free_alignement;
+    int my_real_alignement;
+    int other_real_alignement;
+    bool capture;
+    bool setup_capture;
+    bool is_capturable;
+    bool nothing;
+    bool block_capture;
+} t_direction_info;
+
 bool operator==(const t_data &a, const t_data &b);
 
 
@@ -64,7 +75,8 @@ class Game {
 
         void print_board();
 
-        int heuristic(e_color color, int pos, int board_center);
+        int simple_heuristic(int pos);
+        int complex_heuristic(int pos);
         std::vector<int> get_interesting_pos();
         std::pair<int, int> compute_best_move(e_color color, int depth, bool is_maxi, int alpha, int beta);
 };
