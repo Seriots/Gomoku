@@ -81,9 +81,7 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     auto start_time = std::chrono::high_resolution_clock::now();
 
     std::vector<t_data> data;
-    std::cout << "nb interesting pos: " << game.get_interesting_pos().size() << std::endl;
-    int pos = game.minimax(INT_MIN, INT_MAX, 3, true, -1).first;
-    std::cout << "Best pos: " << pos << std::endl;
+    int pos = game.compute_best_move(2);
 
     auto end_time = std::chrono::high_resolution_clock::now();
     std::cout << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count() << std::endl << std::endl;
@@ -95,7 +93,7 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
 
     removed = game.get_captured(pos);
 
-    
+
 
     game.unset(removed);
 

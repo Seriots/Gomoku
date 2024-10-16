@@ -282,53 +282,81 @@ bool is_cutting_alpha_beta(int *alpha, int *beta, int score, int is_maxi) {
 
 
 
-std::pair<int, int> Game::minimax(int alpha, int beta, int depth, bool is_maxi, int next_pos) {
+int Game::minimax(int alpha, int beta, int depth, bool is_maxi, int next_pos) {
     if (depth) {
         if (is_maxi) {
             int max_eval = -100000;
-            int best_pos = -1;
             for (std::vector<int>::iterator it = this->_interesting_pos.begin(); it != this->_interesting_pos.end(); it++) {
                 int pos = *it;
                 if (_board.get(pos).get() == NONE)
                 {
                     this->set(pos, WHITE);
-                    int tmp = this->minimax(alpha, beta, depth - 1, false, pos).second;
+                    int tmp = this->minimax(alpha, beta, depth - 1, false, pos);
                     this->set(pos, NONE);
-                    if (tmp > max_eval) {
-                        max_eval = tmp;
-                        best_pos = pos;
-                    }
+                    max_eval = std::max(max_eval, tmp);
                     alpha = std::max(alpha, tmp);
                     if (beta <= alpha)
                         break;
                 }
             }
-            return std::make_pair(best_pos, max_eval);
+            return max_eval;
         } else {
             int min_eval = 100000;
-            int best_pos = -1;
             for (std::vector<int>::iterator it = this->_interesting_pos.begin(); it != this->_interesting_pos.end(); it++) {
                 int pos = *it;
                 if (_board.get(pos).get() == NONE)
                 {
                     this->set(pos, BLACK);
-                    int tmp = this->minimax(alpha, beta, depth - 1, true, pos).second;
+                    int tmp = this->minimax(alpha, beta, depth - 1, true, pos);
                     this->set(pos, NONE);
-                    if (tmp < min_eval) {
-                        min_eval = tmp;
-                        best_pos = pos;
-                    }
+                    min_eval = std::min(min_eval, tmp);
                     beta = std::min(beta, tmp);
                     if (beta <= alpha)
                         break;
                 }
             }
-            return std::make_pair(best_pos, min_eval);
+            return min_eval;
         }
     } else {
-        int simple_score = this->complex_heuristic(is_maxi ? WHITESTONE : BLACKSTONE, next_pos);
-        return std::make_pair(next_pos, simple_score);
+        std::cout << "complex heuristic" << this->complex_heuristic(WHITESTONE, next_pos) << std::endl;
+        return this->complex_heuristic(is_maxi ? WHITESTONE : BLACKSTONE, next_pos);
     }
+}
+
+int Game::compute_best_move(int depth) {
+    std::cout << "nb interesting pos: " << this->_interesting_pos.size() << std::endl;
+
+    std::vector<int> board;
+    for (int i = 0; i < 19*19; i++)
+        board.push_back(-1);
+
+    float best_score = INT_MIN;
+    int best_pos = -1;
+    for (std::vector<int>::iterator it = this->_interesting_pos.begin(); it != this->_interesting_pos.end(); it++) {
+        std::cout << "START POS - " << *it << std::endl;
+        float score = this->minimax(best_score, INT_MAX, depth, false, *it);
+        if (score > best_score) {
+            best_score = score;
+            best_pos = *it;
+        }
+        std::cout << "--------------------------------------------\n\n\n\n\n";
+
+        board[*it % 19 + *it / 19 * 19] = score;
+    }
+
+    std::cout << "best pos: " << best_pos << " - " << best_score << std::endl;
+
+    // display board
+    for (int y = 0; y < 19; y++) {
+        for (int x = 0; x < 19; x++) {
+            if (board[x + y * 19] != -1)
+                std::cout << std::setw(4) << std::setfill('0') << board[x + y * 19] << " ";
+            else
+                std::cout << "---- ";
+        }
+        std::cout << std::endl;
+    }
+    return best_pos;
 }
 
 //TODO: Need to add _blocked_pos check for the first iteration
