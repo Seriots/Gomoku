@@ -1,0 +1,181 @@
+
+#include <string>
+#include <vector>
+
+#include "request.hpp"
+#include "utils.hpp"
+
+#include "Game.hpp"
+#include "Board.hpp"
+
+
+t_score_info Game::compute_score_information(std::vector<t_direction_info> &dir_info) {
+    t_score_info score_info;
+
+    for (int i = 0; i < 8; i+=2) {
+        score_info.any_alignement += dir_info[i].my_free_alignement;
+        score_info.any_alignement += dir_info[i+1].my_free_alignement;
+
+        int real_align = dir_info[i].my_real_alignement + dir_info[i+1].my_real_alignement;
+        score_info.align_five += real_align >= 5 ? 1 : 0;
+        score_info.free_four += real_align == 4 ? 1 : 0;
+        score_info.free_three += real_align == 3 ? 1 : 0;
+
+        score_info.capture += dir_info[i].capture == true ? 1 : 0;
+        score_info.capture += dir_info[i + 1].capture == true ? 1 : 0;
+
+        int other_real_align = dir_info[i].other_real_alignement + dir_info[i+1].other_real_alignement;
+        score_info.block_win += other_real_align >= 5 ? 1 : 0;
+        score_info.block_free_four += other_real_align == 4 ? 1 : 0;
+        score_info.block_free_three += other_real_align == 3 ? 1 : 0;
+
+        score_info.setup_capture += dir_info[i].setup_capture ? 1 : 0;
+        score_info.setup_capture += dir_info[i+1].setup_capture ? 1 : 0;
+
+        score_info.is_capturable += dir_info[i].is_capturable ? 1 : 0;
+        score_info.is_capturable += dir_info[i+1].is_capturable ? 1 : 0;
+
+        score_info.block_capture += dir_info[i].block_capture ? 1 : 0;
+        score_info.block_capture += dir_info[i+1].block_capture ? 1 : 0;
+    }
+
+    return score_info;
+}
+
+int Game::compute_score(t_score_info &score_info, int &my_captured) {
+    int score = 0;
+
+    score += score_info.any_alignement * _dna[ANY_ALIGNEMENT];
+    score += score_info.align_five * _dna[ALIGN_FIVE];
+    score += score_info.free_four * _dna[FREE_FOUR];
+    score += score_info.free_three * _dna[FREE_THREE];
+    if (my_captured == 0)
+        score += score_info.capture * _dna[CAPTURE_TOTAL_2];
+    else if (my_captured == 2)
+        score += score_info.capture * _dna[CAPTURE_TOTAL_4];
+    else if (my_captured == 4)
+        score += score_info.capture * _dna[CAPTURE_TOTAL_6];
+    else if (my_captured == 6)
+        score += score_info.capture * _dna[CAPTURE_TOTAL_8];
+    else if (my_captured == 8)
+        score += score_info.capture * _dna[CAPTURE_TOTAL_10];
+    
+    score += score_info.block_win * _dna[BLOCK_WIN];
+    score += score_info.block_free_four * _dna[BLOCK_FREE_FOUR];
+    score += score_info.block_free_three * _dna[BLOCK_FREE_THREE];
+    score += score_info.setup_capture * _dna[SETUP_CAPTURE];
+    score += score_info.is_capturable > 0 ? _dna[IS_CAPTURABLE] : 0;
+
+    score += score_info.block_capture * _dna[BLOCK_CAPTURE];
+    return score;
+}
+
+static t_direction_info init_direction_info() {
+    return {0, 0, 0, false, false, false, false};
+}
+
+std::vector<t_direction_info> Game::compute_dirs_info(t_position &grid_pos, e_cell &my_color, e_cell &other_color) {
+    std::vector<std::vector<int> >  directions;
+    std::vector<t_direction_info>   dirs_info;
+
+    (void)other_color;
+
+    directions = {{-1, 0},{1, 0},{0, -1},{0, 1}, {-1, -1},{1, 1},{1, -1},{-1, 1}};
+    for (size_t i = 0; i < directions.size(); i++) {
+        t_direction_info di = init_direction_info();
+
+        bool found_none = false;
+        
+        int dx = directions[i][0];
+        int dy = directions[i][1];
+
+        for (int forward = 1; forward < 5; forward++) {
+            int nx = grid_pos.x + (forward * dx);
+            int ny = grid_pos.y + (forward * dy);
+            if (nx < 0 || nx >= 19 || ny < 0 || ny >= 19)
+                break;
+            e_cell cell = this->_board.get(nx, ny).get();
+            if (cell == NONE) {
+                if (found_none)
+                    break;
+                else if (di.other_real_alignement != 0) {
+                    if (di.other_real_alignement == 2)
+                        di.setup_capture = true;
+                    break;
+                } 
+                else
+                    found_none = true;
+            }
+            else if (cell == my_color) {
+                if (di.other_real_alignement != 0) {
+                    if (di.other_real_alignement == 2)
+                        di.capture = true;
+                    di.other_real_alignement--;
+                    break;
+                }
+                di.my_free_alignement++;
+                if (!found_none)
+                    di.my_real_alignement++;
+            }
+            else {
+                if (found_none)
+                    break;
+                if (di.my_real_alignement != 0) {
+                    if (di.my_real_alignement == 2)
+                        di.block_capture = true;
+                    else if (di.my_real_alignement == 1)
+                        di.is_capturable = true;
+                    break;
+                }
+                di.other_real_alignement++;
+            } 
+        }
+        dirs_info.push_back(di);
+    }
+    return dirs_info;
+}
+
+int Game::complex_heuristic(e_color &color, int &pos) {
+
+    t_position grid_pos = {pos % 19, pos / 19};
+
+    e_cell my_color = color == WHITESTONE ? WHITE : BLACK;
+    e_cell other_color = (my_color == WHITE ? BLACK : WHITE);
+
+    int my_captured = get_captured_count_by_color(this->_request, color);
+    //int other_captured = get_captured_count_by_color(this->_request, other_color);
+
+    int score = 20 - get_linear_distance(grid_pos, this->_center);
+
+    std::vector<t_direction_info> dirs_info = compute_dirs_info(grid_pos, my_color, other_color);
+
+    t_score_info score_info = compute_score_information(dirs_info);
+
+
+    score += compute_score(score_info, my_captured);
+
+    return score;
+}
+
+
+int Game::simple_heuristic(e_color color, int pos) {
+    
+    int x = pos % 19;
+    int y = pos / 19;
+    e_cell my = color == WHITESTONE ? WHITE : BLACK;
+    e_cell other = (my == WHITE) ? BLACK : WHITE;
+
+    int score = 0;
+    for (int j = y - 4; j <= y + 4; j++) {
+        for (int i = x - 4; i <= x + 4; i++) {
+            if (i >= 0 && i < 19 && j >= 0 && j < 19) {
+                if (_board.get(i, j).get() ==  my)
+                    score += (100 - abs(y - j) * abs(x - i) * 2);
+                else if (_board.get(i, j).get() == other)
+                    score += (100 - abs(y - j) * abs(x - i));
+            }
+        }
+    }
+    
+    return score;
+}
