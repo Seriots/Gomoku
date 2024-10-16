@@ -440,7 +440,6 @@ int Game::simple_heuristic(e_color color, int pos) {
 
 std::pair<int, int> Game::minimax(int alpha, int beta, int depth, bool is_maxi, int next_pos) {
     if (depth) {
-        std::cout << "Depth: " << depth << std::endl;
         if (is_maxi) {
             int max_eval = -100000;
             int best_pos = -1;
@@ -484,8 +483,6 @@ std::pair<int, int> Game::minimax(int alpha, int beta, int depth, bool is_maxi, 
         }
     } else {
         int simple_score = this->simple_heuristic(is_maxi ? WHITESTONE : BLACKSTONE, next_pos);
-        std::cout << "Pos: " << next_pos << std::endl;
-        std::cout << "Score: " << simple_score << std::endl << std::endl;
         return std::make_pair(next_pos, simple_score);
     }
 }

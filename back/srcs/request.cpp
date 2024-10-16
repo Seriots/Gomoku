@@ -81,11 +81,12 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     auto start_time = std::chrono::high_resolution_clock::now();
 
     std::vector<t_data> data;
-    int pos = game.minimax(INT_MIN, INT_MAX, 4, true, -1).first;
+    std::cout << "nb interesting pos: " << game.get_interesting_pos().size() << std::endl;
+    int pos = game.minimax(INT_MIN, INT_MAX, 3, true, -1).first;
     std::cout << "Best pos: " << pos << std::endl;
 
     auto end_time = std::chrono::high_resolution_clock::now();
-    std::cout << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count() << std::endl;
+    std::cout << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count() << std::endl << std::endl;
 
     // game.set(request.blocked, BLOCKED);
 
