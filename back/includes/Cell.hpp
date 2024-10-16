@@ -2,19 +2,15 @@
 
 #include <iostream>
 
-enum e_cell {
-    WHITE,
-    BLACK,
-    BLOCKED,
-    NONE,
-};
+#include "structs.hpp"
+
 
 class Cell {
     private:
         e_cell _value;
     
     public:
-        Cell(e_cell value = NONE);
+        Cell(e_cell value = (e_cell)NONE);
         Cell(const Cell &c);
         ~Cell();
         

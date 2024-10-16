@@ -97,10 +97,12 @@ bool Game::check_free_three(int x, int y, int ax, int ay, e_cell color) {
     std::vector<e_cell> axis_values;
 
     for (int i = -4; i <= 4; i++) {
+        int nx = x + (i * ax);
+        int ny = y + (i * ay); 
         if (i == 0)
             axis_values.push_back(color);
-        else if (x + (i * ax) >= 0 && x + (i * ax) < 19 && y + (i * ay) >= 0 && y + (i * ay) < 19)
-            axis_values.push_back(this->_board.get(x + (i * ax), y + (i * ay)).get());
+        else if (is_in_grid(nx, ny))
+            axis_values.push_back(this->_board.get(nx, y + ny).get());
     }
     size_t i = 1;
     while (i < axis_values.size()) {
@@ -169,9 +171,9 @@ std::vector<int> Game::get_new_blocked_pos(e_color color) {
 
 bool Game::check_sequence(int x, int y, int dx, int dy, std::vector<e_cell> sequence) {
     for (int i = 1; i <= (int)sequence.size(); i++) {
-        if (x + (i * dx) < 0 || x + (i * dx) >= 19
-            || y + (i * dy) < 0 || y + (i * dy) >= 19
-            || _board.get(x + (i * dx), y + (i * dy)).get() != sequence[i-1])
+        int nx = x + (i * dx);
+        int ny = y + (i * dy);
+        if (!is_in_grid(nx, ny) || _board.get(nx, ny).get() != sequence[i-1])
         {
             return false;
         }
@@ -236,7 +238,7 @@ std::vector<int> Game::get_interesting_pos() {
             if (this->get_board().get(x, y).get() != NONE) {
                 for (int j = y - 2; j <= y + 2; j++) {
                     for (int i = x - 2; i <= x + 2; i++) {
-                        if (i >= 0 && i < 19 && j >= 0 && j < 19) {
+                        if (!is_in_grid(i, j)) {
                             if (this->get_board().get(i, j).get() == NONE) {
                                 if (interesting_pos.find(i + j * 19) == interesting_pos.end())
                                     interesting_pos[i + j * 19] = 0;
@@ -261,6 +263,8 @@ std::vector<int> Game::get_interesting_pos() {
     for (size_t i = 0; i < pairs.size(); i++) {
         res.push_back(pairs[i].first);
     }
+    if (res.size() == 0)
+        res.push_back(180);
     return res;
 }
 

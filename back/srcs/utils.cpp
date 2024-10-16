@@ -3,8 +3,8 @@
 #include <string>
 #include <vector>
 
-#include "request.hpp"
 #include "utils.hpp"
+#include "request.hpp"
 #include "Cell.hpp"
 
 /*
@@ -64,6 +64,17 @@ std::string build_json_content(std::vector<std::string> key, std::vector<std::st
     return out;   
 }
 
+std::string build_json_content_bool(std::vector<std::string> key, std::vector<bool> value) {
+    std::string out = "";
+    for (size_t i = 0; i < key.size(); i++) {
+        if (i == 0)
+            out += ("\"" + key[i] + "\":" + std::to_string(value[i]));
+        else
+            out += ",\n\"" + key[i] + "\":" + std::to_string(value[i]);
+    }
+    return out;   
+}
+
 /*
     Parse a request to create a new request structure
     @param req: the request to parse
@@ -116,10 +127,8 @@ int get_captured_count_by_color(t_request request, e_color color) {
     @param value: the list of value for the json content
     @return the response in a string well json handled
 */
-std::string build_action_response(std::vector<t_stone> added, std::vector<int> removed, std::vector<std::string> key, std::vector<std::string> value) {
-    std::string out = "{\n" + build_json_content(key, value);
-    if (!key.empty())
-        out += ",\n";
+std::string build_action_response(std::vector<t_stone> added, std::vector<int> removed, t_endgame_info &endgame_info) {
+    std::string out = "{\n" + build_json_content_bool({"win_by_capture", "win_by_alignement", "no_winner"}, {endgame_info.win_by_capture, endgame_info.win_by_alignement, endgame_info.no_winner}) + ",\n";
     out += "\"added\":[";
     for (size_t i = 0; i < added.size(); i++) {
         if (i == 0)
@@ -133,6 +142,13 @@ std::string build_action_response(std::vector<t_stone> added, std::vector<int> r
             out += std::to_string(removed[i]);
         else
             out += ",\n" + std::to_string(removed[i]);
+    }
+    out += "],\n\"prevent_win\":[";
+    for (size_t i  = 0; i < endgame_info.capture_prevent_win_pos.size(); i++) {
+        if (i == 0)
+            out += std::to_string(endgame_info.capture_prevent_win_pos[i]);
+        else
+            out += ",\n" + std::to_string(endgame_info.capture_prevent_win_pos[i]);
     }
     return out + "]\n}";
 }

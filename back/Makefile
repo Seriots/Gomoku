@@ -8,6 +8,7 @@ define SRCS =
 	srcs/Game.cpp
 	srcs/Game_heuristic.cpp
 	srcs/Game_end.cpp
+	srcs/Game_utils.cpp
 	srcs/request.cpp
 	srcs/utils.cpp
 
