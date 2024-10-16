@@ -1,19 +1,12 @@
-[X] format the response with a list of added stone and a list of removed stone
-[X] Make a fonction that detect position of double free-three (double free-three with capture is allowed)
-[X] Make a fonction that capture stone
-[X] Add call for IA search
-[x] add to added stone the blocked pos and make a fonction to get every blocked pos
-[x] add a blocked stone image
+[ ] Optimise the minimax algorithm
+    [x] Alpha-beta pruning
+    [ ] mnemoisation
+    [ ] MTDF 
+    [ ] negascout
 
-[X] Make a min max tree
-[x] Make a simple heuristic function for min max tree
+[ ] Make a beautiful front
 
-[ ] Optimise the min max tree to find until 4depth
-    [X] alppha beta cut
-    [ ] Find how to modify game data during process (big big opti)
-    [ ] Maybe try to add mnemoisation
-    [ ] add loseMove, winMove
-[ ] make a list of DNA for the heuristic
+[ ] Make the heuristic on the full board
 
 
 DNA:
