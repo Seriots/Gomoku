@@ -75,9 +75,9 @@ class Game {
 
         void print_board();
 
-        int simple_heuristic(int pos);
+        int simple_heuristic(e_color color, int pos);
         int complex_heuristic(int pos);
         std::vector<int> get_interesting_pos();
-        std::pair<int, int> compute_best_move(e_color color, int depth, bool is_maxi, int alpha, int beta);
-        int minimax(int alpha, int beta, int depth, bool is_maxi);
+        //std::pair<int, int> compute_best_move(e_color color, int depth, bool is_maxi, int alpha, int beta);
+        std::pair<int, int> minimax(int alpha, int beta, int depth, bool is_maxi, int next_pos);
 };

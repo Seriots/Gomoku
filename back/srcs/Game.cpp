@@ -416,11 +416,11 @@ int Game::complex_heuristic(int pos) {
 }
 
 
-int Game::simple_heuristic(int pos) {
+int Game::simple_heuristic(e_color color, int pos) {
 
     int x = pos % 19;
     int y = pos / 19;
-    e_cell my = this->get_board().get(x, y).get();
+    e_cell my = color == WHITESTONE ? WHITE : BLACK;
     e_cell other = (my == WHITE) ? BLACK : WHITE;
 
     int score = 0;
@@ -438,46 +438,55 @@ int Game::simple_heuristic(int pos) {
     return score;
 }
 
-using Move = std::vector<int>;
-
-int Game::minimax(const GameState& state,  int alpha, int beta, int depth, bool is_maxi) {
-    // TODO NEED TO ADD A COPY OF THE GAME STATE
-
+std::pair<int, int> Game::minimax(int alpha, int beta, int depth, bool is_maxi, int next_pos) {
     if (depth) {
+        std::cout << "Depth: " << depth << std::endl;
         if (is_maxi) {
             int max_eval = -100000;
-            for (Move::iterator it = this->_interesting_pos.begin(); it != this->_interesting_pos.end(); it++) {
+            int best_pos = -1;
+            for (std::vector<int>::iterator it = this->_interesting_pos.begin(); it != this->_interesting_pos.end(); it++) {
                 int pos = *it;
                 if (_board.get(pos).get() == NONE)
                 {
-                    this->set(pos, is_maxi ? WHITE : BLACK);
-                    int tmp = this->minimax(alpha, beta, depth - 1, false);
-                    max_eval = std::max(max_eval, tmp);
+                    this->set(pos, WHITE);
+                    int tmp = this->minimax(alpha, beta, depth - 1, false, pos).second;
+                    this->set(pos, NONE);
+                    if (tmp > max_eval) {
+                        max_eval = tmp;
+                        best_pos = pos;
+                    }
                     alpha = std::max(alpha, tmp);
                     if (beta <= alpha)
                         break;
                 }
-                return max_eval;
             }
+            return std::make_pair(best_pos, max_eval);
         } else {
             int min_eval = 100000;
-            for (Move::iterator it = this->_interesting_pos.begin(); it != this->_interesting_pos.end(); it++) {
+            int best_pos = -1;
+            for (std::vector<int>::iterator it = this->_interesting_pos.begin(); it != this->_interesting_pos.end(); it++) {
                 int pos = *it;
                 if (_board.get(pos).get() == NONE)
                 {
-                    this->set(pos, is_maxi ? WHITE : BLACK);
-                    int tmp = this->minimax(alpha, beta, depth - 1, true);
-                    min_eval = std::min(min_eval, tmp);
+                    this->set(pos, BLACK);
+                    int tmp = this->minimax(alpha, beta, depth - 1, true, pos).second;
+                    this->set(pos, NONE);
+                    if (tmp < min_eval) {
+                        min_eval = tmp;
+                        best_pos = pos;
+                    }
                     beta = std::min(beta, tmp);
                     if (beta <= alpha)
                         break;
                 }
-                return min_eval;
             }
+            return std::make_pair(best_pos, min_eval);
         }
     } else {
-        // need to have current state
-        return this->simple_heuristic(0);
+        int simple_score = this->simple_heuristic(is_maxi ? WHITESTONE : BLACKSTONE, next_pos);
+        std::cout << "Pos: " << next_pos << std::endl;
+        std::cout << "Score: " << simple_score << std::endl << std::endl;
+        return std::make_pair(next_pos, simple_score);
     }
 }
 
