@@ -81,7 +81,7 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     auto start_time = std::chrono::high_resolution_clock::now();
 
     std::vector<t_data> data;
-    int pos = game.compute_best_move(2);
+    int pos = game.compute_best_move(1);
 
     auto end_time = std::chrono::high_resolution_clock::now();
     std::cout << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count() << std::endl << std::endl;

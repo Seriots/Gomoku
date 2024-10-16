@@ -92,6 +92,7 @@ class Game {
 
         void set(int pos, e_cell cell);
         void set(std::vector<int> pos, e_cell cell);
+        void unset(int pos);
         void unset(std::vector<int> pos);
         void unset_blocked_pos();
 
