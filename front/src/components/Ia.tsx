@@ -1,7 +1,7 @@
 import axios from 'axios';
 import './Game.css';
 
-function Ia() {
+function Game() {
 
     const build_request = (base: string, lst: any) => {
         let res = base;
@@ -53,11 +53,37 @@ function Ia() {
         }
     }
 
+    
 	let color = 'white';
     let is_processing = 0;
     let captured_count = {white: 0, black: 0};
+    let end_game = false;
+
+    const handleEndGame = (res: any, color: string) => {
+        if (res.win_by_capture === 1 || res.win_by_alignement === 1) {
+            const winner_text = document.getElementById('winner-text');
+            if (winner_text) {
+                winner_text.innerText = color + ' win';
+                if (color === 'white')
+                    winner_text.style.color = 'white';
+                else
+                    winner_text.style.color = 'black';
+            }
+            end_game = true;
+        }
+    }
+
+    const startGame = async () => {
+        is_processing += 1;
+        if (is_processing > 1)
+            return;
+        placeIAStone();
+    }
 
     const placeIAStone = async () => {
+
+        if (end_game)
+            return;
         const shadowStone = document.getElementById('shadow-stone');
 		if (!shadowStone)
 			return;
@@ -65,7 +91,6 @@ function Ia() {
 		const listBlack = getPositionList(document.getElementsByClassName('black-stone'));
         const listBlocked = getPositionList(document.getElementsByClassName('blocked-stone'));
         
-        is_processing = is_processing + 1
 		await axios.get(build_request('http://localhost:6325/ia', [color, listWhite, listBlack, listBlocked, captured_count.white, captured_count.black]))
 			.then((res) => {
                 console.log(res.data);
@@ -74,28 +99,27 @@ function Ia() {
                     captured_count.white += res.data.removed.length;
                 else
                     captured_count.black += res.data.removed.length;
+
+                handleEndGame(res.data, color);
                 color = color === 'white' ? 'black' : 'white';
                 shadowStone.className = color + "-shadow-stone";
                 console.log(captured_count);
-                is_processing = is_processing - 1;
                 placeIAStone();
 			})
 			.catch((err) => {
 				console.log(err);
-                is_processing = is_processing - 1;
 			});
     }
 
-    
 
     return (
 		<div className='game'>
-			<div id='board' onClick={placeIAStone}>
+			<div id='board' onClick={startGame}>
 				<div id='shadow-stone' className='white-shadow-stone'></div>
+                <p id="winner-text"></p>
 			</div>
-
 		</div>
 	);
 }
 
-export default Ia;
+export default Game;

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import './Game.css';
 
-function Game() {
+function Player() {
 
     const build_request = (base: string, lst: any) => {
         let res = base;
@@ -60,7 +60,17 @@ function Game() {
     let end_game = false;
 
     const handleEndGame = (res: any, color: string) => {
-        if (res.win_by_capture === 1 || res.win_by_alignement === 1) {
+        if (res.prevent_win.length !== 0) {
+            const winner_text = document.getElementById('winner-text');
+            if (winner_text) {
+            winner_text.innerText = 'still alive';
+            if (color === 'white')
+                winner_text.style.color = 'white';
+            else
+                winner_text.style.color = 'black';
+            }
+        }
+        else if (res.win_by_capture === 1 || (res.win_by_alignement === 1)) {
             const winner_text = document.getElementById('winner-text');
             if (winner_text) {
                 winner_text.innerText = color + ' win';
@@ -71,7 +81,7 @@ function Game() {
             }
             end_game = true;
         }
-        if (res.no_winner === 1) {
+        else if (res.no_winner === 1) {
             const winner_text = document.getElementById('winner-text');
             if (winner_text) {
                 winner_text.innerText = 'No winner';
@@ -79,38 +89,6 @@ function Game() {
             }
             end_game = true;
         }
-    }
-
-    const placeIAStone = async () => {
-        if (end_game)
-            return;
-        const shadowStone = document.getElementById('shadow-stone');
-		if (!shadowStone)
-			return;
-        const listWhite = getPositionList(document.getElementsByClassName('white-stone'));
-		const listBlack = getPositionList(document.getElementsByClassName('black-stone'));
-        const listBlocked = getPositionList(document.getElementsByClassName('blocked-stone'));
-        
-        is_processing = is_processing + 1
-		await axios.get(build_request('http://localhost:6325/ia', [color, listWhite, listBlack, listBlocked, captured_count.white, captured_count.black]))
-			.then((res) => {
-                console.log(res.data);
-                handleBackData(res);
-                if (color === 'white')
-                    captured_count.white += res.data.removed.length;
-                else
-                    captured_count.black += res.data.removed.length;
-
-                handleEndGame(res.data, color);
-                color = color === 'white' ? 'black' : 'white';
-                shadowStone.className = color + "-shadow-stone";
-                console.log(captured_count);
-                is_processing = is_processing - 1
-			})
-			.catch((err) => {
-				console.log(err);
-                is_processing = is_processing - 1
-			});
     }
 
 	const placeStone = async () => {
@@ -139,7 +117,6 @@ function Game() {
                     color = color === 'white' ? 'black' : 'white';
                     shadowStone.className = color + "-shadow-stone";
                     console.log(captured_count);
-                    placeIAStone();
                 }
                 is_processing = is_processing - 1
 			})
@@ -186,4 +163,4 @@ function Game() {
 	);
 }
 
-export default Game;
+export default Player;

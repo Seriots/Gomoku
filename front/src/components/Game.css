@@ -66,6 +66,12 @@
     z-index: 2;
 }
 
+#winner-text {
+    font-size: 60px;
+    font-weight: bold;
+    
+}
+
 .white-shadow-stone {
     background-image: url('../assets/whiteStone.png');
 }

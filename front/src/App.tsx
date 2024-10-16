@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Game from './components/Game';
 import Ia from './components/Ia';
+import Player from './components/Player';
 import Home from './components/Home';
 import './App.css';
 
@@ -12,6 +13,7 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/game" element={<Game />} />
                 <Route path="/ia" element={<Ia />} />
+                <Route path="/player" element={<Player />} />
             </Routes>
 		</div>
 	);
