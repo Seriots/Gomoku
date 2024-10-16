@@ -128,7 +128,7 @@ std::string build_action_response(std::vector<t_stone> added, std::vector<int> r
             out += ",\n{\"pos\":" + std::to_string(added[i].pos) + ",\"color\":\"" + added[i].color + "\"}";
     }
     out += "],\n\"removed\":[";
-    for (size_t i = 0; i < removed.size(); i++) {
+    for (size_t i  = 0; i < removed.size(); i++) {
         if (i == 0)
             out += std::to_string(removed[i]);
         else

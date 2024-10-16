@@ -81,7 +81,7 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     auto start_time = std::chrono::high_resolution_clock::now();
     
     std::vector<t_data> data;
-    int pos = game.compute_best_move(request.color, 2, true, -2147483647, 2147483647).first;
+    int pos = game.compute_best_move(request.color, 0, true, -2147483647, 2147483647).first;
     
     auto end_time = std::chrono::high_resolution_clock::now();
     std::cout << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count() << std::endl;
@@ -93,6 +93,8 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
 
     removed = game.get_captured(pos);
 
+    
+
     game.unset(removed);
 
     blocked_list = game.get_new_blocked_pos(request.color == WHITESTONE ? BLACKSTONE : WHITESTONE);
@@ -101,8 +103,9 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     for (size_t i = 0; i < blocked_list.size(); i++)
         added.push_back({blocked_list[i], "blocked"});
 
+    t_endgame_info endgame_info = game.check_end_game(pos);
 
-    res.set_content(build_action_response(added, removed, {}, {}), "application/json");
+    res.set_content(build_action_response(added, removed, {"win_by_capture", "win_by_alignement", "no_winner"}, {endgame_info.win_by_capture ? "true" : "false", endgame_info.win_by_alignement? "true" : "false", endgame_info.no_winner? "true" : "false"}), "application/json");
 }
 
 /*

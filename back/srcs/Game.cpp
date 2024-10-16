@@ -207,6 +207,8 @@ std::vector<int> Game::get_captured(int pos) {
             captured.push_back((x + 2 * dx) + (y + 2 * dy) * 19);
         }
     }
+    this->_request.white_captured += (baseCell.get() == WHITE) ? captured.size() : 0;
+    this->_request.black_captured += (baseCell.get() == BLACK) ? captured.size() : 0;
     return captured;
 }
 
