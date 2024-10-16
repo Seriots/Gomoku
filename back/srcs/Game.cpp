@@ -326,7 +326,7 @@ std::pair<int, int> Game::minimax(int alpha, int beta, int depth, bool is_maxi, 
             return std::make_pair(best_pos, min_eval);
         }
     } else {
-        int simple_score = this->simple_heuristic(is_maxi ? WHITESTONE : BLACKSTONE, next_pos);
+        int simple_score = this->complex_heuristic(is_maxi ? WHITESTONE : BLACKSTONE, next_pos);
         return std::make_pair(next_pos, simple_score);
     }
 }

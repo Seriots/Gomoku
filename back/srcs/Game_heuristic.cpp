@@ -135,7 +135,7 @@ std::vector<t_direction_info> Game::compute_dirs_info(t_position &grid_pos, e_ce
     return dirs_info;
 }
 
-int Game::complex_heuristic(e_color &color, int &pos) {
+int Game::complex_heuristic(e_color color, int &pos) {
 
     t_position grid_pos = {pos % 19, pos / 19};
 
