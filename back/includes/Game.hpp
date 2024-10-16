@@ -105,12 +105,14 @@ class Game {
 
         int simple_heuristic(e_color color, int pos);
         //std::pair<int, int> compute_best_move(e_color color, int depth, bool is_maxi, int alpha, int beta);
-        int minimax(int alpha, int beta, int depth, bool is_maxi, int next_pos);
-        int compute_best_move(int depth);
+        std::pair<int, int> minimax(int alpha, int beta, int depth, bool is_maxi, int next_pos, std::vector<int> &board);
+
         std::vector<t_direction_info>   compute_dirs_info(t_position &grid_pos, e_cell &my_color, e_cell &other_color);
         t_score_info                    compute_score_information(std::vector<t_direction_info> &dir_info);
         int                             compute_score(t_score_info &score_info, int &my_captured);
         int                             complex_heuristic(e_color color, int &pos);
+
+        int                             full_simple_heuristic(e_color color);
 
         std::vector<int>    get_interesting_pos();
         t_endgame_info      check_end_game(int pos);

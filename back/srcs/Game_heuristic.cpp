@@ -179,3 +179,20 @@ int Game::simple_heuristic(e_color color, int pos) {
     
     return score;
 }
+
+int Game::full_simple_heuristic(e_color color) {
+    e_cell my = color == WHITESTONE ? WHITE : BLACK;
+    e_cell other = (my == WHITE) ? BLACK : WHITE;
+
+    int score = 0;
+    for (int y = 0; y < 19; y++) {
+        for (int x = 0; x < 19; x++) {
+            t_position pos = {x, y};
+            if (_board.get(x, y).get() == my)
+                score += get_linear_distance(pos, this->_center);
+            else if (_board.get(x, y).get() == other)
+                score += get_linear_distance(pos, this->_center);
+        }
+    }
+    return score;
+}
