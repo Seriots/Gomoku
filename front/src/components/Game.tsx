@@ -53,11 +53,37 @@ function Game() {
         }
     }
 
+    
 	let color = 'white';
     let is_processing = 0;
     let captured_count = {white: 0, black: 0};
+    let end_game = false;
+
+    const handleEndGame = (res: any, color: string) => {
+        if (res.win_by_capture === 1 || res.win_by_alignement === 1) {
+            const winner_text = document.getElementById('winner-text');
+            if (winner_text) {
+                winner_text.innerText = color + ' win';
+                if (color === 'white')
+                    winner_text.style.color = 'white';
+                else
+                    winner_text.style.color = 'black';
+            }
+            end_game = true;
+        }
+        if (res.no_winner === 1) {
+            const winner_text = document.getElementById('winner-text');
+            if (winner_text) {
+                winner_text.innerText = 'No winner';
+                winner_text.style.color = 'grey';
+            }
+            end_game = true;
+        }
+    }
 
     const placeIAStone = async () => {
+        if (end_game)
+            return;
         const shadowStone = document.getElementById('shadow-stone');
 		if (!shadowStone)
 			return;
@@ -74,6 +100,8 @@ function Game() {
                     captured_count.white += res.data.removed.length;
                 else
                     captured_count.black += res.data.removed.length;
+
+                handleEndGame(res.data, color);
                 color = color === 'white' ? 'black' : 'white';
                 shadowStone.className = color + "-shadow-stone";
                 console.log(captured_count);
@@ -86,7 +114,7 @@ function Game() {
     }
 
 	const placeStone = async () => {
-        if (is_processing > 0)
+        if (is_processing > 0 || end_game)
             return;
 		const shadowStone = document.getElementById('shadow-stone');
 		if (!shadowStone)
@@ -107,6 +135,7 @@ function Game() {
                         captured_count.white += res.data.removed.length;
                     else
                         captured_count.black += res.data.removed.length;
+                    handleEndGame(res.data, color);
                     color = color === 'white' ? 'black' : 'white';
                     shadowStone.className = color + "-shadow-stone";
                     console.log(captured_count);
@@ -151,8 +180,8 @@ function Game() {
 		<div className='game'>
 			<div id='board' onClick={placeStone} onMouseMove={handleMouseMove} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
 				<div id='shadow-stone' className='white-shadow-stone'></div>
+                <p id="winner-text"></p>
 			</div>
-
 		</div>
 	);
 }

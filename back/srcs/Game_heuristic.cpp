@@ -92,7 +92,7 @@ std::vector<t_direction_info> Game::compute_dirs_info(t_position &grid_pos, e_ce
         for (int forward = 1; forward < 5; forward++) {
             int nx = grid_pos.x + (forward * dx);
             int ny = grid_pos.y + (forward * dy);
-            if (nx < 0 || nx >= 19 || ny < 0 || ny >= 19)
+            if (!is_in_grid(nx, ny))
                 break;
             e_cell cell = this->_board.get(nx, ny).get();
             if (cell == NONE) {

@@ -54,8 +54,10 @@ void    r_action(const httplib::Request &req, httplib::Response &res) {
     added.push_back({request.pos, request.color == WHITESTONE ? "white" : "black"});
     for (size_t i = 0; i < blocked_list.size(); i++)
         added.push_back({blocked_list[i], "blocked"});
+    
+    t_endgame_info endgame_info = game.check_end_game(request.pos);
 
-    res.set_content(build_action_response(added, removed, {}, {}), "application/json"); // everything is send in a nicely formated json
+    res.set_content(build_action_response(added, removed, endgame_info), "application/json"); // everything is send in a nicely formated json
 }
 
 /*
@@ -122,7 +124,7 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
 
     t_endgame_info endgame_info = game.check_end_game(pos);
 
-    res.set_content(build_action_response(added, removed, {"win_by_capture", "win_by_alignement", "no_winner"}, {endgame_info.win_by_capture ? "true" : "false", endgame_info.win_by_alignement? "true" : "false", endgame_info.no_winner? "true" : "false"}), "application/json");
+    res.set_content(build_action_response(added, removed, endgame_info), "application/json");
 }
 
 /*

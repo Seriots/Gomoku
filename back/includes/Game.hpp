@@ -3,62 +3,10 @@
 #include <string>
 #include <vector>
 
+#include "utils.hpp"
 #include "Board.hpp"
 
-enum e_dna {
-    ALIGN_FIVE,
-    FREE_FOUR,
-    FREE_THREE,
-    ANY_ALIGNEMENT,
-    CAPTURE_TOTAL_2,
-    CAPTURE_TOTAL_4,
-    CAPTURE_TOTAL_6,
-    CAPTURE_TOTAL_8,
-    CAPTURE_TOTAL_10,
-    BLOCK_FREE_THREE,
-    BLOCK_FREE_FOUR,
-    BLOCK_CAPTURE,
-    BLOCK_WIN,
-    SETUP_CAPTURE,
-    IS_CAPTURABLE
-};
-
-typedef struct s_data {
-    int pos;
-    e_cell color;
-} t_data;
-
-typedef struct s_direction_info {
-    int my_free_alignement;
-    int my_real_alignement;
-    int other_real_alignement;
-    bool capture;
-    bool setup_capture;
-    bool is_capturable;
-    bool block_capture;
-} t_direction_info;
-
-typedef struct s_score_info {
-    int any_alignement = 0;
-    int align_five = 0;
-    int free_four = 0;
-    int free_three = 0;
-    int capture = 0;
-    int block_win = 0;
-    int block_free_four = 0;
-    int block_free_three = 0;
-    int block_capture = 0;
-    int setup_capture = 0;
-    int is_capturable = 0;
-} t_score_info;
-
-typedef struct s_endgame_info {
-    e_color             color;
-    bool                win_by_capture;
-    bool                win_by_alignement;
-    bool                no_winner;
-    std::vector<int>    capture_prevent_win_pos;
-} t_endgame_info;
+#include "structs.hpp"
 
 bool operator==(const t_data &a, const t_data &b);
 
@@ -77,11 +25,13 @@ class Game {
         bool check_sequence(int x, int y, int dx, int dy, std::vector<e_cell> cell);
         bool check_double_free_three(int x, int y, e_cell color);
         bool check_free_three(int x, int y, int ax, int ay, e_cell color);
-
+    
+        bool                is_capturable(t_position &grid_pos, e_cell color, std::vector<int> *capture_spot);
         bool                check_win_by_capture();
-        bool                check_win_by_alignement(int pos, e_color color);
+        bool                check_win_by_alignement(int pos, e_cell color);
         bool                check_no_winner();
-        std::vector<int>    get_capture_prevent_win_pos();
+        std::vector<int>    get_capture_prevent_win_pos(int pos, e_cell color);
+        bool is_in_grid(int x, int y);
 
     public:
         Game(t_request &request);
