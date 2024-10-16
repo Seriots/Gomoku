@@ -5,6 +5,10 @@
 
 #include "Game.hpp"
 
+/*
+    Return if the game is won by capture
+    @return: true if the game is won by capture, false otherwise
+*/
 bool    Game::check_win_by_capture() {
     int white_captured = this->_request.white_captured;
     int black_captured = this->_request.black_captured;
@@ -16,6 +20,12 @@ bool    Game::check_win_by_capture() {
     return false;
 }
 
+/*
+    Return if the game is won by alignement
+    @args: pos -> the position to check
+    @args: color -> the color of the player
+    @return: true if the game is won by alignement, false otherwise
+*/
 bool    Game::check_win_by_alignement(int pos, e_cell color) {
     t_position grid_pos = {pos % 19, pos / 19};
 
@@ -53,6 +63,13 @@ bool    Game::check_win_by_alignement(int pos, e_cell color) {
     return false;
 }
 
+/*
+    Check if a stone is capturable
+    @args: grid_pos -> the position to check
+    @args: color -> the color of the player
+    @args: capture_spot -> the positions to capture
+    @return: true if the stone is capturable, false otherwise and fill the capture_spot vector
+*/
 bool Game::is_capturable(t_position &grid_pos, e_cell color, std::vector<int> *capture_spot) {
     std::vector<std::vector<int> > directions;
 
@@ -83,6 +100,12 @@ bool Game::is_capturable(t_position &grid_pos, e_cell color, std::vector<int> *c
 
 }
 
+/*
+    If the game is won by alignement, check if a stone is capturable to cancel the alignement and return these positions
+    @args: pos -> the position to check
+    @args: color -> the color of the player
+    @return: the positions to capture
+*/
 std::vector<int>    Game::get_capture_prevent_win_pos(int pos, e_cell color) {
     std::vector<std::deque<t_position> >    alignements;
     std::vector<int>                        capture_spot;
@@ -131,11 +154,20 @@ std::vector<int>    Game::get_capture_prevent_win_pos(int pos, e_cell color) {
     return capture_spot;
 }
 
+/*
+    Check if there is no winner possible
+    @return: true if there is no winner, false otherwise
+*/
 bool   Game::check_no_winner() {
 
     return false;
 }
 
+/*
+    Check if the game is won by capture or alignement or no winner
+    @args: pos -> the position to check
+    @return: the endgame information
+*/
 t_endgame_info  Game::check_end_game(int pos) {
     t_endgame_info endgame_info = {this->_request.color, false, false, false, {}};
 

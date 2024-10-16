@@ -8,9 +8,13 @@
 #include "Game.hpp"
 #include "Board.hpp"
 
-
+/*
+    For each direction, we compute the score information
+    @args: dir_info -> the direction information
+    @return: the score information
+*/
 t_score_info Game::compute_score_information(std::vector<t_direction_info> &dir_info) {
-    t_score_info score_info;
+    t_score_info score_info = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     for (int i = 0; i < 8; i+=2) {
         score_info.any_alignement += dir_info[i].my_free_alignement;
@@ -41,7 +45,12 @@ t_score_info Game::compute_score_information(std::vector<t_direction_info> &dir_
 
     return score_info;
 }
-
+/*
+    Compute the score of the position
+    @args: score_info -> the score information
+    @args: my_captured -> the number of captured stones
+    @return: the score of the position
+*/
 int Game::compute_score(t_score_info &score_info, int &my_captured) {
     int score = 0;
 
@@ -74,6 +83,13 @@ static t_direction_info init_direction_info() {
     return {0, 0, 0, false, false, false, false};
 }
 
+/*
+    Compute the direction information for a given position
+    @args: grid_pos -> the position to compute the direction information
+    @args: my_color -> the color of the player
+    @args: other_color -> the color of the other player
+    @return: the direction information
+*/
 std::vector<t_direction_info> Game::compute_dirs_info(t_position &grid_pos, e_cell &my_color, e_cell &other_color) {
     std::vector<std::vector<int> >  directions;
     std::vector<t_direction_info>   dirs_info;
@@ -135,6 +151,12 @@ std::vector<t_direction_info> Game::compute_dirs_info(t_position &grid_pos, e_ce
     return dirs_info;
 }
 
+/*
+    In the complex heuristic we compute the score of the position with many parameters
+    @args: color -> the color of the player
+    @args: pos -> the position to compute the score
+    @return: the score of the position
+*/
 int Game::complex_heuristic(e_color color, int &pos) {
 
     t_position grid_pos = {pos % 19, pos / 19};
@@ -157,7 +179,12 @@ int Game::complex_heuristic(e_color color, int &pos) {
     return score;
 }
 
-
+/*
+    In the simple heuristic we only compute the score of the position
+    @args: color -> the color of the player
+    @args: pos -> the position to compute the score
+    @return: the score of the position
+*/
 int Game::simple_heuristic(e_color color, int pos) {
     
     int x = pos % 19;
@@ -180,6 +207,14 @@ int Game::simple_heuristic(e_color color, int pos) {
     return score;
 }
 
+/*
+    New solution ! No we need to compute heuristic on the full board instead of only the position
+    This is much smarter and much more logical
+    In the simple version we only compute on the distance from the relative center
+    
+    @args: color -> the color of the player
+    @return: the score of the board
+*/
 int Game::full_simple_heuristic(e_color color) {
     e_cell my = color == WHITESTONE ? WHITE : BLACK;
     e_cell other = (my == WHITE) ? BLACK : WHITE;

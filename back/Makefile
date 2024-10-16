@@ -6,6 +6,7 @@ define SRCS =
 	srcs/Cell.cpp
 	srcs/Board.cpp
 	srcs/Game.cpp
+	srcs/Game_minimax.cpp
 	srcs/Game_heuristic.cpp
 	srcs/Game_end.cpp
 	srcs/Game_utils.cpp

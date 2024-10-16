@@ -33,12 +33,6 @@ enum e_color {
     BLACKSTONE
 };
 
-
-typedef struct s_data {
-    int pos;
-    e_cell color;
-} t_data;
-
 typedef struct s_direction_info {
     int my_free_alignement;
     int my_real_alignement;
@@ -50,17 +44,17 @@ typedef struct s_direction_info {
 } t_direction_info;
 
 typedef struct s_score_info {
-    int any_alignement = 0;
-    int align_five = 0;
-    int free_four = 0;
-    int free_three = 0;
-    int capture = 0;
-    int block_win = 0;
-    int block_free_four = 0;
-    int block_free_three = 0;
-    int block_capture = 0;
-    int setup_capture = 0;
-    int is_capturable = 0;
+    int any_alignement;
+    int align_five;
+    int free_four;
+    int free_three;
+    int capture;
+    int block_win;
+    int block_free_four;
+    int block_free_three;
+    int block_capture;
+    int setup_capture;
+    int is_capturable;
 } t_score_info;
 
 typedef struct s_endgame_info {
