@@ -111,6 +111,8 @@ class Game {
         int                             compute_score(t_score_info &score_info, int &my_captured);
         int                             complex_heuristic(e_color color, int &pos);
         
+        int                             full_simple_heuristic(e_color color);
+        
         std::vector<int>    get_interesting_pos();
         std::pair<int, int> compute_best_move(e_color color, int depth, bool is_maxi, int alpha, int beta);
 
