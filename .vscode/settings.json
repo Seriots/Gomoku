@@ -66,6 +66,7 @@
         "span": "cpp",
         "cstdarg": "cpp",
         "numbers": "cpp",
-        "cinttypes": "cpp"
+        "cinttypes": "cpp",
+        "complex": "cpp"
     }
 }
