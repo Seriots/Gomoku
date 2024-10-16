@@ -81,7 +81,24 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     auto start_time = std::chrono::high_resolution_clock::now();
 
     std::vector<t_data> data;
-    int pos = game.compute_best_move(1);
+
+    // create board
+    std::vector<int> board;
+    for (int i = 0; i < 19*19; i++)
+        board.push_back(-1);
+
+    int pos = game.minimax(INT_MIN, INT_MAX, 5, false, -1, board).first;
+
+    // display board
+    for (int y = 0; y < 19; y++) {
+        for (int x = 0; x < 19; x++) {
+            if (board[x + y * 19] != -1)
+                std::cout << std::setw(4) << std::setfill('0') << board[x + y * 19] << " ";
+            else
+                std::cout << "---- ";
+        }
+        std::cout << std::endl;
+    }
 
     auto end_time = std::chrono::high_resolution_clock::now();
     std::cout << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count() << std::endl << std::endl;
