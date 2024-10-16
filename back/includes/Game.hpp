@@ -77,12 +77,12 @@ class Game {
         bool check_sequence(int x, int y, int dx, int dy, std::vector<e_cell> cell);
         bool check_double_free_three(int x, int y, e_cell color);
         bool check_free_three(int x, int y, int ax, int ay, e_cell color);
-    
+
         bool                check_win_by_capture();
         bool                check_win_by_alignement(int pos, e_color color);
         bool                check_no_winner();
         std::vector<int>    get_capture_prevent_win_pos();
-    
+
     public:
         Game(t_request &request);
         Game(const Game &g);
@@ -92,6 +92,7 @@ class Game {
 
         void set(int pos, e_cell cell);
         void set(std::vector<int> pos, e_cell cell);
+        void unset(int pos);
         void unset(std::vector<int> pos);
         void unset_blocked_pos();
 
@@ -104,8 +105,8 @@ class Game {
 
         int simple_heuristic(e_color color, int pos);
         //std::pair<int, int> compute_best_move(e_color color, int depth, bool is_maxi, int alpha, int beta);
-        std::pair<int, int> minimax(int alpha, int beta, int depth, bool is_maxi, int next_pos);
-
+        int minimax(int alpha, int beta, int depth, bool is_maxi, int next_pos);
+        int compute_best_move(int depth);
         std::vector<t_direction_info>   compute_dirs_info(t_position &grid_pos, e_cell &my_color, e_cell &other_color);
         t_score_info                    compute_score_information(std::vector<t_direction_info> &dir_info);
         int                             compute_score(t_score_info &score_info, int &my_captured);
@@ -114,7 +115,5 @@ class Game {
         int                             full_simple_heuristic(e_color color);
         
         std::vector<int>    get_interesting_pos();
-        std::pair<int, int> compute_best_move(e_color color, int depth, bool is_maxi, int alpha, int beta);
-
         t_endgame_info      check_end_game(int pos);
 };
