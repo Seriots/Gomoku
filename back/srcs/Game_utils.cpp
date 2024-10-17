@@ -140,7 +140,7 @@ bool Game::check_free_three(int x, int y, int ax, int ay, e_cell color) {
         if (i == 0)
             axis_values.push_back(color);
         else if (is_in_grid(nx, ny))
-            axis_values.push_back(this->_board.get(nx, y + ny).get());
+            axis_values.push_back(this->_board.get(nx, ny).get());
     }
     size_t i = 1;
     while (i < axis_values.size()) {
@@ -262,7 +262,7 @@ std::vector<int> Game::get_interesting_pos() {
             if (this->get_board().get(x, y).get() != NONE) {
                 for (int j = y - 2; j <= y + 2; j++) {
                     for (int i = x - 2; i <= x + 2; i++) {
-                        if (!is_in_grid(i, j)) {
+                        if (is_in_grid(i, j)) {
                             if (this->get_board().get(i, j).get() == NONE) {
                                 if (interesting_pos.find(i + j * 19) == interesting_pos.end())
                                     interesting_pos[i + j * 19] = 0;
