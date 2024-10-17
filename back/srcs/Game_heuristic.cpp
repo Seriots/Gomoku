@@ -244,29 +244,29 @@ static int computeSequenceName(std::deque<e_cell> &sequence, e_cell &my_color, e
     return name;
 }
 
-static int computeSequenceName2(std::deque<e_cell> &sequence, int previous_name, e_cell &my_color, e_cell &other_color) {
-    int name = previous_name;
-    if (sequence.size() < 5)
-        return name;
-    else if (sequence.size() > 5)
-        name = (name - sequence[0] * 243) * 3 + sequence[5];
-    else
-        name = computeSequenceName(sequence, my_color, other_color);
+//static int computeSequenceName2(std::deque<e_cell> &sequence, int previous_name, e_cell &my_color, e_cell &other_color) {
+//    int name = previous_name;
+//    if (sequence.size() < 5)
+//        return name;
+//    else if (sequence.size() > 5)
+//        name = (name - sequence[0] * 243) * 3 + sequence[5];
+//    else
+//        name = computeSequenceName(sequence, my_color, other_color);
 
-    return name;
-}
+//    return name;
+//}
 
-static void display_sequence(std::deque<e_cell> &sequence) {
-    for (size_t i = 0; i < sequence.size(); i++) {
-        if (sequence[i] == WHITE)
-            std::cout << "W";
-        else if (sequence[i] == BLACK)
-            std::cout << "B";
-        else
-            std::cout << "N";
-    }
-    std::cout << std::endl;
-}
+//static void display_sequence(std::deque<e_cell> &sequence) {
+//    for (size_t i = 0; i < sequence.size(); i++) {
+//        if (sequence[i] == WHITE)
+//            std::cout << "W";
+//        else if (sequence[i] == BLACK)
+//            std::cout << "B";
+//        else
+//            std::cout << "N";
+//    }
+//    std::cout << std::endl;
+//}
 
 int Game::board_complex_heuristic(e_color color) {
     e_cell my = color == WHITESTONE ? WHITE : BLACK;
@@ -326,7 +326,5 @@ int Game::board_complex_heuristic(e_color color) {
             x++;
         }
     } 
-
-    std::cout << "Score: " << score << std::endl;
     return score;   
 }

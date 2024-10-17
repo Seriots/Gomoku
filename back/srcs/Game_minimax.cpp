@@ -54,7 +54,7 @@ std::pair<int, int> Game::minimax(int alpha, int beta, int depth, bool is_maxi, 
         }
     } else {
             //this->print_board();
-            int score = this->full_simple_heuristic(is_maxi ? WHITESTONE : BLACKSTONE);
+            int score = this->board_complex_heuristic(is_maxi ? WHITESTONE : BLACKSTONE);
             std::string color = is_maxi ? "WHITE" : "BLACK";
             //std::cout << "complex heuristic for " << color << " at " << next_pos << " is " << score << std::endl;
             return std::make_pair(next_pos, score);
