@@ -34,7 +34,7 @@ bool Game::check_free_three(int x, int y, int ax, int ay, e_cell color) {
         if (i == 0)
             axis_values.push_back(color);
         else if (is_in_grid(nx, ny))
-            axis_values.push_back(this->_board.get(nx, y + ny).get());
+            axis_values.push_back(this->_board.get(nx, ny).get());
     }
     size_t i = 1;
     while (i < axis_values.size()) {
