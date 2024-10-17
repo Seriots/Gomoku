@@ -231,3 +231,102 @@ int Game::full_simple_heuristic(e_color color) {
     }
     return score;
 }
+
+static int computeSequenceName(std::deque<e_cell> &sequence, e_cell &my_color, e_cell &other_color) {
+    int name = 0;
+    for (size_t i = 0; i < sequence.size(); i++) {
+        name *= 3;
+        if (sequence[i] == my_color)
+            name += 1;
+        else if (sequence[i] == other_color)
+            name += 2;
+    }
+    return name;
+}
+
+static int computeSequenceName2(std::deque<e_cell> &sequence, int previous_name, e_cell &my_color, e_cell &other_color) {
+    int name = previous_name;
+    if (sequence.size() < 5)
+        return name;
+    else if (sequence.size() > 5)
+        name = (name - sequence[0] * 243) * 3 + sequence[5];
+    else
+        name = computeSequenceName(sequence, my_color, other_color);
+
+    return name;
+}
+
+static void display_sequence(std::deque<e_cell> &sequence) {
+    for (size_t i = 0; i < sequence.size(); i++) {
+        if (sequence[i] == WHITE)
+            std::cout << "W";
+        else if (sequence[i] == BLACK)
+            std::cout << "B";
+        else
+            std::cout << "N";
+    }
+    std::cout << std::endl;
+}
+
+int Game::board_complex_heuristic(e_color color) {
+    e_cell my = color == WHITESTONE ? WHITE : BLACK;
+    e_cell other = (my == WHITE) ? BLACK : WHITE;
+
+    std::deque<e_cell> sequence_1;
+    std::deque<e_cell> sequence_2;
+    int sequence_1_name;
+    int sequence_2_name;
+
+    int score = 0;
+
+    /* Handle horizontal and vertical sequences */
+    for (int y = 0; y < 19; y++) {
+        sequence_1.clear();
+        sequence_2.clear();
+        sequence_1_name = 0;
+        sequence_2_name = 0;
+        for (int x = 0; x < 19; x++) {
+            sequence_1.push_back(_board.get(x, y).get());
+            if (sequence_1.size() == 5) {
+                sequence_1_name = computeSequenceName(sequence_1, my, other);
+                score += this->_sequenceDna[(e_sequenceDna)sequence_1_name];
+                sequence_1.pop_front();
+            }
+            sequence_2.push_back(_board.get(y, x).get());
+            if (sequence_2.size() == 5) {
+                sequence_2_name = computeSequenceName(sequence_2, my, other);
+                score += this->_sequenceDna[(e_sequenceDna)sequence_2_name];
+                sequence_2.pop_front();
+            }
+        }
+    }
+
+    /* Handle diagonales sequences */
+    for (int i = 0; i < 29; i++) {
+        sequence_1.clear();
+        sequence_2.clear();
+        sequence_1_name = 0;
+        sequence_2_name = 0;
+        int y = std::max(14 - i, 0);
+        int x = std::max(-14 + i, 0);
+        while (y < 19 && x < 19) {
+            sequence_1.push_back(_board.get(x, y).get());
+            if (sequence_1.size() == 5) {
+                sequence_1_name = computeSequenceName(sequence_1, my, other);
+                score += this->_sequenceDna[(e_sequenceDna)sequence_1_name];
+                sequence_1.pop_front();
+            }
+            sequence_2.push_back(_board.get(y, x).get());
+            if (sequence_2.size() == 5) {
+                sequence_2_name = computeSequenceName(sequence_2, my, other);
+                score += this->_sequenceDna[(e_sequenceDna)sequence_2_name];
+                sequence_2.pop_front();
+            }
+            y++;
+            x++;
+        }
+    } 
+
+    std::cout << "Score: " << score << std::endl;
+    return score;   
+}

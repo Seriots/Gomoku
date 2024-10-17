@@ -18,6 +18,112 @@ void Game::init_dna() {
     _dna[IS_CAPTURABLE] = -3000;
 }
 
+void Game::init_sequenceDna() {
+    std::map<e_valueDna, int> valuesDna;
+
+    valuesDna[VDNA_NONE] = 0;
+    valuesDna[VDNA_ONE] = 1;
+    valuesDna[VDNA_TWON3] = 24;
+    valuesDna[VDNA_TWON2] = 32;
+    valuesDna[VDNA_TWON1] = 40;
+    valuesDna[VDNA_TWO] = 60;
+    valuesDna[VDNA_THREEN2] = 160;
+    valuesDna[VDNA_THREEN1] = 200;
+    valuesDna[VDNA_THREE] = 400;
+    valuesDna[VDNA_FOURN1] = 1200;
+    valuesDna[VDNA_FOUR] = 4000;
+    valuesDna[VDNA_FIVE] = 1000000;
+    valuesDna[VDNA_CAPTURE] = 3500;
+
+    _sequenceDna[SDNA_NNNNN] = valuesDna[VDNA_NONE];
+    _sequenceDna[SDNA_NNNNM] = valuesDna[VDNA_ONE];
+    _sequenceDna[SDNA_NNNNY] = -valuesDna[VDNA_ONE];
+    _sequenceDna[SDNA_NNNMN] = valuesDna[VDNA_ONE];
+    _sequenceDna[SDNA_NNNMM] = valuesDna[VDNA_TWO];
+    _sequenceDna[SDNA_NNNYN] = -valuesDna[VDNA_ONE];
+    _sequenceDna[SDNA_NNNYY] = -valuesDna[VDNA_TWO];
+    _sequenceDna[SDNA_NNMNN] = valuesDna[VDNA_ONE];
+    _sequenceDna[SDNA_NNMNM] = valuesDna[VDNA_TWON1];
+    _sequenceDna[SDNA_NNMMN] = valuesDna[VDNA_TWO];
+    _sequenceDna[SDNA_NNMMM] = valuesDna[VDNA_THREE];
+    _sequenceDna[SDNA_NNMMY] = -valuesDna[VDNA_CAPTURE];
+    _sequenceDna[SDNA_NNYNN] = -valuesDna[VDNA_ONE];
+    _sequenceDna[SDNA_NNYNY] = -valuesDna[VDNA_TWON1];
+    _sequenceDna[SDNA_NNYYN] = -valuesDna[VDNA_TWO];
+    _sequenceDna[SDNA_NNYYM] = valuesDna[VDNA_CAPTURE];
+    _sequenceDna[SDNA_NNYYY] = -valuesDna[VDNA_THREE];
+    _sequenceDna[SDNA_NMNNN] = valuesDna[VDNA_ONE];
+    _sequenceDna[SDNA_NMNNM] = valuesDna[VDNA_TWON2];
+    _sequenceDna[SDNA_NMNMN] = valuesDna[VDNA_TWON1];
+    _sequenceDna[SDNA_NMNMM] = valuesDna[VDNA_THREEN1];
+    _sequenceDna[SDNA_NMMNN] = valuesDna[VDNA_TWO];
+    _sequenceDna[SDNA_NMMNM] = valuesDna[VDNA_THREEN1];
+    _sequenceDna[SDNA_NMMMN] = valuesDna[VDNA_THREE];
+    _sequenceDna[SDNA_NMMMM] = valuesDna[VDNA_FOUR];
+    _sequenceDna[SDNA_NMMYN] = -valuesDna[VDNA_CAPTURE];
+    _sequenceDna[SDNA_NMMYM] = -valuesDna[VDNA_CAPTURE];
+    _sequenceDna[SDNA_NMMYY] = -valuesDna[VDNA_CAPTURE];
+    _sequenceDna[SDNA_NMYYN] = valuesDna[VDNA_CAPTURE];
+    _sequenceDna[SDNA_NYNNN] = -valuesDna[VDNA_ONE];
+    _sequenceDna[SDNA_NYNNY] = -valuesDna[VDNA_TWON2];
+    _sequenceDna[SDNA_NYNYN] = -valuesDna[VDNA_TWON1];
+    _sequenceDna[SDNA_NYNYY] = -valuesDna[VDNA_THREEN1];
+    _sequenceDna[SDNA_NYMMN] = -valuesDna[VDNA_CAPTURE];
+    _sequenceDna[SDNA_NYYNN] = -valuesDna[VDNA_TWO];
+    _sequenceDna[SDNA_NYYNY] = -valuesDna[VDNA_THREEN1];
+    _sequenceDna[SDNA_NYYMN] = valuesDna[VDNA_CAPTURE];
+    _sequenceDna[SDNA_NYYMM] = valuesDna[VDNA_CAPTURE];
+    _sequenceDna[SDNA_NYYMY] = valuesDna[VDNA_CAPTURE];
+    _sequenceDna[SDNA_NYYYN] = -valuesDna[VDNA_THREE];
+    _sequenceDna[SDNA_NYYYY] = -valuesDna[VDNA_FOUR];
+    _sequenceDna[SDNA_MNNNN] = valuesDna[VDNA_ONE];
+    _sequenceDna[SDNA_MNNNM] = valuesDna[VDNA_TWON3];
+    _sequenceDna[SDNA_MNNMN] = valuesDna[VDNA_TWON2];
+    _sequenceDna[SDNA_MNNMM] = valuesDna[VDNA_THREEN2];
+    _sequenceDna[SDNA_MNMNN] = valuesDna[VDNA_TWON1];
+    _sequenceDna[SDNA_MNMNM] = valuesDna[VDNA_THREEN2];
+    _sequenceDna[SDNA_MNMMN] = valuesDna[VDNA_THREEN1];
+    _sequenceDna[SDNA_MNMMM] = valuesDna[VDNA_FOURN1];
+    _sequenceDna[SDNA_MNMMY] = -valuesDna[VDNA_CAPTURE];
+    _sequenceDna[SDNA_MNYYM] = valuesDna[VDNA_CAPTURE];
+    _sequenceDna[SDNA_MMNNN] = valuesDna[VDNA_TWO];
+    _sequenceDna[SDNA_MMNNM] = valuesDna[VDNA_THREEN2];
+    _sequenceDna[SDNA_MMNMN] = valuesDna[VDNA_THREEN1];
+    _sequenceDna[SDNA_MMNMM] = valuesDna[VDNA_FOURN1];
+    _sequenceDna[SDNA_MMMNN] = valuesDna[VDNA_THREE];
+    _sequenceDna[SDNA_MMMNM] = valuesDna[VDNA_FOURN1];
+    _sequenceDna[SDNA_MMMMN] = valuesDna[VDNA_FOUR];
+    _sequenceDna[SDNA_MMMMM] = valuesDna[VDNA_FIVE];
+    _sequenceDna[SDNA_MMYYN] = valuesDna[VDNA_CAPTURE];
+    _sequenceDna[SDNA_MYMMN] = -valuesDna[VDNA_CAPTURE];
+    _sequenceDna[SDNA_MYYNN] = valuesDna[VDNA_CAPTURE];
+    _sequenceDna[SDNA_MYYNM] = valuesDna[VDNA_CAPTURE];
+    _sequenceDna[SDNA_MYYNY] = valuesDna[VDNA_CAPTURE];
+    _sequenceDna[SDNA_YNNNN] = -valuesDna[VDNA_ONE];
+    _sequenceDna[SDNA_YNNNY] = -valuesDna[VDNA_TWON3];
+    _sequenceDna[SDNA_YNNYN] = -valuesDna[VDNA_TWON2];
+    _sequenceDna[SDNA_YNNYY] = -valuesDna[VDNA_THREEN2];
+    _sequenceDna[SDNA_YNMMY] = -valuesDna[VDNA_CAPTURE];
+    _sequenceDna[SDNA_YNYNN] = -valuesDna[VDNA_TWON1];
+    _sequenceDna[SDNA_YNYNY] = -valuesDna[VDNA_THREEN2];
+    _sequenceDna[SDNA_YNYYN] = -valuesDna[VDNA_THREEN1];
+    _sequenceDna[SDNA_YNYYM] = valuesDna[VDNA_CAPTURE];
+    _sequenceDna[SDNA_YNYYY] = -valuesDna[VDNA_FOURN1];
+    _sequenceDna[SDNA_YMMNN] = -valuesDna[VDNA_CAPTURE];
+    _sequenceDna[SDNA_YMMNM] = -valuesDna[VDNA_CAPTURE];
+    _sequenceDna[SDNA_YMMNY] = -valuesDna[VDNA_CAPTURE];
+    _sequenceDna[SDNA_YMYYN] = valuesDna[VDNA_CAPTURE];
+    _sequenceDna[SDNA_YYNNN] = -valuesDna[VDNA_TWO];
+    _sequenceDna[SDNA_YYNNY] = -valuesDna[VDNA_THREEN2];
+    _sequenceDna[SDNA_YYNYN] = -valuesDna[VDNA_THREEN1];
+    _sequenceDna[SDNA_YYNYY] = -valuesDna[VDNA_FOURN1];
+    _sequenceDna[SDNA_YYMMN] = -valuesDna[VDNA_CAPTURE];
+    _sequenceDna[SDNA_YYYNN] = -valuesDna[VDNA_THREE];
+    _sequenceDna[SDNA_YYYNY] = -valuesDna[VDNA_FOURN1];
+    _sequenceDna[SDNA_YYYYN] = -valuesDna[VDNA_FOUR];
+    _sequenceDna[SDNA_YYYYY] = -valuesDna[VDNA_FIVE];
+}
+
 bool Game::is_in_grid(int x, int y) {
     return (x >= 0 && x < 19 && y >= 0 && y < 19);
 }
@@ -188,4 +294,20 @@ std::vector<int> Game::get_interesting_pos() {
 
 void Game::print_board() {
     _board.print();
+}
+
+
+/* ************************ TEST ************************** */
+
+void Game::init_test_board() {
+    this->_board.set(9, 7, BLACK);
+    this->_board.set(9, 8, BLACK);
+    this->_board.set(9, 9, BLACK);
+    this->_board.set(9, 10, BLACK);
+    this->_board.set(9, 11, BLACK);
+    this->_board.set(7, 9, WHITE);
+    this->_board.set(8, 9, WHITE);
+    this->_board.set(10, 9, WHITE);
+    this->_board.set(11, 9, WHITE);
+
 }

@@ -12,8 +12,11 @@
 void    r_game(const httplib::Request &req, httplib::Response &res) {
     (void)req;
     res.set_header("Access-Control-Allow-Origin", "*");
-    std::string out = "{"+build_json_content({"game", "state"}, {"running", "winning"})+"}";
-    res.set_content(out, "application/json");
+
+    Game game;
+    
+    game.board_complex_heuristic(WHITESTONE);
+    res.set_content("{yolo}", "application/json");
 }
 
 /*
@@ -87,10 +90,9 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     for (int i = 0; i < 19*19; i++)
         board.push_back(-1);
 
-    int pos = game.minimax(INT_MIN, INT_MAX, 5, false, -1, board).first;
+    int pos = game.minimax(INT_MIN, INT_MAX, 4, false, -1, board).first;
 
     // display board
-    auto end_time = std::chrono::high_resolution_clock::now();
     for (int y = 0; y < 19; y++) {
         for (int x = 0; x < 19; x++) {
             if (board[x + y * 19] != -1)
@@ -100,6 +102,7 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
         }
         std::cout << std::endl;
     }
+    auto end_time = std::chrono::high_resolution_clock::now();
 
     std::cout << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count() << std::endl << std::endl;
 
@@ -109,8 +112,6 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     game.set(pos, request.color == WHITESTONE ? WHITE : BLACK);
 
     removed = game.get_captured(pos);
-
-
 
     game.unset(removed);
 
