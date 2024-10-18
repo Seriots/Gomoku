@@ -32,6 +32,7 @@ void Game::init_sequenceDna() {
     valuesDna[VDNA_THREE] = 1400;
     valuesDna[VDNA_FOURN1] = 3400;
     valuesDna[VDNA_FOUR] = 15100;
+    valuesDna[VDNA_THREEFREE] = 20000;
     valuesDna[VDNA_FIVE] = 1000000;
     valuesDna[VDNA_POTENTIAL_CAPTURE] = 3500;
     valuesDna[VDNA_EFFECTIVE_CAPTURE_0] = 5000;
@@ -64,7 +65,7 @@ void Game::init_sequenceDna() {
     _sequenceDna[SDNA_NMNMM] = valuesDna[VDNA_THREEN1];
     _sequenceDna[SDNA_NMMNN] = valuesDna[VDNA_TWO];
     _sequenceDna[SDNA_NMMNM] = valuesDna[VDNA_THREEN1];
-    _sequenceDna[SDNA_NMMMN] = valuesDna[VDNA_THREE];
+    _sequenceDna[SDNA_NMMMN] = valuesDna[VDNA_THREEFREE];
     _sequenceDna[SDNA_NMMMM] = valuesDna[VDNA_FOUR];
     _sequenceDna[SDNA_NMMYN] = minusFactor * valuesDna[VDNA_POTENTIAL_CAPTURE];
     _sequenceDna[SDNA_NMMYM] = minusFactor * valuesDna[VDNA_POTENTIAL_CAPTURE];
@@ -80,7 +81,7 @@ void Game::init_sequenceDna() {
     _sequenceDna[SDNA_NYYMN] = valuesDna[VDNA_POTENTIAL_CAPTURE];
     _sequenceDna[SDNA_NYYMM] = valuesDna[VDNA_POTENTIAL_CAPTURE];
     _sequenceDna[SDNA_NYYMY] = valuesDna[VDNA_POTENTIAL_CAPTURE];
-    _sequenceDna[SDNA_NYYYN] = minusFactor * valuesDna[VDNA_THREE];
+    _sequenceDna[SDNA_NYYYN] = minusFactor * valuesDna[VDNA_THREEFREE];
     _sequenceDna[SDNA_NYYYY] = minusFactor * valuesDna[VDNA_FOUR];
     _sequenceDna[SDNA_MNNNN] = valuesDna[VDNA_ONE];
     _sequenceDna[SDNA_MNNNM] = valuesDna[VDNA_TWON3];
@@ -306,14 +307,7 @@ void Game::print_board() {
 /* ************************ TEST ************************** */
 
 void Game::init_test_board() {
-    this->_board.set(9, 7, BLACK);
-    this->_board.set(9, 8, BLACK);
-    this->_board.set(9, 9, BLACK);
-    this->_board.set(9, 10, BLACK);
-    this->_board.set(9, 11, BLACK);
-    this->_board.set(7, 9, WHITE);
-    this->_board.set(8, 9, WHITE);
-    this->_board.set(10, 9, WHITE);
-    this->_board.set(11, 9, WHITE);
-
+    this->_board.set(8, 8, WHITE);
+    this->_board.set(9, 9, WHITE);
+    this->_board.set(10, 10, WHITE);
 }

@@ -15,8 +15,9 @@ void    r_game(const httplib::Request &req, httplib::Response &res) {
 
     Game game;
     
-    game.board_complex_heuristic(WHITESTONE);
-    res.set_content("{yolo}", "application/json");
+    int score = game.board_complex_heuristic(BLACKSTONE);
+    std::cout << score << std::endl;
+    res.set_content("{"+ std::to_string(score) + "}", "application/json");
 }
 
 /*
