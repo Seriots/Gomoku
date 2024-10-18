@@ -30,7 +30,7 @@ bool Game::check_free_three(int x, int y, int ax, int ay, e_cell color) {
 
     for (int i = -4; i <= 4; i++) {
         int nx = x + (i * ax);
-        int ny = y + (i * ay); 
+        int ny = y + (i * ay);
         if (i == 0)
             axis_values.push_back(color);
         else if (is_in_grid(nx, ny))
@@ -183,6 +183,22 @@ std::vector<int> Game::get_interesting_pos() {
     }
     if (res.size() == 0)
         res.push_back(180);
+
+    std::cout << "res before sorting: ";
+    for (size_t i = 0; i < res.size(); i++) {
+        std::cout << res[i] << " ";
+    }
+
+    std::sort(res.begin(), res.end(), [this](int a, int b) {
+        return this->complex_heuristic(WHITESTONE, a) > this->complex_heuristic(WHITESTONE, b);
+    });
+
+    std::cout << "\n\nres after sorting: ";
+    for (size_t i = 0; i < res.size(); i++) {
+        std::cout << res[i] << " ";
+    }
+    std::cout << std::endl;
+
     return res;
 }
 

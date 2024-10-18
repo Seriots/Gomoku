@@ -10,13 +10,15 @@ std::pair<int, int> Game::minimax(int alpha, int beta, int depth, bool is_maxi, 
                 int pos = *it;
                 if (_board.get(pos).get() == NONE)
                 {
-                    this->set(pos, WHITE);
+                    this->set(pos, BLACK);
                     int tmp = this->minimax(alpha, beta, depth - 1, false, pos, board).second;
                     this->unset(pos);
                     if (tmp > max_eval) {
                         max_eval = tmp;
                         best_pos = pos;
                     }
+                    if (depth == 3)
+                        board[pos] = tmp;
                     alpha = std::max(alpha, tmp);
                     if (beta <= alpha) {
                         //std::cout << "pruning at " << pos << std::endl;
@@ -32,13 +34,11 @@ std::pair<int, int> Game::minimax(int alpha, int beta, int depth, bool is_maxi, 
                 int pos = *it;
                 if (_board.get(pos).get() == NONE)
                 {
-                    this->set(pos, BLACK);
+                    this->set(pos, WHITE);
                     int tmp = this->minimax(alpha, beta, depth - 1, true, pos, board).second;
                     this->unset(pos);
 
-                    //board
-                    if (depth == 5)
-                        board[pos] = tmp;
+
                     if (tmp < min_eval) {
                         min_eval = tmp;
                         best_pos = pos;
@@ -54,9 +54,9 @@ std::pair<int, int> Game::minimax(int alpha, int beta, int depth, bool is_maxi, 
         }
     } else {
             //this->print_board();
-            int score = this->full_simple_heuristic(is_maxi ? WHITESTONE : BLACKSTONE);
-            std::string color = is_maxi ? "WHITE" : "BLACK";
-            //std::cout << "complex heuristic for " << color << " at " << next_pos << " is " << score << std::endl;
+            int score = this->full_simple_heuristic(is_maxi ? BLACKSTONE : WHITESTONE);
+            std::string color = is_maxi ? "black" : "white";
+            std::cout << "complex heuristic for " << color << " at " << next_pos << " is " << score << std::endl;
             return std::make_pair(next_pos, score);
     }
 }
