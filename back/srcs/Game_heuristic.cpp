@@ -231,3 +231,121 @@ int Game::full_simple_heuristic(e_color color) {
     }
     return score;
 }
+
+//static int computeSequenceName(std::deque<e_cell> &sequence, e_cell &my_color, e_cell &other_color) {
+//    int name = 0;
+//    for (size_t i = 0; i < sequence.size(); i++) {
+//        name *= 3;
+//        if (sequence[i] == my_color)
+//            name += 1;
+//        else if (sequence[i] == other_color)
+//            name += 2;
+//    }
+//    return name;
+//}
+
+//static int computeSequenceName2(std::deque<e_cell> &sequence, int previous_name, e_cell &my_color, e_cell &other_color) {
+//    int name = previous_name;
+//    if (sequence.size() < 5)
+//        return name;
+//    else if (sequence.size() > 5)
+//        name = (name - sequence[0] * 243) * 3 + sequence[5];
+//    else
+//        name = computeSequenceName(sequence, my_color, other_color);
+
+//    return name;
+//}
+
+//static void display_sequence(std::deque<e_cell> &sequence) {
+//    for (size_t i = 0; i < sequence.size(); i++) {
+//        if (sequence[i] == WHITE)
+//            std::cout << "W";
+//        else if (sequence[i] == BLACK)
+//            std::cout << "B";
+//        else
+//            std::cout << "N";
+//    }
+//    std::cout << std::endl;
+//}
+
+static int increment_name(int name, e_cell &my_color, e_cell &other_color, e_cell cell) {
+    name *= 3;
+    if (cell == my_color)
+        name += 1;
+    else if (cell== other_color)
+        name += 2;
+    return name;
+}
+
+static int decrement_name(int name) {
+    if (name >= 162)
+        name -= 162;
+    else if (name >= 81)
+        name -= 81;
+    return name;
+}
+
+int Game::board_complex_heuristic(e_color color) {
+    e_cell my = color == WHITESTONE ? WHITE : BLACK;
+    e_cell other = (my == WHITE) ? BLACK : WHITE;
+
+    int sequence_1_name;
+    int sequence_2_name;
+
+    int score = 0;
+
+    //this->print_board();
+    /* Handle horizontal and vertical sequences */
+    for (int y = 0; y < 19; y++) {
+        sequence_1_name = 0;
+        sequence_2_name = 0;
+        sequence_1_name = increment_name(sequence_1_name, my, other, _board.get(0, y).get());
+        sequence_1_name = increment_name(sequence_1_name, my, other, _board.get(1, y).get());
+        sequence_1_name = increment_name(sequence_1_name, my, other, _board.get(2, y).get());
+        sequence_1_name = increment_name(sequence_1_name, my, other, _board.get(3, y).get());
+
+        sequence_2_name = increment_name(sequence_2_name, my, other, _board.get(y, 0).get());
+        sequence_2_name = increment_name(sequence_2_name, my, other, _board.get(y, 1).get());
+        sequence_2_name = increment_name(sequence_2_name, my, other, _board.get(y, 2).get());
+        sequence_2_name = increment_name(sequence_2_name, my, other, _board.get(y, 3).get());
+        for (int x = 4; x < 19; x++) {
+            sequence_1_name = increment_name(sequence_1_name, my, other, _board.get(x, y).get());
+            sequence_2_name = increment_name(sequence_2_name, my, other, _board.get(y, x).get());
+            score += this->_sequenceDna[(e_sequenceDna)sequence_1_name];
+            score += this->_sequenceDna[(e_sequenceDna)sequence_2_name];
+            sequence_1_name = decrement_name(sequence_1_name);
+            sequence_2_name = decrement_name(sequence_2_name);
+        }
+    }
+
+    /* Handle diagonales sequences */
+    for (int i = 0; i < 29; i++) {
+        sequence_1_name = 0;
+        sequence_2_name = 0;
+        int x = std::max(-14 + i, 0);
+        int y = std::max(14 - i, 0);
+        sequence_1_name = increment_name(sequence_1_name, my, other, _board.get(x, y).get());
+        sequence_1_name = increment_name(sequence_1_name, my, other, _board.get(x+1, y+1).get());
+        sequence_1_name = increment_name(sequence_1_name, my, other, _board.get(x+2, y+2).get());
+        sequence_1_name = increment_name(sequence_1_name, my, other, _board.get(x+3, y+3).get());
+
+        sequence_2_name = increment_name(sequence_2_name, my, other, _board.get(y, x).get());
+        sequence_2_name = increment_name(sequence_2_name, my, other, _board.get(y+1, x+1).get());
+        sequence_2_name = increment_name(sequence_2_name, my, other, _board.get(y+2, x+2).get());
+        sequence_2_name = increment_name(sequence_2_name, my, other, _board.get(y+3, x+3).get());
+        x+=4;
+        y+=4;
+        while (y < 19 && x < 19) {
+            sequence_1_name = increment_name(sequence_1_name, my, other, _board.get(x, y).get());
+            sequence_2_name = increment_name(sequence_2_name, my, other, _board.get(y, x).get());
+            score += this->_sequenceDna[(e_sequenceDna)sequence_1_name];
+            score += this->_sequenceDna[(e_sequenceDna)sequence_2_name];
+            sequence_1_name = decrement_name(sequence_1_name);
+            sequence_2_name = decrement_name(sequence_2_name);
+            y++;
+            x++;
+        }
+    }
+    //std::cout << "Score: " << score << std::endl;
+    return score;   
+}

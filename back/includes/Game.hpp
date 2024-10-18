@@ -10,16 +10,18 @@
 
 class Game {
     private:
-        Board                   _board;
-        t_position              _center;
-        std::map<e_dna, int>    _dna;
-        t_request               _request;
-        std::vector<int>        _interesting_pos;
-        std::vector<int>        _blocked_pos;
+        Board                           _board;
+        t_position                      _center;
+        std::map<e_dna, int>            _dna;
+        t_request                       _request;
+        std::vector<int>                _interesting_pos;
+        std::vector<int>                _blocked_pos;
+        std::map<e_sequenceDna, int>    _sequenceDna;
 
-
+        void                            init_test_board();
     public:
         /* ******* Game core ******* */
+        Game();
         Game(t_request &request);
         Game(const Game &g);
         ~Game();
@@ -35,6 +37,7 @@ class Game {
 
         /* ******* Game utils ******* */
         void                            init_dna();
+        void                            init_sequenceDna();
         bool                            is_in_grid(int x, int y);
         bool                            check_free_three(int x, int y, int ax, int ay, e_cell color);
         bool                            check_double_free_three(int x, int y, e_cell color);
@@ -60,7 +63,7 @@ class Game {
         int                             simple_heuristic(e_color color, int pos);
         int                             complex_heuristic(e_color color, int &pos);
         int                             full_simple_heuristic(e_color color);
-        
+        int                             board_complex_heuristic(e_color color); 
         /* ******* Game minimax ******* */
         std::pair<int, int>             minimax(int alpha, int beta, int depth, bool is_maxi, int next_pos, std::vector<int> &board);
 };
