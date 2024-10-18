@@ -11,6 +11,8 @@ typedef struct s_population {
 
 int NB_DNA = 16;
 int POPULATION_NUMBER_BY_GEN = 50;
+int SCORE_THRESHOLD = 40;
+int POPULATION_SAVED = 10;
 
 std::ostream& operator<<(std::ostream &os, const e_valueDna &c) {
     if (c == VDNA_ONE)
@@ -161,8 +163,7 @@ int main() {
         return a.score > b.score;
     });
     logsPopulationScore(logfile, population);
-    // sort population
-    // select bests
+
     // crossover
     // mutate
     // repeat
