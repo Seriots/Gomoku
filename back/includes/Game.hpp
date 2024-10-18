@@ -45,9 +45,11 @@ class Game {
         std::vector<int>                get_new_blocked_pos(e_color color);
         std::vector<int>                get_captured(int pos);
         std::vector<int>                get_interesting_pos();
+        void                            sort_interesting_pos(e_color const &color);
         void                            print_board();
+        std::map<e_cell, std::vector<int> > get_all_positions_stone();
 
-        
+
         /* ******* Game end ******* */
         bool                            check_win_by_capture();
         bool                            check_win_by_alignement(int pos, e_cell color);
@@ -63,7 +65,7 @@ class Game {
         int                             simple_heuristic(e_color color, int pos);
         int                             complex_heuristic(e_color color, int &pos);
         int                             full_simple_heuristic(e_color color);
-        int                             board_complex_heuristic(e_color color); 
+        int                             board_complex_heuristic(e_color color);
         /* ******* Game minimax ******* */
         std::pair<int, int>             minimax(int alpha, int beta, int depth, bool is_maxi, int next_pos, std::vector<int> &board);
 };

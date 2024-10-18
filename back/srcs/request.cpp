@@ -14,7 +14,7 @@ void    r_game(const httplib::Request &req, httplib::Response &res) {
     res.set_header("Access-Control-Allow-Origin", "*");
 
     Game game;
-    
+
     game.board_complex_heuristic(WHITESTONE);
     res.set_content("{yolo}", "application/json");
 }
@@ -57,7 +57,7 @@ void    r_action(const httplib::Request &req, httplib::Response &res) {
     added.push_back({request.pos, request.color == WHITESTONE ? "white" : "black"});
     for (size_t i = 0; i < blocked_list.size(); i++)
         added.push_back({blocked_list[i], "blocked"});
-    
+
     t_endgame_info endgame_info = game.check_end_game(request.pos);
 
     res.set_content(build_action_response(added, removed, endgame_info), "application/json"); // everything is send in a nicely formated json
@@ -90,7 +90,7 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     for (int i = 0; i < 19*19; i++)
         board.push_back(-1);
 
-    int pos = game.minimax(INT_MIN, INT_MAX, 3, false, -1, board).first;
+    int pos = game.minimax(INT_MIN, INT_MAX, 6, true, -1, board).first;
 
     // display board
     for (int y = 0; y < 19; y++) {

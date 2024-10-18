@@ -142,7 +142,7 @@ bool Game::check_free_three(int x, int y, int ax, int ay, e_cell color) {
 
     for (int i = -4; i <= 4; i++) {
         int nx = x + (i * ax);
-        int ny = y + (i * ay); 
+        int ny = y + (i * ay);
         if (i == 0)
             axis_values.push_back(color);
         else if (is_in_grid(nx, ny))
@@ -295,11 +295,38 @@ std::vector<int> Game::get_interesting_pos() {
     }
     if (res.size() == 0)
         res.push_back(180);
+
+    std::sort(res.begin(), res.end(), [this](int a, int b) {
+        return this->complex_heuristic(BLACKSTONE, a) > this->complex_heuristic(BLACKSTONE, b);
+    });
+
     return res;
+}
+
+void Game::sort_interesting_pos(e_color const &color) {
+    std::sort(this->_interesting_pos.begin(), this->_interesting_pos.end(), [this, color](int a, int b) {
+        return this->complex_heuristic(color, a) > this->complex_heuristic(color, b);
+    });
 }
 
 void Game::print_board() {
     _board.print();
+}
+
+std::map<e_cell, std::vector<int> > Game::get_all_positions_stone() {
+    std::map<e_cell, std::vector<int> > positions;
+    // set a vector for Black and White stones
+    positions[WHITE] = std::vector<int>();
+    positions[BLACK] = std::vector<int>();
+
+    for (int i = 0; i < 361; i++) {
+        if (_board.get(i).get() == WHITE)
+            positions[WHITE].push_back(i);
+        else if (_board.get(i).get() == BLACK)
+            positions[BLACK].push_back(i);
+    }
+
+    return positions;
 }
 
 

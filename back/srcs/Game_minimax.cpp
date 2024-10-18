@@ -6,13 +6,16 @@ std::pair<int, int> Game::minimax(int alpha, int beta, int depth, bool is_maxi, 
         if (is_maxi) {
             int max_eval = INT_MIN;
             int best_pos = -1;
+            //this->sort_interesting_pos(BLACKSTONE);
             for (std::vector<int>::iterator it = this->_interesting_pos.begin(); it != this->_interesting_pos.end(); it++) {
                 int pos = *it;
                 if (_board.get(pos).get() == NONE)
                 {
-                    this->set(pos, WHITE);
+                    this->set(pos, BLACK);
                     int tmp = this->minimax(alpha, beta, depth - 1, false, pos, board).second;
                     this->unset(pos);
+                    if (depth == 6)
+                        board[pos] = tmp;
                     if (tmp > max_eval) {
                         max_eval = tmp;
                         best_pos = pos;
@@ -28,17 +31,15 @@ std::pair<int, int> Game::minimax(int alpha, int beta, int depth, bool is_maxi, 
         } else {
             int min_eval = INT_MAX;
             int best_pos = -1;
+            //this->sort_interesting_pos(WHITESTONE);
             for (std::vector<int>::iterator it = this->_interesting_pos.begin(); it != this->_interesting_pos.end(); it++) {
                 int pos = *it;
                 if (_board.get(pos).get() == NONE)
                 {
-                    this->set(pos, BLACK);
+                    this->set(pos, WHITE);
                     int tmp = this->minimax(alpha, beta, depth - 1, true, pos, board).second;
                     this->unset(pos);
 
-                    //board
-                    if (depth == 5)
-                        board[pos] = tmp;
                     if (tmp < min_eval) {
                         min_eval = tmp;
                         best_pos = pos;
@@ -53,10 +54,25 @@ std::pair<int, int> Game::minimax(int alpha, int beta, int depth, bool is_maxi, 
             return std::make_pair(best_pos, min_eval);
         }
     } else {
-            //this->print_board();
-            int score = this->board_complex_heuristic(is_maxi ? WHITESTONE : BLACKSTONE);
+
+            this->print_board();
+            int score = this->board_complex_heuristic(BLACKSTONE);
+
+            std::map<e_cell, std::vector<int> > positions = this->get_all_positions_stone();
+            std::vector<int> white = positions[WHITE];
+            std::vector<int> black = positions[BLACK];
+            std::cout << "WHITE: " << white.size() << std::endl;
+            for (size_t i = 0; i < white.size(); i++)
+                std::cout << white[i] << " ";
+            std::cout << std::endl;
+
+            std::cout << "BLACK: " << black.size() << std::endl;
+            for (size_t i = 0; i < black.size(); i++)
+                std::cout << black[i] << " ";
+            std::cout << std::endl << std::endl;
+
             std::string color = is_maxi ? "WHITE" : "BLACK";
-            //std::cout << "complex heuristic for " << color << " at " << next_pos << " is " << score << std::endl;
+            std::cout << "complex heuristic for " << color << " at " << next_pos << " is " << score << std::endl << std::endl << std::endl;
             return std::make_pair(next_pos, score);
     }
 }
