@@ -6,8 +6,8 @@
 
 [ ] Make a beautiful front
 
-[ ] Make the heuristic on the full board
-
+[X] Make the heuristic on the full board
+    [ ] Give specific value for opopnent like four in a row or freethree
 
 DNA:
 
