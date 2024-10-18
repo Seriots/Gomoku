@@ -21,7 +21,6 @@ void Game::init_dna() {
 void Game::init_sequenceDna() {
     std::map<e_valueDna, int> valuesDna;
 
-    valuesDna[VDNA_NONE] = 0;
     valuesDna[VDNA_ONE] = 1;
     valuesDna[VDNA_TWON3] = 24;
     valuesDna[VDNA_TWON2] = 32;
@@ -41,7 +40,6 @@ void Game::init_sequenceDna() {
 
     float minusFactor = -1.0;
 
-    _sequenceDna[SDNA_NNNNN] = valuesDna[VDNA_NONE];
     _sequenceDna[SDNA_NNNNM] = valuesDna[VDNA_ONE];
     _sequenceDna[SDNA_NNNNY] = minusFactor * valuesDna[VDNA_ONE];
     _sequenceDna[SDNA_NNNMN] = valuesDna[VDNA_ONE];
