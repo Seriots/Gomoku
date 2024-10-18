@@ -68,4 +68,5 @@ class Game {
         int                             board_complex_heuristic(e_color color);
         /* ******* Game minimax ******* */
         std::pair<int, int>             minimax(int alpha, int beta, int depth, bool is_maxi, int next_pos, std::vector<int> &board);
+        std::pair<int, int>             negamax(int alpha, int beta, int depth, int color, int next_pos, std::vector<int> &board);
 };

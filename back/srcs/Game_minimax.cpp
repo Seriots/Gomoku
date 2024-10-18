@@ -78,6 +78,43 @@ std::pair<int, int> Game::minimax(int alpha, int beta, int depth, bool is_maxi, 
 }
 
 
+std::pair<int, int> Game::negamax(int alpha, int beta, int depth, int color, int next_pos, std::vector<int> &board) {
+    if (depth) {
+        int max_eval = INT_MIN;
+        int best_pos = -1;
+
+        for (std::vector<int>::iterator it = this->_interesting_pos.begin(); it != this->_interesting_pos.end(); it++) {
+            int pos = *it;
+            if (_board.get(pos).get() == NONE)
+            {
+                this->set(pos, color == 1 ? BLACK : WHITE);
+
+                int tmp = -this->negamax(alpha, beta, depth - 1, -color, pos, board).second;
+
+                this->unset(pos);
+
+                if (depth == 6)
+                    board[pos] = tmp;
+
+                if (tmp > max_eval) {
+                    max_eval = tmp;
+                    best_pos = pos;
+                }
+
+                alpha = std::max(alpha, tmp);
+                if (beta <= alpha) {
+                    break;
+                }
+            }
+        }
+        return std::make_pair(best_pos, max_eval);
+    } else {
+
+        int score = color * this->board_complex_heuristic(BLACKSTONE);
+        return std::make_pair(next_pos, score);
+    }
+}
+
 //bool is_cutting_alpha_beta(int *alpha, int *beta, int score, int is_maxi) {
 //    if (is_maxi)
 //    {
