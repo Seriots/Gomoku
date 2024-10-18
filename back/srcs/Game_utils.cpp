@@ -29,10 +29,10 @@ void Game::init_sequenceDna() {
     valuesDna[VDNA_TWO] = 60;
     valuesDna[VDNA_THREEN2] = 160;
     valuesDna[VDNA_THREEN1] = 200;
-    valuesDna[VDNA_THREE] = 1400;
-    valuesDna[VDNA_FOURN1] = 3400;
-    valuesDna[VDNA_FOUR] = 15100;
-    valuesDna[VDNA_THREEFREE] = 20000;
+    valuesDna[VDNA_THREE] = 1000;
+    valuesDna[VDNA_FOURN1] = 2000;
+    valuesDna[VDNA_FOUR] = 7200;
+    valuesDna[VDNA_THREEFREE] = 4000;
     valuesDna[VDNA_FIVE] = 1000000;
     valuesDna[VDNA_POTENTIAL_CAPTURE] = 3500;
     valuesDna[VDNA_EFFECTIVE_CAPTURE_0] = 5000;

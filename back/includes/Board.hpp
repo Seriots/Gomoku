@@ -25,6 +25,6 @@ class Board {
         Cell get(int x, int y) const;
         Cell get(int pos) const;
         void set(int x, int y, e_cell cell);
-
+        void set(int pos, e_cell cell);
         void print();
 };
