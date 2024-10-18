@@ -324,26 +324,29 @@ int Game::board_complex_heuristic(e_color color) {
         sequence_2_name = 0;
         int x = std::max(-14 + i, 0);
         int y = std::max(14 - i, 0);
+        int x2 = std::min(4 + i, 18);
         sequence_1_name = increment_name(sequence_1_name, my, other, _board.get(x, y).get());
         sequence_1_name = increment_name(sequence_1_name, my, other, _board.get(x+1, y+1).get());
         sequence_1_name = increment_name(sequence_1_name, my, other, _board.get(x+2, y+2).get());
         sequence_1_name = increment_name(sequence_1_name, my, other, _board.get(x+3, y+3).get());
 
-        sequence_2_name = increment_name(sequence_2_name, my, other, _board.get(y, x).get());
-        sequence_2_name = increment_name(sequence_2_name, my, other, _board.get(y+1, x+1).get());
-        sequence_2_name = increment_name(sequence_2_name, my, other, _board.get(y+2, x+2).get());
-        sequence_2_name = increment_name(sequence_2_name, my, other, _board.get(y+3, x+3).get());
+        sequence_2_name = increment_name(sequence_2_name, my, other, _board.get(x2, x).get());
+        sequence_2_name = increment_name(sequence_2_name, my, other, _board.get(x2-1, x+1).get());
+        sequence_2_name = increment_name(sequence_2_name, my, other, _board.get(x2-2, x+2).get());
+        sequence_2_name = increment_name(sequence_2_name, my, other, _board.get(x2-3, x+3).get());
         x+=4;
         y+=4;
+        x2-=4;
         while (y < 19 && x < 19) {
             sequence_1_name = increment_name(sequence_1_name, my, other, _board.get(x, y).get());
-            sequence_2_name = increment_name(sequence_2_name, my, other, _board.get(y, x).get());
+            sequence_2_name = increment_name(sequence_2_name, my, other, _board.get(x2, x).get());
             score += this->_sequenceDna[(e_sequenceDna)sequence_1_name];
             score += this->_sequenceDna[(e_sequenceDna)sequence_2_name];
             sequence_1_name = decrement_name(sequence_1_name);
             sequence_2_name = decrement_name(sequence_2_name);
-            y++;
             x++;
+            y++;
+            x2--;
         }
     }
     //std::cout << "Score: " << score << std::endl;
