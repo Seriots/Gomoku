@@ -33,3 +33,6 @@
 
 back/env
 back/Gomoku
+.vscode/settings.json
+settings.json
+Gomoku
