@@ -34,3 +34,5 @@
 back/env
 back/Gomoku
 Gomoku
+trainer
+back/logs/*
