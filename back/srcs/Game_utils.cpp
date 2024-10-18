@@ -334,21 +334,7 @@ std::map<e_cell, std::vector<int> > Game::get_all_positions_stone() {
 /* ************************ TEST ************************** */
 
 void Game::init_test_board() {
-<<<<<<< HEAD
-    this->_board.set(9, 7, BLACK);
-    this->_board.set(9, 8, BLACK);
-    this->_board.set(9, 9, BLACK);
-    this->_board.set(9, 10, BLACK);
-    this->_board.set(9, 11, BLACK);
-    this->_board.set(7, 9, WHITE);
-    this->_board.set(8, 9, WHITE);
-    this->_board.set(10, 9, WHITE);
-    this->_board.set(11, 9, WHITE);
-
-}
-=======
     this->_board.set(8, 8, WHITE);
     this->_board.set(9, 9, WHITE);
     this->_board.set(10, 10, WHITE);
 }
->>>>>>> heuristic

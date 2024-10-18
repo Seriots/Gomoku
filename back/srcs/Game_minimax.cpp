@@ -14,8 +14,10 @@ std::pair<int, int> Game::minimax(int alpha, int beta, int depth, bool is_maxi, 
                     this->set(pos, BLACK);
                     int tmp = this->minimax(alpha, beta, depth - 1, false, pos, board).second;
                     this->unset(pos);
-                    if (depth == 6)
+                    /* LOG */
+                    if (depth == 1)
                         board[pos] = tmp;
+                    /* ****** */
                     if (tmp > max_eval) {
                         max_eval = tmp;
                         best_pos = pos;
@@ -58,6 +60,7 @@ std::pair<int, int> Game::minimax(int alpha, int beta, int depth, bool is_maxi, 
             this->print_board();
             int score = this->board_complex_heuristic(BLACKSTONE);
 
+            /* LOG */
             std::map<e_cell, std::vector<int> > positions = this->get_all_positions_stone();
             std::vector<int> white = positions[WHITE];
             std::vector<int> black = positions[BLACK];
@@ -73,6 +76,7 @@ std::pair<int, int> Game::minimax(int alpha, int beta, int depth, bool is_maxi, 
 
             std::string color = is_maxi ? "WHITE" : "BLACK";
             std::cout << "complex heuristic for " << color << " at " << next_pos << " is " << score << std::endl << std::endl << std::endl;
+            /* ******** */
             return std::make_pair(next_pos, score);
     }
 }
