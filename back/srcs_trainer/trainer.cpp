@@ -9,10 +9,19 @@ typedef struct s_population {
     int score;
 } t_population;
 
+enum e_derivation_power {
+    NOTHING,
+    SMALL,
+    MEDIUM,
+    BIG
+};
+
 int NB_DNA = 16;
 int POPULATION_NUMBER_BY_GEN = 50;
 int SCORE_THRESHOLD = 40;
 int POPULATION_SAVED = 10;
+
+int NB_GENERATION = 50;
 
 std::ostream& operator<<(std::ostream &os, const e_valueDna &c) {
     if (c == VDNA_ONE)
@@ -48,6 +57,21 @@ std::ostream& operator<<(std::ostream &os, const e_valueDna &c) {
     else if (c == VDNA_EFFECTIVE_CAPTURE_3)
         os << "VDNA_EFFECTIVE_CAPTURE_3";
     return os;
+}
+
+int rand_weighted(std::vector<double> weights) {
+    double sum = 0;
+    for (auto &weight : weights) {
+        sum += weight;
+    }
+    double random = (double)rand() / RAND_MAX;
+    double sum_weights = 0;
+    for (size_t i = 0; i < weights.size(); i++) {
+        sum_weights += weights[i] / sum;
+        if (random <= sum_weights)
+            return i;
+    }
+    return 0;
 }
 
 std::string generateNewFilename(std::string exec_time, int generation) {
@@ -128,6 +152,21 @@ std::vector<int> generateRandonDna(int nbDna) {
     return dna;
 }
 
+std::vector<int> generateDnaFromParents(int nbDna, std::map<e_valueDna, int> &parent1, std::map<e_valueDna, int> &parent2, e_derivation_power power) {
+    std::vector<int> dna(nbDna);
+
+    for (int i = 0; i < nbDna; i++) {
+        dna[i] = rand() % 2 ? parent1[(e_valueDna)i] : parent2[(e_valueDna)i];
+        if (power == SMALL)
+            dna[i] *= 1 + (float)((rand() % 20) - 10) / 100;
+        else if (power == MEDIUM)
+            dna[i] *= 1 + (float)((rand() % 40) - 20) / 100;
+        else if (power == BIG)
+            dna[i] *= 1 + (float)((rand() % 80) - 40) / 100;        
+    }
+    return dna;
+}
+
 std::vector<t_population> generatePopulationsGenZero(int populationSize, int nbDna) {
     std::vector<t_population> population(populationSize);
 
@@ -140,8 +179,41 @@ std::vector<t_population> generatePopulationsGenZero(int populationSize, int nbD
     return population;
 }
 
+std::vector<t_population> generatePopulationFromLastGen(int populationSize, int nbDna, std::vector<t_population> &lastGen) {
+    std::vector<t_population> population(populationSize);
+    
+
+    for (int i = 0; i < POPULATION_SAVED; i++) {
+        population[i].dna = lastGen[i].dna;
+        population[i].id = lastGen[i].id;
+        population[i].score = 0;
+    }
+    
+    t_population parent1;
+    t_population parent2;
+    e_derivation_power power;
+
+    for (int i = POPULATION_SAVED; i < populationSize; i++) {
+        population[i].id = generateRandomId();
+        parent1 = lastGen[rand() % POPULATION_SAVED];
+        parent2 = lastGen[rand() % POPULATION_SAVED];
+        power = (e_derivation_power)(rand_weighted({0.4, 0.3, 0.2, 0.1}));
+        population[i].dna = generateValuesMaps(generateDnaFromParents(nbDna, parent1.dna, parent2.dna, power));
+        population[i].score = 0;
+    }
+    return population;
+}
+
+std::vector<t_population> generatePopulation(int populationSize, int nbDna, int gen, std::vector<t_population> &lastGen) {
+    if (gen == 0) 
+        return generatePopulationsGenZero(populationSize, nbDna);
+    else
+        return generatePopulationFromLastGen(populationSize, nbDna, lastGen);
+}
+
 void train(std::vector<t_population> &population, int populationSize) {
     for (int i = 0; i < populationSize; i++) {
+        population[i].score = 0;
         for (int dna = 0; dna < NB_DNA - 6; dna++) {
             population[i].score += population[i].dna[(e_valueDna)dna];
         }
@@ -150,22 +222,25 @@ void train(std::vector<t_population> &population, int populationSize) {
 }
 
 int main() {
-    std::string exec_time = std::to_string(time(NULL));
+    std::vector<t_population>   population;
+    std::string                 exec_time;
+    std::string                 logfile;
+
     srand(time(NULL));
-    std::map<std::string, int> gen_records;
+    
+    exec_time = std::to_string(time(NULL));
 
-    std::string logfile = generateNewFilename(exec_time, 0);
-    std::vector<t_population> population = generatePopulationsGenZero(POPULATION_NUMBER_BY_GEN, NB_DNA);
-    logsPopulationDna(logfile, population);
+    for (int i = 0; i < NB_GENERATION; i++) {
+        logfile = generateNewFilename(exec_time, i);
+        population = generatePopulation(POPULATION_NUMBER_BY_GEN, NB_DNA, i, population);
+        logsPopulationDna(logfile, population);
+        train(population, POPULATION_NUMBER_BY_GEN);
+        std::sort(population.begin(), population.end(), [](t_population a, t_population b) {
+            return a.score > b.score;
+        });
+        logsPopulationScore(logfile, population);
+    }
 
-    train(population, POPULATION_NUMBER_BY_GEN);
-    std::sort(population.begin(), population.end(), [](t_population a, t_population b) {
-        return a.score > b.score;
-    });
-    logsPopulationScore(logfile, population);
 
-    // crossover
-    // mutate
-    // repeat
     return 0;
 }
