@@ -107,6 +107,21 @@ t_request create_new_ia_request(const httplib::Request &req) {
     return {0, 0, 0, color, white, black, blocked, white_captured, black_captured};
 }
 
+std::vector<int> get_request_dna(const httplib::Request &req) {
+    std::vector<int> dna;
+    size_t pos = 0;
+    size_t end = 0;
+    if (req.path_params.at("dna").empty())
+        return dna;
+
+    while ((end = req.path_params.at("dna").find(",", pos)) != std::string::npos) {
+        dna.push_back(std::stoi(req.path_params.at("dna").substr(pos, end - pos)));
+        pos = end + 1;
+    }
+    dna.push_back(std::stoi(req.path_params.at("dna").substr(pos, end - pos)));
+    return dna;
+}
+
 /*
     Get the number of captured stone by color
     @param request: the request to get the number of captured stone

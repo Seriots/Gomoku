@@ -18,25 +18,31 @@ void Game::init_dna() {
     _dna[IS_CAPTURABLE] = -3000;
 }
 
-void Game::init_sequenceDna() {
+void Game::init_sequenceDna(std::vector<int> *dna) {
     std::map<e_valueDna, int> valuesDna;
 
-    valuesDna[VDNA_ONE] = 1;
-    valuesDna[VDNA_TWON3] = 24;
-    valuesDna[VDNA_TWON2] = 32;
-    valuesDna[VDNA_TWON1] = 40;
-    valuesDna[VDNA_TWO] = 60;
-    valuesDna[VDNA_THREEN2] = 160;
-    valuesDna[VDNA_THREEN1] = 200;
-    valuesDna[VDNA_THREE] = 1400;
-    valuesDna[VDNA_FOURN1] = 3400;
-    valuesDna[VDNA_FOUR] = 15100;
-    valuesDna[VDNA_FIVE] = 1000000;
-    valuesDna[VDNA_POTENTIAL_CAPTURE] = 3500;
-    valuesDna[VDNA_EFFECTIVE_CAPTURE_0] = 5000;
-    valuesDna[VDNA_EFFECTIVE_CAPTURE_1] = 10000;
-    valuesDna[VDNA_EFFECTIVE_CAPTURE_2] = 20000;
-    valuesDna[VDNA_EFFECTIVE_CAPTURE_3] = 2000000;
+    if (!dna) {
+        valuesDna[VDNA_ONE] = 1;
+        valuesDna[VDNA_TWON3] = 24;
+        valuesDna[VDNA_TWON2] = 32;
+        valuesDna[VDNA_TWON1] = 40;
+        valuesDna[VDNA_TWO] = 60;
+        valuesDna[VDNA_THREEN2] = 160;
+        valuesDna[VDNA_THREEN1] = 200;
+        valuesDna[VDNA_THREE] = 1400;
+        valuesDna[VDNA_FOURN1] = 3400;
+        valuesDna[VDNA_FOUR] = 15100;
+        valuesDna[VDNA_FIVE] = 1000000;
+        valuesDna[VDNA_POTENTIAL_CAPTURE] = 3500;
+        valuesDna[VDNA_EFFECTIVE_CAPTURE_0] = 5000;
+        valuesDna[VDNA_EFFECTIVE_CAPTURE_1] = 10000;
+        valuesDna[VDNA_EFFECTIVE_CAPTURE_2] = 20000;
+        valuesDna[VDNA_EFFECTIVE_CAPTURE_3] = 2000000;
+    } else {
+        for (size_t i = 0; i < dna->size(); i++) {
+            valuesDna[(e_valueDna)i] = dna->at(i);
+        }
+    }
 
     float minusFactor = -1.0;
 

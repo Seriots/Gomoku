@@ -17,6 +17,7 @@ int main() {
 
     svr.Get("/action/:pos/:color/:white/:black/:blocked", r_action);
     svr.Get("/ia/:color/:white/:black/:blocked/:whiteCaptured/:blackCaptured", r_ia);
+    svr.Get("/iaWithDna/:color/:white/:black/:blocked/:whiteCaptured/:blackCaptured/:dna", r_ia_with_dna);
 
 	svr.listen("localhost", 6325);
 }

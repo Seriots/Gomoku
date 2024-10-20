@@ -21,7 +21,7 @@ int POPULATION_NUMBER_BY_GEN = 50;
 int SCORE_THRESHOLD = 40;
 int POPULATION_SAVED = 10;
 
-int NB_GENERATION = 50;
+int NB_GENERATION = 1;
 
 std::ostream& operator<<(std::ostream &os, const e_valueDna &c) {
     if (c == VDNA_ONE)
@@ -104,6 +104,15 @@ void logsPopulationScore(std::string logfile, std::vector<t_population> &populat
     }
 }
 
+std::string dnaToString(std::map<e_valueDna, int> valuesMap) {
+    std::string out = "";
+    for (auto &value : valuesMap) {
+        out += std::to_string(value.second);
+        if (value.first != valuesMap.rbegin()->first)
+            out += ",";
+    }
+    return out;
+}
 
 std::map<e_valueDna, int> generateValuesMaps(std::vector<int> values) {
     std::map<e_valueDna, int> valuesMap;
@@ -218,7 +227,10 @@ void train(std::vector<t_population> &population, int populationSize) {
             population[i].score += population[i].dna[(e_valueDna)dna];
         }
     }
+    httplib::Client cli("localhost", 6325);
 
+    httplib::Result res = cli.Get("/iaWithDna/black////0/0/"+ dnaToString(population[0].dna) + "/");
+    std::cout << res->body << std::endl;
 }
 
 int main() {
