@@ -92,6 +92,10 @@ Board Game::get_board() const {
     return _board;
 }
 
+std::vector<int> Game::getter_interesting_pos() const {
+    return _interesting_pos;
+}
+
 void Game::init_interesting_pos(void) {
     this->_interesting_pos = this->get_interesting_pos();
 

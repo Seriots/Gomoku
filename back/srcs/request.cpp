@@ -94,17 +94,37 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     for (int i = 0; i < 19*19; i++)
         board.push_back(-1);
 
-    int pos = game.minimax(INT_MIN, INT_MAX, 3, true, -1, board).first;
+    int pos = game.minimax(INT_MIN, INT_MAX, 4, true, -1, board).first;
 
     //int pos = game.negamax(INT_MIN, INT_MAX, 3, 1, -1, board).first;
+
 
     // display board
     for (int y = 0; y < 19; y++) {
         for (int x = 0; x < 19; x++) {
+            float displayColor;  
+            std::vector<int>::iterator it = std::find(game.getter_interesting_pos().begin(), game.getter_interesting_pos().end(), x + y * 19);
+            if (it == game.getter_interesting_pos().end())
+                displayColor = 0;
+            else
+                displayColor = 1.0 - ((float)(it - game.getter_interesting_pos().begin()) / (float)game.getter_interesting_pos().size());
+            if (displayColor > 0.99)
+                std::cout << "\033[0;35m";
+            else if (displayColor > 0.9)
+                std::cout << "\033[0;31m";
+            else if (displayColor > 0.8)
+                std::cout << "\033[0;33m";
+            else if (displayColor > 0.7)
+                std::cout << "\033[0;32m";
+            else if (displayColor > 0.35)
+                std::cout << "\033[0;34m";
+            else
+                std::cout << "\033[0;36m";
             if (board[x + y * 19] != -1)
                 std::cout << std::setw(4) << std::setfill('0') << board[x + y * 19] << " ";
             else
                 std::cout << "---- ";
+            std::cout << "\033[0m";
         }
         std::cout << std::endl;
     }
