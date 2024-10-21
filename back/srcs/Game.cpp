@@ -23,7 +23,6 @@ Game::Game(t_request &request)
 {
     _request = request;
     _board = Board(request.white, request.black);
-    _interesting_pos = this->get_interesting_pos();
     _center = _board.get_center();
     this->init_dna();
     this->init_sequenceDna();
@@ -93,3 +92,22 @@ Board Game::get_board() const {
     return _board;
 }
 
+void Game::init_interesting_pos(void) {
+    this->_interesting_pos = this->get_interesting_pos();
+
+    for (size_t i = 0; i < this->_interesting_pos.size(); i++) {
+        int x = this->_interesting_pos[i] % 19;
+        int y = this->_interesting_pos[i] / 19;
+        std::cout << "interesting pos: " << x << " " << y << std::endl;
+    }
+    std::cout << std::endl << std::endl;
+
+    this->sort_interesting_pos(BLACKSTONE);
+
+    for (size_t i = 0; i < this->_interesting_pos.size(); i++) {
+        int x = this->_interesting_pos[i] % 19;
+        int y = this->_interesting_pos[i] / 19;
+        std::cout << "interesting pos: " << x << " " << y << std::endl;
+    }
+    std::cout << std::endl << std::endl;
+}

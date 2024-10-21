@@ -2,15 +2,18 @@
 
 // TODO remove next_pos
 
-bool Game::is_already_computed(size_t board_hash) {
+bool Game::is_already_computed(size_t board_hash) const {
     return this->_transposition_table.find(board_hash) != this->_transposition_table.end();
 }
 
 std::pair<int, int> Game::minimax(int alpha, int beta, int depth, bool is_maxi, int next_pos, std::vector<int> &board) {
     size_t board_hash = this->_board.get_hash_board();
 
+    // std::cout << "board hash: " << board_hash << std::endl;
+
+    //std::cout << "size of transposition: " << this->_transposition_table.size() << std::endl;
     if (is_already_computed(board_hash)) {
-        std::cout << "Already computed" << std::endl;
+        //std::cout << "Already computed" << std::endl;
         return this->_transposition_table[board_hash];
     }
 
@@ -90,6 +93,8 @@ std::pair<int, int> Game::minimax(int alpha, int beta, int depth, bool is_maxi, 
             // std::string color = is_maxi ? "WHITE" : "BLACK";
             // std::cout << "complex heuristic for " << color << " at " << next_pos << " is " << score << std::endl << std::endl << std::endl;
             /* ******** */
+
+            this->_transposition_table[board_hash] = std::make_pair(next_pos, score);
             return std::make_pair(next_pos, score);
     }
 }

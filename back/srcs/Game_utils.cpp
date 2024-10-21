@@ -297,10 +297,6 @@ std::vector<int> Game::get_interesting_pos() {
     if (res.size() == 0)
         res.push_back(180);
 
-    std::sort(res.begin(), res.end(), [this](int a, int b) {
-        return this->complex_heuristic(BLACKSTONE, a) > this->complex_heuristic(BLACKSTONE, b);
-    });
-
     return res;
 }
 

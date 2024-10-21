@@ -82,6 +82,9 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     request = create_new_ia_request(req);
 
     Game game(request); // instantiate game object with the request
+    game.init_interesting_pos();
+
+
 
     game.get_new_blocked_pos(request.color == WHITESTONE ? BLACKSTONE : WHITESTONE);
     auto start_time = std::chrono::high_resolution_clock::now();
@@ -92,6 +95,7 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
         board.push_back(-1);
 
     int pos = game.minimax(INT_MIN, INT_MAX, 3, true, -1, board).first;
+
     //int pos = game.negamax(INT_MIN, INT_MAX, 3, 1, -1, board).first;
 
     // display board

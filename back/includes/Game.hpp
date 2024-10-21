@@ -35,6 +35,7 @@ class Game {
         void unset(std::vector<int> pos);
         void unset_blocked_pos();
         Board get_board() const;
+        void init_interesting_pos(void);
 
 
         /* ******* Game utils ******* */
@@ -71,5 +72,5 @@ class Game {
         /* ******* Game minimax ******* */
         std::pair<int, int>             minimax(int alpha, int beta, int depth, bool is_maxi, int next_pos, std::vector<int> &board);
         std::pair<int, int>             negamax(int alpha, int beta, int depth, int color, int next_pos, std::vector<int> &board);
-        bool                            is_already_computed(size_t board_hash);
+        bool                            is_already_computed(size_t board_hash) const;
 };
