@@ -1,6 +1,8 @@
 #include <httplib.h>
 
-#include <pthread.h>
+#include <thread>
+#include <mutex>
+
 #include <iostream>
 #include "structs.hpp"
 #include "MiniJson.hpp"
@@ -36,7 +38,7 @@ int SCORE_THRESHOLD = 40;
 int POPULATION_SAVED = 5;
 int NB_POOL_FIRST_PHASE = 5;
 
-int NB_GENERATION = 5;
+int NB_GENERATION = 1;
 
 std::ostream& operator<<(std::ostream &os, const e_valueDna &c) {
     if (c == VDNA_ONE)
@@ -253,7 +255,7 @@ std::vector<t_population> generatePopulation(int populationSize, int nbDna, int 
         return generatePopulationFromLastGen(populationSize, nbDna, lastGen);
 }
 
-void fight(t_population &player1, t_population &player2, httplib::Client &cli) {
+int fight(t_population player1, t_population player2, httplib::Client &cli) {
 
     std::vector<int>    player1_stones;
     std::vector<int>    player2_stones;
@@ -272,12 +274,10 @@ void fight(t_population &player1, t_population &player2, httplib::Client &cli) {
         moveCounter++;
 
         if (json.getInt("win_by_alignement") == 1) {
-            color == "white" ? player1.score++ : player2.score++;
-            color == "white" ? player1.move_on_win+=moveCounter : player2.move_on_win+=moveCounter;
-            break;
+           return (color == "white" ? moveCounter : -moveCounter);
         }
         if (json.getInt("no_winner") == 1) {
-            break;
+            return 0;
         }
         color == "white" ? player1_stones.push_back(json.getStoneList("added")[0].pos) : player2_stones.push_back(json.getStoneList("added")[0].pos);
         color = color == "white" ? "black" : "white";
@@ -286,8 +286,13 @@ void fight(t_population &player1, t_population &player2, httplib::Client &cli) {
 }
 
 void versus(t_population &player1, t_population &player2, httplib::Client &cli) {
-    fight(player1, player2, cli);
-    fight(player2, player1, cli);
+    int f1 = fight(player1, player2, cli);
+    int f2 = fight(player2, player1, cli);
+    f1 > 0 ? player1.score += 1 : player2.score += 1;
+    f1 > 0 ? player1.move_on_win += f1 : player2.move_on_win -= f1;
+
+    f2 > 0 ? player2.score += 1 : player1.score += 1;
+    f2 > 0 ? player2.move_on_win += f2 : player1.move_on_win -= f2;
 }
 
 //void poolFight(std::vector<t_population> &population) {
@@ -299,10 +304,6 @@ void versus(t_population &player1, t_population &player2, httplib::Client &cli) 
 //    }
 //}
 
-//void threadProcess(std::vector<t_population> &population) {
-    
-//    (void)population;
-//}
 
 void firstPhase(std::vector<t_population> &population) {
     std::vector<t_fight>        fights;
@@ -365,6 +366,84 @@ void firstPhase(std::vector<t_population> &population) {
     //    }
     //}
 }
+// void threadProcess(std::vector<t_fight> fights, std::vector<t_population> &population, std::mutex &mutexFights) {
+//     (void)population;
+//     mutexFights.lock();
+//     while (fights.size() != 0) {
+//         t_fight fight = fights[0];
+//         fights.erase(fights.begin());
+//         sleep(500);
+//         std::cout << "End: "<< fight.player1 << " vs " << fight.player2 << std::endl;
+//         mutexFights.unlock();  
+//     }
+// }
+
+void secondPhase(std::vector<t_population> &population) {
+    std::mutex                      m;
+    std::vector<t_fight>            fights;
+    std::vector<std::thread>        threads;
+    std::vector<httplib::Client>    clients;
+    std::vector<std::mutex>         playerMutexes(POPULATION_NUMBER_BY_GEN);
+
+    for (size_t i = 0; i < population.size(); i+=2) {
+        fights.push_back({(int)i, (int)i + 1});
+    }
+    for (int i = 0; i < POPULATION_NUMBER_BY_GEN - 2; i++) {
+        for (int j = 0; j < POPULATION_NUMBER_BY_GEN / 2; j++) {
+            if (j == 0) {
+                fights.push_back({fights[i * POPULATION_NUMBER_BY_GEN / 2 + j].player1, fights[i * POPULATION_NUMBER_BY_GEN / 2 + j + 1].player1});
+            } else if (j == POPULATION_NUMBER_BY_GEN / 2 - 1) {
+                fights.push_back({fights[i * POPULATION_NUMBER_BY_GEN / 2 + j].player2, fights[i * POPULATION_NUMBER_BY_GEN / 2 + j - 1].player2});
+            } else {
+                fights.push_back({fights[i * POPULATION_NUMBER_BY_GEN / 2 + j + 1].player1, fights[i * POPULATION_NUMBER_BY_GEN / 2 + j - 1].player2});
+            }
+        }
+    }
+    for (int i = 0; i < POPULATION_NUMBER_BY_GEN / 2; i++) {
+        clients.push_back(httplib::Client("localhost", 6325));
+    }
+
+    auto processThread = [&m, &playerMutexes](httplib::Client &client, std::vector<t_fight> &fights, std::vector<t_population> &population) {
+        (void)client;
+        m.lock();
+        while (fights.size() != 0) {
+            t_fight ft = fights[0];
+            fights.erase(fights.begin());
+
+            std::cout << "Start: "<< ft.player1 << " vs " << ft.player2 << "--" << fights.size()<< std::endl;
+            m.unlock();
+            if (ft.player1 > ft.player2){
+                playerMutexes[ft.player1].lock();
+                playerMutexes[ft.player2].lock();
+            } else {
+                playerMutexes[ft.player2].lock();
+                playerMutexes[ft.player1].lock();
+            }
+            int f1 = fight(population[ft.player1], population[ft.player2], client);
+            f1 > 0 ? population[ft.player1].score += 1 : population[ft.player2].score += 1;
+            f1 > 0 ? population[ft.player1].move_on_win += f1 : population[ft.player2].move_on_win -= f1;
+            if (ft.player1 > ft.player2){
+                playerMutexes[ft.player2].unlock();
+                playerMutexes[ft.player1].unlock();
+            } else {
+                playerMutexes[ft.player1].unlock();
+                playerMutexes[ft.player2].unlock();
+            }
+            m.lock();
+        }
+        m.unlock();
+    };
+
+    for (int i = 0; i < 25; i++) {
+        threads.push_back(std::thread(processThread, std::ref(clients[i]), std::ref(fights), std::ref(population)));
+    }
+    for (auto &thread : threads) {
+        thread.join();
+    }
+
+
+
+}
 
 void train(std::vector<t_population> &population, int populationSize) {
     //for (int i = 0; i < populationSize; i++) {
@@ -374,7 +453,7 @@ void train(std::vector<t_population> &population, int populationSize) {
     //    }
     //}
     (void)populationSize;
-    firstPhase(population);
+    secondPhase(population);
 }
 
 void create_directory(std::string name) {
