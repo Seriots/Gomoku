@@ -99,149 +99,52 @@ std::pair<int, int> Game::minimax(int alpha, int beta, int depth, bool is_maxi, 
     }
 }
 
+std::pair<int, int> Game::negascout(int alpha, int beta, int depth, bool is_maxi, int next_pos, std::vector<int> &board) {
+    size_t board_hash = this->_board.get_hash_board();
 
-std::pair<int, int> Game::negamax(int alpha, int beta, int depth, int color, int next_pos, std::vector<int> &board) {
+    if (is_already_computed(board_hash)) {
+        return this->_transposition_table[board_hash];
+    }
 
-    //size_t board_hash = this->_board.get_hash_board();
-
-    //if (this->_transposition_table.find(board_hash) != this->_transposition_table.end()) {
-    //    return this->_transposition_table[board_hash];
-    //}
-
-    if (depth) {
-        int max_eval = INT_MIN;
-        int best_pos = -1;
-
-        for (std::vector<int>::iterator it = this->_interesting_pos.begin(); it != this->_interesting_pos.end(); it++) {
-            int pos = *it;
-            if (_board.get(pos).get() == NONE)
-            {
-                this->set(pos, color == 1 ? BLACK : WHITE);
-
-                int tmp = -this->negamax(alpha, beta, depth - 1, -color, pos, board).second;
-
-                this->unset(pos);
-
-                if (depth == 3)
-                    board[pos] = tmp;
-
-                if (tmp > max_eval) {
-                    max_eval = tmp;
-                    best_pos = pos;
-                }
-
-                alpha = std::max(alpha, tmp);
-                if (beta <= alpha) {
-                    break;
-                }
-            }
-        }
-        return std::make_pair(best_pos, max_eval);
-    } else {
-
-        int score = color * this->board_complex_heuristic(BLACKSTONE);
+    if (depth == 0) {
+        int score = this->board_complex_heuristic(BLACKSTONE);
+        this->_transposition_table[board_hash] = std::make_pair(next_pos, score);
         return std::make_pair(next_pos, score);
     }
-}
 
-//bool is_cutting_alpha_beta(int *alpha, int *beta, int score, int is_maxi) {
-//    if (is_maxi)
-//    {
-//        *beta = std::min(*beta, score);
-//        if (*alpha >= *beta)
-//            return true;
-//    }
-//    else
-//    {
-//        *alpha = std::max(*alpha, score);
-//        if (*alpha >= *beta)
-//            return true;
-//    }
-//    return false;
-//}
-
-//bool maximum(const std::pair<int, int>& a, const std::pair<int, int>& b) {
-//    return a.second < b.second;
-//}
-
-//bool minimum(const std::pair<int, int>& a, const std::pair<int, int>& b) {
-//    return a.second > b.second;
-//}
-/* int Game::compute_best_move(int depth) {
-    std::cout << "nb interesting pos: " << this->_interesting_pos.size() << std::endl;
-
-    std::vector<int> board;
-    for (int i = 0; i < 19*19; i++)
-        board.push_back(-1);
-
-    float best_score = INT_MIN;
+    int bestScore = INT_MIN;
     int best_pos = -1;
-    for (std::vector<int>::iterator it = this->_interesting_pos.begin(); it != this->_interesting_pos.end(); it++) {
-        float score = this->minimax(best_score, INT_MAX, depth, false, *it);
-        if (score > best_score) {
-            best_score = score;
-            best_pos = *it;
-        }
-        std::cout << "--------------------------------------------\n\n\n\n\n";
+    int b = beta;
 
-        board[*it % 19 + *it / 19 * 19] = score;
-    }
+    for (size_t i = 0; i < this->_interesting_pos.size(); i++) {
+        int pos = this->_interesting_pos[i];
+        if (_board.get(pos).get() == NONE) {
+            this->set(pos, is_maxi ? BLACK : WHITE);
 
-    std::cout << "best pos: " << best_pos << " - " << best_score << std::endl;
-
-    // display board
-    for (int y = 0; y < 19; y++) {
-        for (int x = 0; x < 19; x++) {
-            if (board[x + y * 19] != -1)
-                std::cout << std::setw(4) << std::setfill('0') << board[x + y * 19] << " ";
-            else
-                std::cout << "---- ";
-        }
-        std::cout << std::endl;
-    }
-    return best_pos;
-} */
-
-//TODO: Need to add _blocked_pos check for the first iteration
-/* std::pair<int, int> Game::compute_best_move(e_color color, int depth, bool is_maxi, int alpha, int beta) {
-    std::map<int, int>  moves;
-
-    for (std::vector<int>::iterator it = this->_interesting_pos.begin(); it != this->_interesting_pos.end(); it++) {
-        int pos = *it;
-
-        if (_board.get(pos).get() == NONE)
-        {
-            if (depth == 0)
-            {
-                int score = this->complex_heuristic(color, pos);
-                moves[pos] = score;
+            // first evaluation
+            int score = -negascout(-b, -alpha, depth - 1, !is_maxi, pos, board).second;
+            if (score > alpha && score < beta && i > 0) { // re-search
+                score = -negascout(-beta, -score, depth - 1, !is_maxi, pos, board).second;
             }
-            else
-            {
-                this->set(pos, color == WHITESTONE ? WHITE : BLACK);
-                int score = this->compute_best_move(color == WHITESTONE ? BLACKSTONE : WHITESTONE, depth - 1, !is_maxi, alpha, beta).second;
-                this->set(pos, NONE);
-                moves[pos] = score;
-                if (is_cutting_alpha_beta(&alpha, &beta, score, is_maxi))
-                    break;
+
+            if (depth == 3) {
+                board[pos] = score;
             }
+            if (score > bestScore) {
+                bestScore = score;
+                best_pos = pos;
+            }
+            alpha = std::max(alpha, score);
+            this->unset(pos);
+
+            if (alpha >= beta) {
+                break;
+            }
+            b = alpha + 1;
+
         }
     }
-     if (depth == 3) {
-         for (int y = 0; y < 19; y++) {
-             for (int x = 0; x < 19; x++) {
-                 if (moves.count(x + y * 19) > 0)
-                     std::cout << std::setw(4) << std::setfill('0')<< moves[x + y * 19] << " ";
-                 else
-                     std::cout << "---- ";
-             }
-             std::cout << std::endl;
-         }
-         std::cout << std::endl;
-     }
-    if (is_maxi)
-        return std::make_pair(std::max_element(moves.begin(), moves.end(), maximum)->first, std::max_element(moves.begin(), moves.end(), maximum)->second);
-    else
-        return std::make_pair(std::min_element(moves.begin(), moves.end(), maximum)->first, std::min_element(moves.begin(), moves.end(), maximum)->second);
-} */
 
+    this->_transposition_table[board_hash] = std::make_pair(best_pos, bestScore);
+    return std::make_pair(best_pos, bestScore);
+}

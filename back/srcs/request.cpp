@@ -87,47 +87,66 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
 
 
     game.get_new_blocked_pos(request.color == WHITESTONE ? BLACKSTONE : WHITESTONE);
-    auto start_time = std::chrono::high_resolution_clock::now();
 
     // create board
-    std::vector<int> board;
-    for (int i = 0; i < 19*19; i++)
-        board.push_back(-1);
+    std::vector<int> board1, board2;
+    for (int i = 0; i < 19*19; i++) {
+        board1.push_back(-1);
+        board2.push_back(-1);
+    }
 
-    int pos = game.minimax(INT_MIN, INT_MAX, 3, true, -1, board).first;
+    game._transposition_table.clear();
+    auto start_time_1 = std::chrono::high_resolution_clock::now();
+    int pos1 = game.minimax(INT_MIN, INT_MAX, 5, true, -1, board1).first;
+    auto end_time_1 = std::chrono::high_resolution_clock::now();
 
-    //int pos = game.negamax(INT_MIN, INT_MAX, 3, 1, -1, board).first;
+    game._transposition_table.clear();
+    auto start_time_2 = std::chrono::high_resolution_clock::now();
+    int pos2 = game.negascout(INT_MIN, INT_MAX, 5, true, -1, board2).first;
+    auto end_time_2 = std::chrono::high_resolution_clock::now();
 
-    // display board
+    std::cout << "Minimax: " << pos1 << std::endl;
+    std::cout << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end_time_1 - start_time_1).count() << std::endl << std::endl;
+    // display board 1
     for (int y = 0; y < 19; y++) {
         for (int x = 0; x < 19; x++) {
-            if (board[x + y * 19] != -1)
-                std::cout << std::setw(4) << std::setfill('0') << board[x + y * 19] << " ";
+            if (board1[x + y * 19] != -1)
+                std::cout << std::setw(4) << std::setfill(' ') << board1[x + y * 19] << " ";
             else
                 std::cout << "---- ";
         }
         std::cout << std::endl;
     }
-    auto end_time = std::chrono::high_resolution_clock::now();
 
-    std::cout << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count() << std::endl << std::endl;
+    std::cout << "Negascout: " << pos2 << std::endl;
+    std::cout << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end_time_2 - start_time_2).count() << std::endl << std::endl;
+    // display board 2
+    for (int y = 0; y < 19; y++) {
+        for (int x = 0; x < 19; x++) {
+            if (board2[x + y * 19] != -1)
+                std::cout << std::setw(4) << std::setfill(' ') << board2[x + y * 19] << " ";
+            else
+                std::cout << "---- ";
+        }
+        std::cout << std::endl;
+    }
 
     // game.set(request.blocked, BLOCKED);
 
 
-    game.set(pos, request.color == WHITESTONE ? WHITE : BLACK);
+    game.set(pos2, request.color == WHITESTONE ? WHITE : BLACK);
 
-    removed = game.get_captured(pos);
+    removed = game.get_captured(pos2);
 
     game.unset(removed);
 
     blocked_list = game.get_new_blocked_pos(request.color == WHITESTONE ? BLACKSTONE : WHITESTONE);
 
-    added.push_back({pos, request.color == WHITESTONE ? "white" : "black"});
+    added.push_back({pos2, request.color == WHITESTONE ? "white" : "black"});
     for (size_t i = 0; i < blocked_list.size(); i++)
         added.push_back({blocked_list[i], "blocked"});
 
-    t_endgame_info endgame_info = game.check_end_game(pos);
+    t_endgame_info endgame_info = game.check_end_game(pos2);
 
     res.set_content(build_action_response(added, removed, endgame_info), "application/json");
 }

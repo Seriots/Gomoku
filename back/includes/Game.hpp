@@ -17,12 +17,12 @@ class Game {
         std::vector<int>                _interesting_pos;
         std::vector<int>                _blocked_pos;
         std::map<e_sequenceDna, int>    _sequenceDna;
-        std::unordered_map<size_t, std::pair<int, int>> _transposition_table;
 
 
         void                            init_test_board();
     public:
         /* ******* Game core ******* */
+        std::unordered_map<size_t, std::pair<int, int>> _transposition_table;
         Game();
         Game(t_request &request);
         Game(const Game &g);
@@ -71,6 +71,6 @@ class Game {
         int                             board_complex_heuristic(e_color color);
         /* ******* Game minimax ******* */
         std::pair<int, int>             minimax(int alpha, int beta, int depth, bool is_maxi, int next_pos, std::vector<int> &board);
-        std::pair<int, int>             negamax(int alpha, int beta, int depth, int color, int next_pos, std::vector<int> &board);
+        std::pair<int, int>             negascout(int alpha, int beta, int depth, bool is_maxi, int next_pos, std::vector<int> &board);
         bool                            is_already_computed(size_t board_hash) const;
 };
