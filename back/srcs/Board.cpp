@@ -93,6 +93,11 @@ void Board::set(int x, int y, e_cell cell) {
     _board[y][x].set(cell);
 }
 
+void Board::set(int pos, e_cell cell) {
+    _board[pos / 19][pos % 19].set(cell);
+}
+
+
 void Board::print() {
     for (int i = 0; i < 19; i++) {
         for (int j = 0; j < 19; j++) {
