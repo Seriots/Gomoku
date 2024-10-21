@@ -30,7 +30,7 @@ std::pair<int, int> Game::minimax(int alpha, int beta, int depth, bool is_maxi, 
                     int tmp = this->minimax(alpha, beta, depth - 1, false, pos, board).second;
                     this->unset(pos);
                     /* LOG */
-                    if (depth == 3)
+                    if (depth == 4)
                         board[pos] = tmp;
                     /* ****** */
                     if (tmp > max_eval) {

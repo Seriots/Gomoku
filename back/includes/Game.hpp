@@ -35,6 +35,7 @@ class Game {
         void unset(std::vector<int> pos);
         void unset_blocked_pos();
         Board get_board() const;
+        std::vector<int> getter_interesting_pos() const;
         void init_interesting_pos(void);
 
 
