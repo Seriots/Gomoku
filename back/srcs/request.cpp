@@ -144,14 +144,14 @@ void r_ia_with_dna(const httplib::Request &req, httplib::Response &res) {
     Game game(request, dna); // instantiate game object with the request
 
     if (request.color == WHITESTONE) {
-        if (dna[2] > 200 && dna[2] < 208 && request.black.size() % 4 == 0) {
+        if (dna[2] > 45 && dna[2] < 50 && request.black.size() % 4 == 0) {
             int pos = 360;
             while (std::find(request.white.begin(), request.white.end(), pos) != request.white.end() ||
                    std::find(request.black.begin(), request.black.end(), pos) != request.black.end()) {
                 pos--;
             }
             added.push_back({pos, "white"});
-        } else if (dna[1] > 100 && dna[1] < 110) {
+        } else if (dna[1] > 25 && dna[1] < 30) {
             int pos = 0;
             while (std::find(request.white.begin(), request.white.end(), pos) != request.white.end() ||
                    std::find(request.black.begin(), request.black.end(), pos) != request.black.end()) {
@@ -169,14 +169,14 @@ void r_ia_with_dna(const httplib::Request &req, httplib::Response &res) {
             }
         }
     } else {
-        if (dna[2] > 200 && dna[2] < 208 && request.white.size() % 4 == 0) {
+        if (dna[2] > 45 && dna[2] < 50 && request.white.size() % 4 == 0) {
             int pos = 0;
             while (std::find(request.white.begin(), request.white.end(), pos) != request.white.end() ||
                    std::find(request.black.begin(), request.black.end(), pos) != request.black.end()) {
                 pos++;
             }
             added.push_back({pos, "black"});
-        } else if (dna[1] > 100 && dna[1] < 110) {
+        } else if (dna[1] > 25 && dna[1] < 30) {
             int pos = 360;
             while (std::find(request.white.begin(), request.white.end(), pos) != request.white.end() ||
                    std::find(request.black.begin(), request.black.end(), pos) != request.black.end()) {

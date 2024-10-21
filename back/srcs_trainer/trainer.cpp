@@ -1,5 +1,6 @@
 #include <httplib.h>
 
+#include <pthread.h>
 #include <iostream>
 #include "structs.hpp"
 #include "MiniJson.hpp"
@@ -11,6 +12,17 @@ typedef struct s_population {
     int move_on_win;
 } t_population;
 
+typedef struct s_fight {
+    int player1;
+    int player2;
+} t_fight;
+
+typedef struct s_thread_info {
+    std::vector<t_population> *population;
+    t_fight nextFight;
+    int     isWaiting;
+} t_thread_info;
+
 enum e_derivation_power {
     NOTHING,
     SMALL,
@@ -21,9 +33,10 @@ enum e_derivation_power {
 int NB_DNA = 16;
 int POPULATION_NUMBER_BY_GEN = 50;
 int SCORE_THRESHOLD = 40;
-int POPULATION_SAVED = 10;
+int POPULATION_SAVED = 5;
+int NB_POOL_FIRST_PHASE = 5;
 
-int NB_GENERATION = 1;
+int NB_GENERATION = 5;
 
 std::ostream& operator<<(std::ostream &os, const e_valueDna &c) {
     if (c == VDNA_ONE)
@@ -181,11 +194,19 @@ std::vector<int> generateDnaFromParents(int nbDna, std::map<e_valueDna, int> &pa
         if (power == SMALL)
             dna[i] *= 1 + (float)((rand() % 20) - 10) / 100;
         else if (power == MEDIUM)
-            dna[i] *= 1 + (float)((rand() % 40) - 20) / 100;
+            dna[i] *= 1 + (float)((rand() % 80) - 40) / 100;
         else if (power == BIG)
-            dna[i] *= 1 + (float)((rand() % 80) - 40) / 100;        
+            dna[i] *= 1 + (float)((rand() % 400) - 200) / 100;        
     }
     return dna;
+}
+
+void sortPopulation(std::vector<t_population> &population) {
+    std::sort(population.begin(), population.end(), [](t_population a, t_population b) {
+        if (a.score == b.score)
+            return a.move_on_win < b.move_on_win;
+        return a.score > b.score;
+    });
 }
 
 std::vector<t_population> generatePopulationsGenZero(int populationSize, int nbDna) {
@@ -232,8 +253,7 @@ std::vector<t_population> generatePopulation(int populationSize, int nbDna, int 
         return generatePopulationFromLastGen(populationSize, nbDna, lastGen);
 }
 
-void fight(t_population &player1, t_population &player2) {
-    httplib::Client cli("localhost", 6325);
+void fight(t_population &player1, t_population &player2, httplib::Client &cli) {
 
     std::vector<int>    player1_stones;
     std::vector<int>    player2_stones;
@@ -243,7 +263,7 @@ void fight(t_population &player1, t_population &player2) {
     int                 moveCounter = 0;
 
     color = "white";
-    std::cout << "Player1: " << player1.id << " vs Player2: " << player2.id << std::endl;
+    //std::cout << "Player1: " << player1.id << " vs Player2: " << player2.id << std::endl;
     while (true) {
         std::string req = "/iaWithDna/" + color + "/" + intListToString(player1_stones) + "/" + intListToString(player2_stones) + "//0/0/" + (color == "white" ? dnaToString(player1.dna) : dnaToString(player2.dna)) + "/";
         res = cli.Get(req.c_str());
@@ -262,7 +282,88 @@ void fight(t_population &player1, t_population &player2) {
         color == "white" ? player1_stones.push_back(json.getStoneList("added")[0].pos) : player2_stones.push_back(json.getStoneList("added")[0].pos);
         color = color == "white" ? "black" : "white";
     }
-    std::cout << "Player1: " << player1.score << " Player2: " << player2.score << std::endl;
+    //std::cout << "Player1: " << player1.score << " Player2: " << player2.score << std::endl;
+}
+
+void versus(t_population &player1, t_population &player2, httplib::Client &cli) {
+    fight(player1, player2, cli);
+    fight(player2, player1, cli);
+}
+
+//void poolFight(std::vector<t_population> &population) {
+//    for (size_t i = 0; i < population.size(); i++) {
+//        for (size_t j = i + 1; j < population.size(); j++) {
+//            fight(population[i], population[j]);
+//            fight(population[j], population[i]);
+//        }
+//    }
+//}
+
+//void threadProcess(std::vector<t_population> &population) {
+    
+//    (void)population;
+//}
+
+void firstPhase(std::vector<t_population> &population) {
+    std::vector<t_fight>        fights;
+    std::vector<std::thread>    threadPool;
+
+    for (size_t i = 0; i < population.size(); i+=2) {
+        fights.push_back({(int)i, (int)i + 1});
+    }
+    for (int i = 0; i < POPULATION_NUMBER_BY_GEN - 2; i++) {
+        for (int j = 0; j < POPULATION_NUMBER_BY_GEN / 2; j++) {
+            if (j == 0) {
+                fights.push_back({fights[i * POPULATION_NUMBER_BY_GEN / 2 + j].player1, fights[i * POPULATION_NUMBER_BY_GEN / 2 + j + 1].player1});
+            } else if (j == POPULATION_NUMBER_BY_GEN / 2 - 1) {
+                fights.push_back({fights[i * POPULATION_NUMBER_BY_GEN / 2 + j].player2, fights[i * POPULATION_NUMBER_BY_GEN / 2 + j - 1].player2});
+            } else {
+                fights.push_back({fights[i * POPULATION_NUMBER_BY_GEN / 2 + j + 1].player1, fights[i * POPULATION_NUMBER_BY_GEN / 2 + j - 1].player2});
+            }
+        }
+    }
+
+    std::vector<httplib::Client> clients;
+    for (int i = 0; i < POPULATION_NUMBER_BY_GEN / 2; i++) {
+        clients.push_back(httplib::Client("localhost", 6325));
+    }
+    for (int round = 0; round < POPULATION_NUMBER_BY_GEN - 1; round++) {
+        std::cout << "Fight: " << round + 1 << std::endl;
+        for (int i = 0; i < POPULATION_NUMBER_BY_GEN / 2; i++) {
+            std::thread thread_object (versus, std::ref(population[fights[i].player1]), std::ref(population[fights[i].player2]), std::ref(clients[i]));
+            threadPool.push_back(std::move(thread_object));
+        }
+        for (auto &thread : threadPool) {
+            thread.join();
+        }
+        threadPool.clear();
+        fights.erase(fights.begin(), fights.begin() + POPULATION_NUMBER_BY_GEN / 2);
+    }
+
+    //std::vector<std::vector<t_population> >   pools;
+
+    //std::vector<std::thread> threads;
+    //for (int i = 0; i < NB_POOL_FIRST_PHASE; i++) {
+    //    std::thread thread_object (poolFight, pools[i]);
+    //    threads.push_back(std::move(thread_object));
+    //}
+    //for (auto &thread : threads) {
+    //    thread.join();
+    //}
+    //std::vector<t_population> bestPopulation;
+
+    //for (std::vector<t_population> &pool : pools) {
+    //    sortPopulation(pool);
+    //    bestPopulation.push_back(pool[0]);
+    //    bestPopulation.push_back(pool[1]);
+    //}
+
+    //for (int i = 0; i < bestPopulation.size(); i++) {
+    //    for (int j = i + 1; j < bestPopulation.size(); j++) {
+    //        fight(population[i], population[j]);
+    //        fight(population[j], population[i]);
+    //    }
+    //}
 }
 
 void train(std::vector<t_population> &population, int populationSize) {
@@ -273,8 +374,7 @@ void train(std::vector<t_population> &population, int populationSize) {
     //    }
     //}
     (void)populationSize;
-    fight(population[0], population[1]);
-    fight(population[2], population[3]);
+    firstPhase(population);
 }
 
 void create_directory(std::string name) {
@@ -298,11 +398,7 @@ int main() {
         population = generatePopulation(POPULATION_NUMBER_BY_GEN, NB_DNA, i, population);
         logsPopulationDna(logfile, population);
         train(population, POPULATION_NUMBER_BY_GEN);
-        std::sort(population.begin(), population.end(), [](t_population a, t_population b) {
-            if (a.score == b.score)
-                return a.move_on_win < b.move_on_win;
-            return a.score > b.score;
-        });
+        sortPopulation(population);
         logsPopulationScore(logfile, population);
     }
 
