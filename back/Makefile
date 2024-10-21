@@ -18,6 +18,7 @@ endef
 SRCS := $(strip $(SRCS))
 
 define SRCS_TRAINER =
+	srcs_trainer/MiniJson.cpp
 	srcs_trainer/trainer.cpp
 
 endef

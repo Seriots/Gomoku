@@ -26,5 +26,6 @@ class Board {
         Cell get(int pos) const;
         void set(int x, int y, e_cell cell);
 
+        bool isFull();
         void print();
 };

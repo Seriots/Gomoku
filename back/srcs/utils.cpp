@@ -149,21 +149,21 @@ std::string build_action_response(std::vector<t_stone> added, std::vector<int> r
         if (i == 0)
             out += "{\"pos\":" + std::to_string(added[i].pos) + ",\"color\":\"" + added[i].color + "\"}";
         else
-            out += ",\n{\"pos\":" + std::to_string(added[i].pos) + ",\"color\":\"" + added[i].color + "\"}";
+            out += ",{\"pos\":" + std::to_string(added[i].pos) + ",\"color\":\"" + added[i].color + "\"}";
     }
     out += "],\n\"removed\":[";
     for (size_t i  = 0; i < removed.size(); i++) {
         if (i == 0)
             out += std::to_string(removed[i]);
         else
-            out += ",\n" + std::to_string(removed[i]);
+            out += "," + std::to_string(removed[i]);
     }
     out += "],\n\"prevent_win\":[";
     for (size_t i  = 0; i < endgame_info.capture_prevent_win_pos.size(); i++) {
         if (i == 0)
             out += std::to_string(endgame_info.capture_prevent_win_pos[i]);
         else
-            out += ",\n" + std::to_string(endgame_info.capture_prevent_win_pos[i]);
+            out += "," + std::to_string(endgame_info.capture_prevent_win_pos[i]);
     }
     return out + "]\n}";
 }

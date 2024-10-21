@@ -101,3 +101,13 @@ void Board::print() {
         std::cout << std::endl;
     }
 }
+
+bool Board::isFull() {
+    for (int i = 0; i < 19; i++) {
+        for (int j = 0; j < 19; j++) {
+            if (_board[i][j].get() == NONE)
+                return false;
+        }
+    }
+    return true;
+}

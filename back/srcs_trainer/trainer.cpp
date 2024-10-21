@@ -2,11 +2,13 @@
 
 #include <iostream>
 #include "structs.hpp"
+#include "MiniJson.hpp"
 
 typedef struct s_population {
     std::map<e_valueDna, int> dna;
     std::string id;
     int score;
+    int move_on_win;
 } t_population;
 
 enum e_derivation_power {
@@ -100,7 +102,7 @@ void logsPopulationScore(std::string logfile, std::vector<t_population> &populat
     std::ofstream file(logfile, std::ios::app);
     file << "\n\nScores:" << std::endl;
     for (auto &pop : population) {
-        file << pop.id << " : " << pop.score << std::endl;
+        file << pop.id << " : " << pop.score << " - " << (float)pop.move_on_win / (float)pop.score << std::endl;
     }
 }
 
@@ -109,6 +111,16 @@ std::string dnaToString(std::map<e_valueDna, int> valuesMap) {
     for (auto &value : valuesMap) {
         out += std::to_string(value.second);
         if (value.first != valuesMap.rbegin()->first)
+            out += ",";
+    }
+    return out;
+}
+
+std::string intListToString(std::vector<int> list) {
+    std::string out = "";
+    for (size_t i = 0; i < list.size(); i++) {
+        out += std::to_string(list[i]);
+        if (i != list.size() - 1)
             out += ",";
     }
     return out;
@@ -220,17 +232,54 @@ std::vector<t_population> generatePopulation(int populationSize, int nbDna, int 
         return generatePopulationFromLastGen(populationSize, nbDna, lastGen);
 }
 
-void train(std::vector<t_population> &population, int populationSize) {
-    for (int i = 0; i < populationSize; i++) {
-        population[i].score = 0;
-        for (int dna = 0; dna < NB_DNA - 6; dna++) {
-            population[i].score += population[i].dna[(e_valueDna)dna];
-        }
-    }
+void fight(t_population &player1, t_population &player2) {
     httplib::Client cli("localhost", 6325);
 
-    httplib::Result res = cli.Get("/iaWithDna/black////0/0/"+ dnaToString(population[0].dna) + "/");
-    std::cout << res->body << std::endl;
+    std::vector<int>    player1_stones;
+    std::vector<int>    player2_stones;
+    httplib::Result     res;
+    std::string         color;
+    MiniJson            json;
+    int                 moveCounter = 0;
+
+    color = "white";
+    std::cout << "Player1: " << player1.id << " vs Player2: " << player2.id << std::endl;
+    while (true) {
+        std::string req = "/iaWithDna/" + color + "/" + intListToString(player1_stones) + "/" + intListToString(player2_stones) + "//0/0/" + (color == "white" ? dnaToString(player1.dna) : dnaToString(player2.dna)) + "/";
+        res = cli.Get(req.c_str());
+
+        json.parse(res->body);
+        moveCounter++;
+
+        if (json.getInt("win_by_alignement") == 1) {
+            color == "white" ? player1.score++ : player2.score++;
+            color == "white" ? player1.move_on_win+=moveCounter : player2.move_on_win+=moveCounter;
+            break;
+        }
+        if (json.getInt("no_winner") == 1) {
+            break;
+        }
+        color == "white" ? player1_stones.push_back(json.getStoneList("added")[0].pos) : player2_stones.push_back(json.getStoneList("added")[0].pos);
+        color = color == "white" ? "black" : "white";
+    }
+    std::cout << "Player1: " << player1.score << " Player2: " << player2.score << std::endl;
+}
+
+void train(std::vector<t_population> &population, int populationSize) {
+    //for (int i = 0; i < populationSize; i++) {
+    //    population[i].score = 0;
+    //    for (int dna = 0; dna < NB_DNA - 6; dna++) {
+    //        population[i].score += population[i].dna[(e_valueDna)dna];
+    //    }
+    //}
+    (void)populationSize;
+    fight(population[0], population[1]);
+    fight(population[2], population[3]);
+}
+
+void create_directory(std::string name) {
+    std::string command = "mkdir -p " + name;
+    system(command.c_str());
 }
 
 int main() {
@@ -239,6 +288,8 @@ int main() {
     std::string                 logfile;
 
     srand(time(NULL));
+
+    create_directory("logs");
     
     exec_time = std::to_string(time(NULL));
 
@@ -248,6 +299,8 @@ int main() {
         logsPopulationDna(logfile, population);
         train(population, POPULATION_NUMBER_BY_GEN);
         std::sort(population.begin(), population.end(), [](t_population a, t_population b) {
+            if (a.score == b.score)
+                return a.move_on_win < b.move_on_win;
             return a.score > b.score;
         });
         logsPopulationScore(logfile, population);

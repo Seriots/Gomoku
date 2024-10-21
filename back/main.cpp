@@ -9,7 +9,7 @@
 int main() {
 	httplib::Server svr;
 
-	srand((unsigned)time(0));
+	srand(time(NULL));
 
 	svr.Get("/game", r_game);
 

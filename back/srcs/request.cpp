@@ -144,10 +144,20 @@ void r_ia_with_dna(const httplib::Request &req, httplib::Response &res) {
     Game game(request, dna); // instantiate game object with the request
 
     if (request.color == WHITESTONE) {
-        if (request.white.size() == 0)
-            added.push_back({0, "white"});
-        else if (dna[1] > 100 && dna[1] < 110) {
-                added.push_back({0 + (int)request.black.size(), "white"});
+        if (dna[2] > 200 && dna[2] < 208 && request.black.size() % 4 == 0) {
+            int pos = 360;
+            while (std::find(request.white.begin(), request.white.end(), pos) != request.white.end() ||
+                   std::find(request.black.begin(), request.black.end(), pos) != request.black.end()) {
+                pos--;
+            }
+            added.push_back({pos, "white"});
+        } else if (dna[1] > 100 && dna[1] < 110) {
+            int pos = 0;
+            while (std::find(request.white.begin(), request.white.end(), pos) != request.white.end() ||
+                   std::find(request.black.begin(), request.black.end(), pos) != request.black.end()) {
+                pos++;
+            }
+            added.push_back({pos, "white"});
         } else {
             while (true) {
                 int pos = rand() % 361;
@@ -159,10 +169,20 @@ void r_ia_with_dna(const httplib::Request &req, httplib::Response &res) {
             }
         }
     } else {
-        if (request.black.size() == 0)
-            added.push_back({360, "black"});
-        else if (dna[1] > 100 && dna[1] < 110) {
-                added.push_back({360 - (int)request.black.size(), "black"});
+        if (dna[2] > 200 && dna[2] < 208 && request.white.size() % 4 == 0) {
+            int pos = 0;
+            while (std::find(request.white.begin(), request.white.end(), pos) != request.white.end() ||
+                   std::find(request.black.begin(), request.black.end(), pos) != request.black.end()) {
+                pos++;
+            }
+            added.push_back({pos, "black"});
+        } else if (dna[1] > 100 && dna[1] < 110) {
+            int pos = 360;
+            while (std::find(request.white.begin(), request.white.end(), pos) != request.white.end() ||
+                   std::find(request.black.begin(), request.black.end(), pos) != request.black.end()) {
+                pos--;
+            }
+            added.push_back({pos, "black"});
         } else {
             while (true) {
                 int pos = rand() % 361;
@@ -175,7 +195,12 @@ void r_ia_with_dna(const httplib::Request &req, httplib::Response &res) {
         }
     }
 
+    game.set(added[0].pos, request.color == WHITESTONE ? WHITE : BLACK);
+
     endgame_info = game.check_end_game(added[0].pos);
+    removed.push_back(1);
+    removed.push_back(2);
+    added.push_back({5, "black"});
 
     res.set_content(build_action_response(added, removed, endgame_info), "application/json");
 }
