@@ -106,3 +106,17 @@ void Board::print() {
         std::cout << std::endl;
     }
 }
+
+size_t Board::get_hash_board() const {
+    size_t hash = 0;
+    size_t prime = 31;
+
+    for (int i = 0; i < 19; i++) {
+        for (int j = 0; j < 19; j++) {
+            e_cell color = this->get(j, i).get();
+            int v = (color == WHITE) ? 1 : (color == BLACK) ? 2 : 0;
+            hash = hash * prime + (v * (i + 1) * (j + 1));
+        }
+    }
+    return hash;
+}

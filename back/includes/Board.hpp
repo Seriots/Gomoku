@@ -17,7 +17,7 @@ class Board {
 
         void operator= (const Board &b);
 
-        
+
         void compute_board_center();
 
         t_position get_center() const;
@@ -27,4 +27,5 @@ class Board {
         void set(int x, int y, e_cell cell);
         void set(int pos, e_cell cell);
         void print();
+        size_t get_hash_board() const;
 };
