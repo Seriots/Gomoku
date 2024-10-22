@@ -127,6 +127,85 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     res.set_content(build_action_response(added, removed, endgame_info), "application/json");
 }
 
+void r_ia_with_dna(const httplib::Request &req, httplib::Response &res) {
+    t_request               request;
+    std::vector<t_stone>    added;
+    std::vector<int>        removed;
+    std::vector<int>        blocked_list;
+    std::vector<int>        dna;
+    t_endgame_info          endgame_info;
+
+
+    res.set_header("Access-Control-Allow-Origin", "*"); // prevent CORS problems
+
+    request = create_new_ia_request(req);
+
+    dna = get_request_dna(req);
+
+    Game game(request, dna); // instantiate game object with the request
+
+    if (request.color == WHITESTONE) {
+        if (dna[2] > 45 && dna[2] < 50 && request.black.size() % 4 == 0) {
+            int pos = 360;
+            while (std::find(request.white.begin(), request.white.end(), pos) != request.white.end() ||
+                   std::find(request.black.begin(), request.black.end(), pos) != request.black.end()) {
+                pos--;
+            }
+            added.push_back({pos, "white"});
+        } else if (dna[1] > 25 && dna[1] < 30) {
+            int pos = 0;
+            while (std::find(request.white.begin(), request.white.end(), pos) != request.white.end() ||
+                   std::find(request.black.begin(), request.black.end(), pos) != request.black.end()) {
+                pos++;
+            }
+            added.push_back({pos, "white"});
+        } else {
+            while (true) {
+                int pos = rand() % 361;
+                if (std::find(request.white.begin(), request.white.end(), pos) == request.white.end() &&
+                    std::find(request.black.begin(), request.black.end(), pos) == request.black.end()) {
+                    added.push_back({pos, "black"});
+                    break;
+                }
+            }
+        }
+    } else {
+        if (dna[2] > 45 && dna[2] < 50 && request.white.size() % 4 == 0) {
+            int pos = 0;
+            while (std::find(request.white.begin(), request.white.end(), pos) != request.white.end() ||
+                   std::find(request.black.begin(), request.black.end(), pos) != request.black.end()) {
+                pos++;
+            }
+            added.push_back({pos, "black"});
+        } else if (dna[1] > 25 && dna[1] < 30) {
+            int pos = 360;
+            while (std::find(request.white.begin(), request.white.end(), pos) != request.white.end() ||
+                   std::find(request.black.begin(), request.black.end(), pos) != request.black.end()) {
+                pos--;
+            }
+            added.push_back({pos, "black"});
+        } else {
+            while (true) {
+                int pos = rand() % 361;
+                if (std::find(request.white.begin(), request.white.end(), pos) == request.white.end() &&
+                    std::find(request.black.begin(), request.black.end(), pos) == request.black.end()) {
+                    added.push_back({pos, "black"});
+                    break;
+                }
+            }
+        }
+    }
+
+    game.set(added[0].pos, request.color == WHITESTONE ? WHITE : BLACK);
+
+    endgame_info = game.check_end_game(added[0].pos);
+    removed.push_back(1);
+    removed.push_back(2);
+    added.push_back({5, "black"});
+
+    res.set_content(build_action_response(added, removed, endgame_info), "application/json");
+}
+
 /*
     Request to end the game
 */

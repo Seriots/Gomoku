@@ -1,5 +1,6 @@
 
-NAME		=	Gomoku
+NAME			=	Gomoku
+NAME_TRAINER	=	trainer
 
 define SRCS =
 	main.cpp
@@ -16,9 +17,18 @@ define SRCS =
 endef
 SRCS := $(strip $(SRCS))
 
-OBJS_DIR	=	objs
-OBJS		= 	$(addprefix $(OBJS_DIR)/,$(SRCS:.cpp=.o))
-DEPS		=	$(OBJS:.o=.d)
+define SRCS_TRAINER =
+	srcs_trainer/MiniJson.cpp
+	srcs_trainer/trainer.cpp
+
+endef
+SRCS_TRAINER := $(strip $(SRCS_TRAINER))
+
+OBJS_DIR		=	objs
+OBJS			= 	$(addprefix $(OBJS_DIR)/,$(SRCS:.cpp=.o))
+OBJS_TRAINER	= 	$(addprefix $(OBJS_DIR)/,$(SRCS_TRAINER:.cpp=.o))
+DEPS			=	$(OBJS:.o=.d)
+DEPS_TRAINER	=	$(OBJS_TRAINER:.o=.d)
 
 CXX			=	c++
 CXXFLAGS	=	-Wall -Wextra -Werror -Iincludes -g
@@ -43,6 +53,9 @@ all: $(NAME)
 $(NAME): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJS)
 
+$(NAME_TRAINER): $(OBJS_TRAINER)
+	$(CXX) $(CXXFLAGS) -o $(NAME_TRAINER) $(OBJS_TRAINER)
+
 $(OBJS_DIR)/%.o: %.cpp
 	@if [ ! -d $(dir $@) ]; then \
 		mkdir -p $(dir $@); \
@@ -60,9 +73,11 @@ $(OBJS_DIR)/%.d: %.cpp Makefile
 clean:
 	rm -Rf $(OBJS_DIR) 2> /dev/null || true
 	rm -f $(OBJS) $(DEPS)
+	rm -f $(OBJS_TRAINER) $(DEPS_TRAINER)
 
 fclean: clean
 	rm -f $(NAME)
+	rm -f $(NAME_TRAINER)
 
 re: fclean all
 

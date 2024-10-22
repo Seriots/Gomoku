@@ -29,6 +29,16 @@ Game::Game(t_request &request)
     this->init_sequenceDna();
 }
 
+Game::Game(t_request &request, std::vector<int> &dna)
+{
+    _request = request;
+    _board = Board(request.white, request.black);
+    _interesting_pos = this->get_interesting_pos();
+    _center = _board.get_center();
+    this->init_dna();
+    this->init_sequenceDna(&dna);
+}
+
 Game::Game(const Game &g) {
     _board = g.get_board();
     _dna = g._dna;
