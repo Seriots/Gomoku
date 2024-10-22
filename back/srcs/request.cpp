@@ -120,33 +120,45 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     game.get_new_blocked_pos(request.color == WHITESTONE ? BLACKSTONE : WHITESTONE);
 
     // create board
-    std::vector<int> board1, board2;
+    std::vector<int> board1, board2, board3;
     for (int i = 0; i < 19*19; i++) {
         board1.push_back(-1);
         board2.push_back(-1);
+        board3.push_back(-1);
     }
 
-    game._transposition_table.clear();
-    auto start_time_1 = std::chrono::high_resolution_clock::now();
-    int pos1 = game.minimax(INT_MIN, INT_MAX, 5, true, -1, board1).first;
-    auto end_time_1 = std::chrono::high_resolution_clock::now();
+    // game._transposition_table.clear();
+    // auto start_time_1 = std::chrono::high_resolution_clock::now();
+    // int pos1 = game.minimax(INT_MIN, INT_MAX, 5, true, -1, board1).first;
+    // auto end_time_1 = std::chrono::high_resolution_clock::now();
 
     game._transposition_table.clear();
     auto start_time_2 = std::chrono::high_resolution_clock::now();
-    int pos2 = game.negascout(INT_MIN, INT_MAX, 5, true, -1, board2).first;
+    int pos2 = game.negamax(INT_MIN, INT_MAX, 5, true, -1, board2, std::chrono::steady_clock::now()).first;
     auto end_time_2 = std::chrono::high_resolution_clock::now();
 
-    std::cout << "Minimax: " << pos1 << std::endl;
-    std::cout << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end_time_1 - start_time_1).count() << std::endl << std::endl;
+    // game._transposition_table.clear();
+    // auto start_time_3 = std::chrono::high_resolution_clock::now();
+    // int pos3 = game.negascout(INT_MIN, INT_MAX, 5, true, -1, board3).first;
+    // auto end_time_3 = std::chrono::high_resolution_clock::now();
+
+    // std::cout << "Minimax: " << pos1 << " - " << pos1 % 19 << " " << pos1 / 19 << std::endl;
+    // std::cout << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end_time_1 - start_time_1).count() << std::endl << std::endl;
     // display board 1
-    display_board(board1, game);
+    // display_board(board1, game);
 
 
 
-    std::cout << "Negascout: " << pos2 << std::endl;
+    std::cout << "Negamax: " << pos2 << " - " << pos2 % 19 << " " << pos2 / 19 << std::endl;
     std::cout << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end_time_2 - start_time_2).count() << std::endl << std::endl;
     // display board 2
     display_board(board2, game);
+
+
+    // std::cout << "Negascout: " << pos3 << " - " << pos3 % 19 << " " << pos3 / 19 << std::endl;
+    // std::cout << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end_time_3 - start_time_3).count() << std::endl << std::endl;
+    // display board 3
+    // display_board(board3, game);
 
     // game.set(request.blocked, BLOCKED);
 

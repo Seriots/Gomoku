@@ -73,5 +73,6 @@ class Game {
         /* ******* Game minimax ******* */
         std::pair<int, int>             minimax(int alpha, int beta, int depth, bool is_maxi, int next_pos, std::vector<int> &board);
         std::pair<int, int>             negascout(int alpha, int beta, int depth, bool is_maxi, int next_pos, std::vector<int> &board);
+        std::pair<int, int>             negamax(int alpha, int beta, int depth, int color, int next_pos, std::vector<int> &board, std::chrono::steady_clock::time_point start_time);
         bool                            is_already_computed(size_t board_hash) const;
 };

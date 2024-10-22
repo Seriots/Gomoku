@@ -30,7 +30,7 @@ std::pair<int, int> Game::minimax(int alpha, int beta, int depth, bool is_maxi, 
                     int tmp = this->minimax(alpha, beta, depth - 1, false, pos, board).second;
                     this->unset(pos);
                     /* LOG */
-                    if (depth == 4)
+                    if (depth == 5)
                         board[pos] = tmp;
                     /* ****** */
                     if (tmp > max_eval) {
@@ -99,6 +99,57 @@ std::pair<int, int> Game::minimax(int alpha, int beta, int depth, bool is_maxi, 
     }
 }
 
+std::pair<int, int> Game::negamax(int alpha, int beta, int depth, int color, int next_pos, std::vector<int> &board, std::chrono::steady_clock::time_point start_time) {
+    size_t board_hash = this->_board.get_hash_board();
+
+    if (is_already_computed(board_hash)) {
+        return this->_transposition_table[board_hash];
+    }
+
+    if (depth == 0) {
+        int score = color * this->board_complex_heuristic(BLACKSTONE);
+        this->_transposition_table[board_hash] = std::make_pair(next_pos, score);
+        return std::make_pair(next_pos, score);
+    }
+
+    int max_eval = INT_MIN;
+    int best_pos = -1;
+
+    for (std::vector<int>::iterator it = this->_interesting_pos.begin(); it != this->_interesting_pos.end(); it++) {
+        int pos = *it;
+
+        if (_board.get(pos).get() == NONE) {
+            this->set(pos, (color == 1) ? BLACK : WHITE);
+
+            int tmp = -this->negamax(-beta, -alpha, depth - 1, -color, pos, board, start_time).second;
+
+            this->unset(pos);
+
+            if (depth == 5) {
+                board[pos] = tmp;
+            }
+
+            if (tmp > max_eval) {
+                max_eval = tmp;
+                best_pos = pos;
+            }
+
+            alpha = std::max(alpha, tmp);
+            if (alpha >= beta) {
+                break;
+            }
+        }
+
+        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start_time).count();
+        if (elapsed > 500) {
+            return std::make_pair(best_pos, max_eval);
+        }
+    }
+
+    this->_transposition_table[board_hash] = std::make_pair(best_pos, max_eval);
+    return std::make_pair(best_pos, max_eval);
+}
+
 std::pair<int, int> Game::negascout(int alpha, int beta, int depth, bool is_maxi, int next_pos, std::vector<int> &board) {
     size_t board_hash = this->_board.get_hash_board();
 
@@ -127,7 +178,7 @@ std::pair<int, int> Game::negascout(int alpha, int beta, int depth, bool is_maxi
                 score = -negascout(-beta, -score, depth - 1, !is_maxi, pos, board).second;
             }
 
-            if (depth == 3) {
+            if (depth == 5) {
                 board[pos] = score;
             }
             if (score > bestScore) {
