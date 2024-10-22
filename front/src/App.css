@@ -1,3 +1,13 @@
 .App {
   text-align: center;
 }
+
+@font-face {
+    font-family: "Kaph";
+        src: url('assets/Kaph-Regular.ttf') format('truetype');
+}
+
+body {
+    background-image: url("assets/WoodTexture.jpg");
+    font-family: "Kaph";
+}

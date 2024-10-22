@@ -91,7 +91,7 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     for (int i = 0; i < 19*19; i++)
         board.push_back(-1);
 
-    int pos = game.minimax(INT_MIN, INT_MAX, 1, true, -1, board).first;
+    int pos = game.minimax(INT_MIN, INT_MAX, 3, true, -1, board).first;
 
     // display board
     for (int y = 0; y < 19; y++) {

@@ -1,0 +1,11 @@
+
+.home-title {
+    font-size: min(12vw, 150px);
+    color: #090909;
+}
+
+.homepage-buttons {
+    display: flex;
+    justify-content: space-evenly;
+    margin-top: 10vw;
+}

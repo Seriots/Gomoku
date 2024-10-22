@@ -1,0 +1,20 @@
+
+.mode-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: min(30vw, 400px);
+    height: min(30vw, 400px);
+    font-size: min(4vw, 45px);
+    font-weight: 300;
+    border: solid;
+    border-color: #632f02;
+    border-width: 8px;
+    border-radius: 1vw;
+    cursor: pointer;
+    background-color: #ce9400;
+    /*background-image: url("../../assets/WoodCartoon.webp");*/
+    font-family: "Kaph";
+    color: #a84f03;
+}
+

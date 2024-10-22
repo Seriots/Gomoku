@@ -1,0 +1,16 @@
+.params-bar {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    width: 300px;
+    height: 100%;
+    position: absolute;
+    left: 0%;
+    background-color: #ce9400;
+}
+
+.params-bar h1 {
+    color: #090909;
+    font-weight: 200;
+}
