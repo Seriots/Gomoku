@@ -300,8 +300,8 @@ std::vector<int> Game::get_interesting_pos() {
     return res;
 }
 
-void Game::sort_interesting_pos(e_color const &color) {
-    std::sort(this->_interesting_pos.begin(), this->_interesting_pos.end(), [this, color](int a, int b) {
+void Game::sort_interesting_pos(e_color const &color, std::vector<int> &vec) {
+    std::sort(vec.begin(), vec.end(), [this, color](int a, int b) {
         return this->complex_heuristic(color, a) > this->complex_heuristic(color, b);
     });
 }

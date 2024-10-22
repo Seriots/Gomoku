@@ -49,7 +49,7 @@ class Game {
         std::vector<int>                get_new_blocked_pos(e_color color);
         std::vector<int>                get_captured(int pos);
         std::vector<int>                get_interesting_pos();
-        void                            sort_interesting_pos(e_color const &color);
+        void                            sort_interesting_pos(e_color const &color, std::vector<int> &vec);
         void                            print_board();
         std::map<e_cell, std::vector<int> > get_all_positions_stone();
 
@@ -74,5 +74,6 @@ class Game {
         std::pair<int, int>             minimax(int alpha, int beta, int depth, bool is_maxi, int next_pos, std::vector<int> &board);
         std::pair<int, int>             negascout(int alpha, int beta, int depth, bool is_maxi, int next_pos, std::vector<int> &board);
         std::pair<int, int>             negamax(int alpha, int beta, int depth, int color, int next_pos, std::vector<int> &board, std::chrono::steady_clock::time_point start_time);
+        std::pair<int, int>             negamax2(int alpha, int beta, int depth, int color, int next_pos, std::vector<int> &board, std::chrono::steady_clock::time_point start_time);
         bool                            is_already_computed(size_t board_hash) const;
 };

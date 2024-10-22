@@ -69,26 +69,34 @@ void display_board(std::vector<int> &board, Game &game) {
         for (int x = 0; x < 19; x++) {
             float displayColor;
             std::vector<int>::iterator it = std::find(game.getter_interesting_pos().begin(), game.getter_interesting_pos().end(), x + y * 19);
+
             if (it == game.getter_interesting_pos().end())
                 displayColor = 0;
             else
                 displayColor = 1.0 - ((float)(it - game.getter_interesting_pos().begin()) / (float)game.getter_interesting_pos().size());
             if (displayColor > 0.99)
-                std::cout << "\033[0;35m";
+                std::cout << "\033[0;35m"; // magenta
             else if (displayColor > 0.9)
-                std::cout << "\033[0;31m";
+                std::cout << "\033[0;31m"; // red
             else if (displayColor > 0.8)
-                std::cout << "\033[0;33m";
+                std::cout << "\033[0;33m"; // yellow
             else if (displayColor > 0.7)
-                std::cout << "\033[0;32m";
+                std::cout << "\033[0;32m"; // green
             else if (displayColor > 0.35)
-                std::cout << "\033[0;34m";
+                std::cout << "\033[0;34m"; // blue
             else
-                std::cout << "\033[0;36m";
+                std::cout << "\033[0;36m"; // cyan
+
             if (board[x + y * 19] != -1)
-                std::cout << std::setw(4) << std::setfill('0') << board[x + y * 19] << " ";
+                std::cout << std::setw(5) << std::setfill(' ') << board[x + y * 19] << " ";
+            else if (game.get_board().get(x, y).get() == WHITE)
+                std::cout << "ooooo ";
+            else if (game.get_board().get(x, y).get() == BLACK)
+                std::cout << "***** ";
+            else if (game.get_board().get(x, y).get() == BLOCKED)
+                std::cout << "xxxxx ";
             else
-                std::cout << "---- ";
+                std::cout << "----- ";
             std::cout << "\033[0m";
         }
         std::cout << std::endl;
@@ -134,7 +142,7 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
 
     game._transposition_table.clear();
     auto start_time_2 = std::chrono::high_resolution_clock::now();
-    int pos2 = game.negamax(INT_MIN, INT_MAX, 5, true, -1, board2, std::chrono::steady_clock::now()).first;
+    int pos2 = game.negamax2(INT_MIN, INT_MAX, 5, true, -1, board2, std::chrono::steady_clock::now()).first;
     auto end_time_2 = std::chrono::high_resolution_clock::now();
 
     // game._transposition_table.clear();
