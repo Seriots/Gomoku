@@ -33,7 +33,7 @@ enum e_derivation_power {
     BIG
 };
 
-int NB_DNA = 16;
+int NB_DNA = 17;
 int POPULATION_NUMBER_BY_GEN = 50;
 int POPULATION_SAVED = 10;
 
@@ -60,6 +60,8 @@ std::ostream& operator<<(std::ostream &os, const e_valueDna &c) {
         os << "VDNA_FOURN1";
     else if (c == VDNA_FOUR)
         os << "VDNA_FOUR";
+    else if (c == VDNA_THREEFREE)
+        os << "VDNA_THREEFREE";
     else if (c == VDNA_FIVE)
         os << "VDNA_FIVE";
     else if (c == VDNA_POTENTIAL_CAPTURE)
@@ -177,12 +179,13 @@ std::vector<int> generateRandonDna() {
     dna[7] = rand() % 2000;
     dna[8] = rand() % 4000;
     dna[9] = rand() % 8000;
-    dna[10] = rand() % 1000000;
-    dna[11] = rand() % 5000;
-    dna[12] = rand() % 20000;
+    dna[10] = rand() % 15000;
+    dna[11] = rand() % 1000000;
+    dna[12] = rand() % 5000;
     dna[13] = rand() % 20000;
     dna[14] = rand() % 20000;
-    dna[15] = rand() % 1000000;
+    dna[15] = rand() % 20000;
+    dna[16] = rand() % 1000000;
 
     return dna;
 }

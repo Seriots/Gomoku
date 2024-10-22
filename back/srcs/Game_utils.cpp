@@ -32,6 +32,7 @@ void Game::init_sequenceDna(std::vector<int> *dna) {
         valuesDna[VDNA_THREE] = 1400;
         valuesDna[VDNA_FOURN1] = 3400;
         valuesDna[VDNA_FOUR] = 15100;
+        valuesDna[VDNA_THREEFREE] = 20000;
         valuesDna[VDNA_FIVE] = 1000000;
         valuesDna[VDNA_POTENTIAL_CAPTURE] = 3500;
         valuesDna[VDNA_EFFECTIVE_CAPTURE_0] = 5000;
