@@ -126,7 +126,7 @@ function Game() {
 		const listBlocked = getPositionList(document.getElementsByClassName('blocked-stone'));
 
         is_processing = is_processing + 1
-		await axios.get(build_request('http://localhost:6325/action', [pos, color, listWhite, listBlack, listBlocked]))
+		await axios.get(build_request('http://localhost:6325/action', [pos, color, listWhite, listBlack, listBlocked, captured_count.white, captured_count.black]))
 			.then((res) => {
                 console.log(res.data);
                 if (res.data.error === undefined) {

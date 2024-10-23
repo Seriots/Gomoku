@@ -15,8 +15,8 @@ std::pair<int, int> Game::minimax(int alpha, int beta, int depth, bool is_maxi, 
                     int tmp = this->minimax(alpha, beta, depth - 1, false, pos, board).second;
                     this->unset(pos);
                     /* LOG */
-                    if (depth == 1)
-                        board[pos] = tmp;
+                    //if (depth == 1)
+                    //    board[pos] = tmp;
                     /* ****** */
                     if (tmp > max_eval) {
                         max_eval = tmp;
@@ -57,25 +57,25 @@ std::pair<int, int> Game::minimax(int alpha, int beta, int depth, bool is_maxi, 
         }
     } else {
 
-            this->print_board();
+            //this->print_board();
             int score = this->board_complex_heuristic(BLACKSTONE);
 
             /* LOG */
-            std::map<e_cell, std::vector<int> > positions = this->get_all_positions_stone();
-            std::vector<int> white = positions[WHITE];
-            std::vector<int> black = positions[BLACK];
-            std::cout << "WHITE: " << white.size() << std::endl;
-            for (size_t i = 0; i < white.size(); i++)
-                std::cout << white[i] << " ";
-            std::cout << std::endl;
+            //std::map<e_cell, std::vector<int> > positions = this->get_all_positions_stone();
+            //std::vector<int> white = positions[WHITE];
+            //std::vector<int> black = positions[BLACK];
+            //std::cout << "WHITE: " << white.size() << std::endl;
+            //for (size_t i = 0; i < white.size(); i++)
+            //    std::cout << white[i] << " ";
+            //std::cout << std::endl;
 
-            std::cout << "BLACK: " << black.size() << std::endl;
-            for (size_t i = 0; i < black.size(); i++)
-                std::cout << black[i] << " ";
-            std::cout << std::endl << std::endl;
+            //std::cout << "BLACK: " << black.size() << std::endl;
+            //for (size_t i = 0; i < black.size(); i++)
+            //    std::cout << black[i] << " ";
+            //std::cout << std::endl << std::endl;
 
-            std::string color = is_maxi ? "WHITE" : "BLACK";
-            std::cout << "complex heuristic for " << color << " at " << next_pos << " is " << score << std::endl << std::endl << std::endl;
+            //std::string color = is_maxi ? "WHITE" : "BLACK";
+            //std::cout << "complex heuristic for " << color << " at " << next_pos << " is " << score << std::endl << std::endl << std::endl;
             /* ******** */
             return std::make_pair(next_pos, score);
     }
