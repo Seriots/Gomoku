@@ -11,15 +11,14 @@ const InfoBar : React.FC<InfoBarProps> = ({
 }) => {
     return (
         <div className='info-bar'>
-            <h1>Info</h1>
             <div className='info-props-div'>
                 <span>
-                    <InfoProp title={'Player'} value={gameInfo.currentPlayer}></InfoProp>
-                    <InfoProp title={'White Cap'} value={gameInfo.whiteCaptured.toString() + '/10'}></InfoProp>
-                    <InfoProp title={'Black Cap'} value={gameInfo.blackCaptured.toString() + '/10'}></InfoProp>
+                    <InfoProp title={'Player'} img={gameInfo.currentPlayer}></InfoProp>
+                    <InfoProp title={'White Capture'} value={gameInfo.whiteCaptured.toString() + '/10'}></InfoProp>
+                    <InfoProp title={'Black Capture'} value={gameInfo.blackCaptured.toString() + '/10'}></InfoProp>
                 </span>
                 <span>
-                    <InfoProp title={'Turn'} value={gameInfo.currentRound.toString()}></InfoProp>
+                    <InfoProp title={'Turn'} value={(Math.floor(gameInfo.currentRound / 2)).toString()}></InfoProp>
                     <InfoProp title={'Time'} value={gameInfo.processTime.toString()}></InfoProp>
                     <InfoProp title={'Depth'} value={gameInfo.processDepth.toString()}></InfoProp>
                 </span>

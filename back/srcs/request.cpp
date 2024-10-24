@@ -63,7 +63,7 @@ void    r_action(const httplib::Request &req, httplib::Response &res) {
     t_endgame_info endgame_info = game.check_end_game(request.pos);
     std::cout << "After white check end" << std::endl;
 
-    res.set_content(build_action_response(added, removed, endgame_info), "application/json"); // everything is send in a nicely formated json
+    res.set_content(build_action_response(added, removed, endgame_info, {}, {}), "application/json"); // everything is send in a nicely formated json
 }
 
 /*
@@ -107,7 +107,9 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     //}
     auto end_time = std::chrono::high_resolution_clock::now();
 
-    std::cout << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count() << std::endl << std::endl;
+    auto time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+
+    std::cout << "Time: " << time << std::endl << std::endl;
 
     // game.set(request.blocked, BLOCKED);
 
@@ -126,7 +128,7 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
 
     t_endgame_info endgame_info = game.check_end_game(pos);
 
-    res.set_content(build_action_response(added, removed, endgame_info), "application/json");
+    res.set_content(build_action_response(added, removed, endgame_info, {"time", "depthSearch"}, {std::to_string(time), std::to_string(1)}), "application/json");
 }
 
 void r_ia_with_dna(const httplib::Request &req, httplib::Response &res) {
@@ -205,7 +207,7 @@ void r_ia_with_dna(const httplib::Request &req, httplib::Response &res) {
     removed.push_back(2);
     added.push_back({5, "black"});
 
-    res.set_content(build_action_response(added, removed, endgame_info), "application/json");
+    res.set_content(build_action_response(added, removed, endgame_info, {}, {}), "application/json");
 }
 
 /*

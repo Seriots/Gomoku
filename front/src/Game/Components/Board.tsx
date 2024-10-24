@@ -11,6 +11,7 @@ interface BoardProps {
     gameRunning: boolean,
     setGameRunning: any,
     setWinner: any,
+    gameInfo: GameInfoInterface,
     setGameInfo: any,
 }
 
@@ -82,7 +83,7 @@ const handleMouseMove = (e: any) => {
         return;
     }
     const x = e.clientX - board.offsetLeft + board.offsetWidth * 0.5;
-    const y = e.clientY - board.offsetTop + board.offsetHeight * 0.6;
+    const y = e.clientY - board.offsetTop + board.offsetHeight * 0.6 + window.scrollY;
     const nearestX = Math.floor(x / CASESIZE) * CASESIZE + BORDERSIZE;
     const nearestY = Math.floor(y / CASESIZE) * CASESIZE + BORDERSIZE;
     setCurrentPos(nearestX, nearestY);
@@ -214,6 +215,7 @@ const placeStone = async () => {
 
     await axios.get(build_request('http://localhost:6325/action', [pos, localGameInfo.currentPlayer, listWhite, listBlack, listBlocked, localGameInfo.listAllowed, localGameInfo.whiteCaptured, localGameInfo.whiteCaptured]))
     .then((res) => {
+        console.log(res.data);
         localGameInfo.response = res.data;
         localGameInfo.moveCount++;
     })
@@ -238,20 +240,24 @@ const placeIAStone = async () => {
     });
 }
 
-const updateGameInfo = (data: any, setGameInfo: any) => {
-    const gameInfo: GameInfoInterface = {
+const updateGameInfo = (data: any, gameInfo: GameInfoInterface, setGameInfo: any) => {
+    const time = data.time === undefined ? gameInfo.processTime : data.time;
+    const depth = data.depthSearch === undefined ? gameInfo.processDepth : data.depthSearch;
+
+
+    const newGameInfo: GameInfoInterface = {
         currentPlayer: localGameInfo.currentPlayer,
         currentRound: localGameInfo.moveCount,
         whiteCaptured: localGameInfo.whiteCaptured,
         blackCaptured: localGameInfo.blackCaptured,
-        processTime: 54,//data.time,
-        processDepth: 3,//data.depthSearch,
+        processTime: time,
+        processDepth: depth,
     }
-    setGameInfo(gameInfo);
+    setGameInfo(newGameInfo);
 }
 
 
-const handleClick = (gameRunning: any, setGameRunning: any, setWinner: any, setGameInfo: any) => async (e: any) => {
+const handleClick = (gameRunning: any, setGameRunning: any, setWinner: any, gameInfo: GameInfoInterface, setGameInfo: any) => async (e: any) => {
     if (localGameInfo.isProcessing || !gameRunning || localGameInfo.endGame) {
         return;
     }
@@ -270,7 +276,7 @@ const handleClick = (gameRunning: any, setGameRunning: any, setWinner: any, setG
     responseHandler(localGameInfo.response);
     checkEndGame(localGameInfo.response, setGameRunning, setWinner);
     switchColor();
-    updateGameInfo(localGameInfo.response, setGameInfo);
+    updateGameInfo(localGameInfo.response, gameInfo, setGameInfo);
     hideShadowStone();
     if (localGameInfo.endGame || !gameRunning) {
         localGameInfo.isProcessing = false;
@@ -281,7 +287,7 @@ const handleClick = (gameRunning: any, setGameRunning: any, setWinner: any, setG
     responseHandler(localGameInfo.response);
     checkEndGame(localGameInfo.response, setGameRunning, setWinner);
     switchColor();
-    updateGameInfo(localGameInfo.response, setGameInfo);
+    updateGameInfo(localGameInfo.response, gameInfo, setGameInfo);
     showShadowStone();
     
     localGameInfo.isProcessing = false;
@@ -292,6 +298,7 @@ const Board : React.FC<BoardProps> = ({
     gameRunning,
     setGameRunning,
     setWinner,
+    gameInfo,
     setGameInfo
 }) => {
     useEffect(() => {
@@ -312,7 +319,7 @@ const Board : React.FC<BoardProps> = ({
     }, [gameRunning]);
 
     return (
-        <div id='boardID' className='board' onClick={handleClick(gameRunning, setGameRunning, setWinner, setGameInfo)} onMouseMove={handleMouseMove} onMouseEnter={handleMouseEnter(gameRunning)} onMouseLeave={handleMouseLeave}>
+        <div id='boardID' className='board' onClick={handleClick(gameRunning, setGameRunning, setWinner, gameInfo, setGameInfo)} onMouseMove={handleMouseMove} onMouseEnter={handleMouseEnter(gameRunning)} onMouseLeave={handleMouseLeave}>
             <div id='shadow-stone' className='white-shadow-stone'></div>
         </div>
     );

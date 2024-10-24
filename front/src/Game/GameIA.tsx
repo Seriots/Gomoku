@@ -31,9 +31,9 @@ function GameIA() {
 
     return (
         <div className='gameIA-master'>
-            <ParamsBar />
+            {/*<ParamsBar />*/}
             <InfoBar gameInfo={gameInfo}/>
-            <Board gameRunning={gameRunning} setGameRunning={setGameRunning} setWinner={setWinner} setGameInfo={setGameInfo}/>
+            <Board gameRunning={gameRunning} setGameRunning={setGameRunning} setWinner={setWinner} gameInfo={gameInfo} setGameInfo={setGameInfo}/>
             <BoardShadow gameRunning={gameRunning} winner={winner} setWinner={setWinner}/>
             <StartButton gameRunning={gameRunning} setGameRunning={setGameRunning} />
         </div>

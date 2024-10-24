@@ -153,8 +153,12 @@ int get_captured_count_by_color(t_request request, e_color color) {
     @param value: the list of value for the json content
     @return the response in a string well json handled
 */
-std::string build_action_response(std::vector<t_stone> added, std::vector<int> removed, t_endgame_info &endgame_info) {
+std::string build_action_response(std::vector<t_stone> added, std::vector<int> removed, t_endgame_info &endgame_info, std::vector<std::string> keys, std::vector<std::string> values) {
+    (void)keys;
+    (void)values;
     std::string out = "{\n" + build_json_content_bool({"win_by_capture", "win_by_alignement", "no_winner"}, {endgame_info.win_by_capture, endgame_info.win_by_alignement, endgame_info.no_winner}) + ",\n";
+    if (keys.size() > 0)
+        out += build_json_content(keys, values) + ",\n";
     out += "\"added\":[";
     for (size_t i = 0; i < added.size(); i++) {
         if (i == 0)
