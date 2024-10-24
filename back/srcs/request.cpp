@@ -126,66 +126,37 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
 
     // create board
     std::vector<int> board1, board2, board3;
-    for (int i = 0; i < 19*19; i++) {
-        // board1.push_back(-1);
+    for (int i = 0; i < 19*19; i++)
         board2.push_back(-1);
-        // board3.push_back(-1);
-    }
 
-    // game._transposition_table.clear();
-    // auto start_time_1 = std::chrono::high_resolution_clock::now();
-    // int pos1 = game.minimax(INT_MIN, INT_MAX, 5, true, -1, board1).first;
-    // auto end_time_1 = std::chrono::high_resolution_clock::now();
     game.set_depth(6);
     std::vector<int> threshold_by_layer = generate_thresholds(game.get_depth(), 5000, 10, 2);
-    // display thresholds
+
+    auto start_time = std::chrono::high_resolution_clock::now();
+    int pos = game.negamax(INT_MIN, INT_MAX, game.get_depth(), 1, -1, board2, std::chrono::steady_clock::now(), request.white_capture, request.black_capture).first;
+    auto end_time = std::chrono::high_resolution_clock::now();
+
+    /* logs */
     for (size_t i = 0; i < threshold_by_layer.size(); i++)
-        std::cout << "Threshold " << i << ": " << threshold_by_layer[i] << std::endl;
+        std::cout << "depth " << i + 1  << ": " << threshold_by_layer[i] << std::endl;
     game.set_threshold(threshold_by_layer);
-
-    auto start_time_2 = std::chrono::high_resolution_clock::now();
-    int pos2 = game.negamax2(INT_MIN, INT_MAX, game.get_depth(), true, -1, board2, std::chrono::steady_clock::now(), request.white_captured, request.black_captured).first;
-    auto end_time_2 = std::chrono::high_resolution_clock::now();
-
-    // game._transposition_table.clear();
-    // auto start_time_3 = std::chrono::high_resolution_clock::now();
-    // int pos3 = game.negascout(INT_MIN, INT_MAX, 5, true, -1, board3).first;
-    // auto end_time_3 = std::chrono::high_resolution_clock::now();
-
-    // std::cout << "Minimax: " << pos1 << " - " << pos1 % 19 << " " << pos1 / 19 << std::endl;
-    // std::cout << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end_time_1 - start_time_1).count() << std::endl << std::endl;
-    // display board 1
-    // display_board(board1, game);
-
-
-
-    std::cout << "Negamax: " << pos2 << " - " << pos2 % 19 << " " << pos2 / 19 << std::endl;
-    std::cout << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end_time_2 - start_time_2).count() << std::endl << std::endl;
-    // display board 2
+    std::cout << "Negamax: " << pos << " - " << pos % 19 << " " << pos / 19 << std::endl;
+    std::cout << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count() << std::endl << std::endl;
     display_board(board2, game);
 
+    game.set(pos, color_to_cell(request.color));
 
-    // std::cout << "Negascout: " << pos3 << " - " << pos3 % 19 << " " << pos3 / 19 << std::endl;
-    // std::cout << "Time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end_time_3 - start_time_3).count() << std::endl << std::endl;
-    // display board 3
-    // display_board(board3, game);
-
-    // game.set(request.blocked, BLOCKED);
-
-
-    game.set(pos2, request.color == WHITESTONE ? WHITE : BLACK);
-
-    removed = game.get_captured(pos2);
+    removed = game.get_captured(pos);
 
     game.unset(removed);
 
     blocked_list = game.get_new_blocked_pos(request.color == WHITESTONE ? BLACKSTONE : WHITESTONE);
 
-    added.push_back({pos2, request.color == WHITESTONE ? "white" : "black"});
+    added.push_back({pos, request.color == WHITESTONE ? "white" : "black"});
     for (size_t i = 0; i < blocked_list.size(); i++)
         added.push_back({blocked_list[i], "blocked"});
 
-    t_endgame_info endgame_info = game.check_end_game(pos2, removed.size(), request.color);
+    t_endgame_info endgame_info = game.check_end_game(pos, removed.size(), request.color);
 
     res.set_content(build_action_response(added, removed, endgame_info), "application/json");
 }

@@ -8,6 +8,17 @@
 #include "Cell.hpp"
 
 /*
+    e_color to e_cell
+    @param color: the color to convert
+    @return the corresponding cell
+*/
+e_cell color_to_cell(e_color color) {
+    if (color == WHITESTONE)
+        return WHITE;
+    return BLACK;
+}
+
+/*
     Check if the request is valid
     @param request: the request to check
     @param res: the response to send if the request is invalid
@@ -86,10 +97,11 @@ t_request create_new_request(const httplib::Request &req) {
     int x = (pos) % 19;
     int y = (pos) / 19;
     e_color color = req.path_params.at("color") == "white" ? WHITESTONE : BLACKSTONE;
+    e_color color_opponent = color == WHITESTONE ? BLACKSTONE : WHITESTONE;
     std::vector<int> white = parse_board_input(req.path_params.at("white"));
     std::vector<int> black = parse_board_input(req.path_params.at("black"));
     std::vector<int> blocked = parse_board_input(req.path_params.at("blocked"));
-    return {pos, x, y, color, white, black, blocked, 0, 0};
+    return {pos, x, y, color, color_opponent, white, black, blocked, 0, 0};
 }
 
 /*
@@ -99,12 +111,13 @@ t_request create_new_request(const httplib::Request &req) {
 */
 t_request create_new_ia_request(const httplib::Request &req) {
     e_color color = req.path_params.at("color") == "white" ? WHITESTONE : BLACKSTONE;
+    e_color color_opponent = color == WHITESTONE ? BLACKSTONE : WHITESTONE;
     std::vector<int> white = parse_board_input(req.path_params.at("white"));
     std::vector<int> black = parse_board_input(req.path_params.at("black"));
     std::vector<int> blocked = parse_board_input(req.path_params.at("blocked"));
-    int white_captured = std::stoi(req.path_params.at("whiteCaptured"));
-    int black_captured = std::stoi(req.path_params.at("blackCaptured"));
-    return {0, 0, 0, color, white, black, blocked, white_captured, black_captured};
+    int white_capture = std::stoi(req.path_params.at("whiteCaptured"));
+    int black_capture = std::stoi(req.path_params.at("blackCaptured"));
+    return {0, 0, 0, color, color_opponent, white, black, blocked, white_capture, black_capture};
 }
 
 /*
@@ -115,8 +128,8 @@ t_request create_new_ia_request(const httplib::Request &req) {
 */
 int get_captured_count_by_color(t_request request, e_color color) {
     if (color == WHITESTONE)
-        return request.white_captured;
-    return request.black_captured;
+        return request.white_capture;
+    return request.black_capture;
 }
 
 /*

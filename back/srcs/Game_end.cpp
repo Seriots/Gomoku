@@ -10,12 +10,12 @@
     @return: true if the game is won by capture, false otherwise
 */
 bool    Game::check_win_by_capture(size_t captured, e_color color) {
-    int white_captured = this->_request.white_captured + ((color == WHITESTONE) ? captured : 0);
-    int black_captured = this->_request.black_captured + ((color == BLACKSTONE) ? captured : 0);
+    int white_capture = this->_request.white_capture + ((color == WHITESTONE) ? captured : 0);
+    int black_capture = this->_request.black_capture + ((color == BLACKSTONE) ? captured : 0);
 
-    if (white_captured >= 10)
+    if (white_capture >= 10)
         return true;
-    if (black_captured >= 10)
+    if (black_capture >= 10)
         return true;
     return false;
 }
