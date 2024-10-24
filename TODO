@@ -9,6 +9,13 @@
 [ ] Make the heuristic on the full board
 
 
+<TRAINER>
+
+[ ] GENERER une liste de duel
+[ ] Creer une pool de thread qui joue tous les duels
+[ ] Faire le systeme de duel et voir le gagnant, ajouter le gagnant a son score et le nombre de coups
+[ ] FIN
+
 DNA:
 
 FREE_FIVE
