@@ -6,6 +6,7 @@
 
 #include "Game.hpp"
 
+
 /*
     Basic test request, does nothing nice
 */
@@ -130,19 +131,24 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     // create board
     std::vector<int> board1, board2, board3;
     for (int i = 0; i < 19*19; i++) {
-        board1.push_back(-1);
+        // board1.push_back(-1);
         board2.push_back(-1);
-        board3.push_back(-1);
+        // board3.push_back(-1);
     }
 
     // game._transposition_table.clear();
     // auto start_time_1 = std::chrono::high_resolution_clock::now();
     // int pos1 = game.minimax(INT_MIN, INT_MAX, 5, true, -1, board1).first;
     // auto end_time_1 = std::chrono::high_resolution_clock::now();
+    game.set_depth(8);
+    std::vector<int> threshold_by_layer = generate_thresholds(game.get_depth(), 5000, 10, 2);
+    // display thresholds
+    for (size_t i = 0; i < threshold_by_layer.size(); i++)
+        std::cout << "Threshold " << i << ": " << threshold_by_layer[i] << std::endl;
+    game.set_threshold(threshold_by_layer);
 
-    game._transposition_table.clear();
     auto start_time_2 = std::chrono::high_resolution_clock::now();
-    int pos2 = game.negamax2(INT_MIN, INT_MAX, 5, true, -1, board2, std::chrono::steady_clock::now()).first;
+    int pos2 = game.negamax2(INT_MIN, INT_MAX, game.get_depth(), true, -1, board2, std::chrono::steady_clock::now()).first;
     auto end_time_2 = std::chrono::high_resolution_clock::now();
 
     // game._transposition_table.clear();

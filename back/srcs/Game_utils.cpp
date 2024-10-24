@@ -267,8 +267,8 @@ std::vector<int> Game::get_interesting_pos() {
             int x = pos % 19;
             int y = pos / 19;
             if (this->get_board().get(x, y).get() != NONE) {
-                for (int j = y - 2; j <= y + 2; j++) {
-                    for (int i = x - 2; i <= x + 2; i++) {
+                for (int j = y - 1; j <= y + 1; j++) {
+                    for (int i = x - 1; i <= x + 1; i++) {
                         if (is_in_grid(i, j)) {
                             if (this->get_board().get(i, j).get() == NONE) {
                                 if (interesting_pos.find(i + j * 19) == interesting_pos.end())

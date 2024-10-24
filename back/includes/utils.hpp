@@ -24,3 +24,4 @@ t_request create_new_ia_request(const httplib::Request &req);
 int get_captured_count_by_color(t_request request, e_color color);
 
 int get_linear_distance(t_position &a, t_position &b);
+std::vector<int> generate_thresholds(int max_depth, int max_calculations, int max_thresholds, int min_thresholds);

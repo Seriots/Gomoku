@@ -117,8 +117,14 @@ std::pair<int, int> Game::negamax2(int alpha, int beta, int depth, int color, in
 
     std::vector<int> tmp_interesting_pos = this->get_interesting_pos();
     this->sort_interesting_pos((color == 1) ? BLACKSTONE : WHITESTONE, tmp_interesting_pos);
-    if (tmp_interesting_pos.size() > 5) {
-        tmp_interesting_pos.resize(5);
+    if ((int)tmp_interesting_pos.size() > this->_threshold[depth - 1]) {
+        //std::cout << "Resize depth " << depth << " from " << tmp_interesting_pos.size() << " to " << this->_threshold[depth] << std::endl;
+        tmp_interesting_pos.resize(this->_threshold[depth - 1]);
+    }
+    if (depth == this->_depth) {
+        std::cout << "Depth " << depth << " - " << tmp_interesting_pos.size() << std::endl;
+        std::cout << "Threshold " << this->_threshold[depth - 1] << std::endl << std::endl;
+
     }
     for (std::vector<int>::iterator it = tmp_interesting_pos.begin(); it != tmp_interesting_pos.end(); it++) {
         int pos = *it;
@@ -130,7 +136,7 @@ std::pair<int, int> Game::negamax2(int alpha, int beta, int depth, int color, in
 
             this->unset(pos);
 
-            if (depth == 5) {
+            if (depth == this->_depth) {
                 board[pos] = tmp;
             }
 

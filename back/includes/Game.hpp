@@ -17,7 +17,8 @@ class Game {
         std::vector<int>                _interesting_pos;
         std::vector<int>                _blocked_pos;
         std::map<e_sequenceDna, int>    _sequenceDna;
-
+        int                             _depth;
+        std::vector<int>                _threshold;
 
         void                            init_test_board();
     public:
@@ -37,6 +38,9 @@ class Game {
         Board get_board() const;
         std::vector<int> getter_interesting_pos() const;
         void init_interesting_pos(void);
+        void set_depth(int depth);
+        void set_threshold(std::vector<int> threshold);
+        int get_depth() const;
 
 
         /* ******* Game utils ******* */

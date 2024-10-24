@@ -61,7 +61,7 @@ std::string build_json_content(std::vector<std::string> key, std::vector<std::st
         else
             out += ",\n\"" + key[i] + "\":\"" + value[i] + "\"";
     }
-    return out;   
+    return out;
 }
 
 std::string build_json_content_bool(std::vector<std::string> key, std::vector<bool> value) {
@@ -72,7 +72,7 @@ std::string build_json_content_bool(std::vector<std::string> key, std::vector<bo
         else
             out += ",\n\"" + key[i] + "\":" + std::to_string(value[i]);
     }
-    return out;   
+    return out;
 }
 
 /*
@@ -155,4 +155,66 @@ std::string build_action_response(std::vector<t_stone> added, std::vector<int> r
 
 int get_linear_distance(t_position &a, t_position &b) {
     return std::max(abs(a.x - b.x), abs(a.y - b.y));
+}
+
+/*
+    Compute the number of calculations needed for the thresholds
+    @param thresholds: the list of thresholds
+*/
+int compute_calculations(const std::vector<int>& thresholds) {
+    int calculations = 1;
+    for (int threshold : thresholds) {
+        calculations *= threshold;
+    }
+    return calculations;
+}
+
+/*
+    Get the index to increment in the thresholds list
+    @param thresholds: the list of thresholds
+    @param max_thresholds: the maximum threshold
+*/
+int index_to_increment(std::vector<int>& thresholds, int max_thresholds) {
+        for (int i = 0; i < (int)thresholds.size() - 1; ++i) {
+            if (thresholds[i] <= thresholds[i + 1] && thresholds[i] < max_thresholds) {
+                return i;
+            }
+        }
+        return (int)thresholds.size() - 1;
+}
+
+/*
+    Generate the thresholds for the negamax algorithm
+    @param max_depth: the maximum depth
+    @param max_calculations: the maximum number of calculations
+    @param max_thresholds: the maximum threshold
+    @param min_thresholds: the minimum threshold
+    @return the list of thresholds
+*/
+std::vector<int> generate_thresholds(int max_depth, int max_calculations, int max_thresholds, int min_thresholds) {
+    std::vector<int> thresholds(max_depth, min_thresholds);
+    bool done = false;
+        int index, calculations;
+
+        while (!done) {
+                calculations = compute_calculations(thresholds);
+                index = index_to_increment(thresholds, max_thresholds);
+                if (calculations < max_calculations) {
+                    thresholds[index]++;
+                }
+                if (calculations > max_calculations) {
+                    int e;
+                    for (e = index; thresholds[e + 1] == thresholds[index] && e < (int)thresholds.size(); ++e);
+                    if (thresholds[e] > min_thresholds) {
+                        thresholds[e]--;
+                        done = true;
+                    } else if (index - 1 >= 0 && thresholds[index - 1] > min_thresholds) {
+                            thresholds[index - 1]--;
+                    }
+                    done = true;
+                }
+        }
+
+        std::reverse(thresholds.begin(), thresholds.end());
+        return thresholds;
 }

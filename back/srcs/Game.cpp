@@ -65,6 +65,18 @@ void Game::set(std::vector<int> pos, e_cell cell) {
     }
 }
 
+void Game::set_threshold(std::vector<int> threshold) {
+    _threshold = threshold;
+}
+
+void Game::set_depth(int depth) {
+    _depth = depth;
+}
+
+int Game::get_depth() const {
+    return _depth;
+}
+
 void Game::unset(int pos) {
     int x = pos % 19;
     int y = pos / 19;
