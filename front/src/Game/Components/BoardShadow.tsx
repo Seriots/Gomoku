@@ -45,7 +45,7 @@ const BoardShadow : React.FC<BoardShadowProps> = ({
         end_game_text.classList.remove('show');
         setWinner('');
 
-    }, [gameRunning]);
+    }, [gameRunning, setWinner]);
 
     return (
         <div id='shadowMasterID' className='board-shadow-master'>

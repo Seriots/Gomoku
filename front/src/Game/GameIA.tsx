@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Board from './Components/Board';
 import BoardShadow from './Components/BoardShadow';
 import InfoBar from './Components/InfoBar';
@@ -15,8 +15,17 @@ export interface GameInfoInterface {
     processDepth: number,
 }
 
-const GameIn : GameInfoInterface = {
+const GameInWhite: GameInfoInterface = {
     currentPlayer: 'white',
+    currentRound: 0,
+    whiteCaptured: 0,
+    blackCaptured: 0,
+    processTime: 0,
+    processDepth: 0,
+}
+
+const GameInBlack: GameInfoInterface = {
+    currentPlayer: 'black',
     currentRound: 0,
     whiteCaptured: 0,
     blackCaptured: 0,
@@ -27,14 +36,23 @@ const GameIn : GameInfoInterface = {
 function GameIA() {
     const [gameRunning, setGameRunning] = useState(false);
     const [winner, setWinner] = useState('');
-    const [gameInfo, setGameInfo] = useState(GameIn);
+    const [gameInfo, setGameInfo] = useState(GameInWhite);
     const [firstPlayer, setFirstPlayer] = useState('white');
+    const firstPlayerRef = useRef(firstPlayer);
+
+    useEffect(() => {
+        if (firstPlayer === 'white')
+            setGameInfo(GameInWhite);
+        else
+            setGameInfo(GameInBlack);
+        firstPlayerRef.current = firstPlayer;
+    }, [firstPlayer]);
 
     return (
         <div className='gameIA-master'>
-            <ParamsBar  setFirstPlayer={setFirstPlayer}/>
+            <ParamsBar  firstPlayer={firstPlayer} setFirstPlayer={setFirstPlayer} gameRunning={gameRunning}/>
             <InfoBar gameInfo={gameInfo}/>
-            <Board gameRunning={gameRunning} setGameRunning={setGameRunning} setWinner={setWinner} gameInfo={gameInfo} setGameInfo={setGameInfo} firstPlayer={firstPlayer}/>
+            <Board gameRunning={gameRunning} setGameRunning={setGameRunning} setWinner={setWinner} gameInfo={gameInfo} setGameInfo={setGameInfo} firstPlayer={firstPlayerRef}/>
             <BoardShadow gameRunning={gameRunning} winner={winner} setWinner={setWinner}/>
             <StartButton gameRunning={gameRunning} setGameRunning={setGameRunning} />
         </div>

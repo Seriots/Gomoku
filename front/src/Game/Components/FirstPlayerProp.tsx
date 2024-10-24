@@ -1,33 +1,40 @@
 import './ParamsBar.css';
 
-import whiteStone from '../../assets/whiteStone.png';
-import blackStone from '../../assets/blackStone.png';
 
 interface FirstPlayerPropProps {
+    firstPlayer: string,
 	setFirstPlayer: any,
+    gameRunning: boolean,
 }
 
-const handleClick = (setFirstPlayer: any) => () => {
-    const firstPlayer = document.getElementById('firstPlayerID') as HTMLElement;
-    if (!firstPlayer)
+const handleClick = (firstPlayer: string, setFirstPlayer: any, gameRunning: boolean) => () => {
+    if (gameRunning)
         return;
-    firstPlayer.classList.toggle('black');
-    if (firstPlayer.innerHTML === 'white') {
-        setFirstPlayer('black');
-        firstPlayer.innerHTML = 'black';
-    } else {
-        setFirstPlayer('white');
-        firstPlayer.innerHTML = 'white';
-    }
+    const firstPlayerIMG = document.getElementById('firstPlayerID') as HTMLElement;
+    const whiteText = document.getElementById('WhiteTextID') as HTMLElement;
+    const blackText = document.getElementById('BlackTextID') as HTMLElement; 
+    if (!firstPlayerIMG || !whiteText || !blackText)
+        return;
+    firstPlayerIMG.classList.toggle('black');
+    whiteText.classList.toggle('toggle');
+    blackText.classList.toggle('toggle');
+
+    firstPlayer === 'white' ? setFirstPlayer('black') : setFirstPlayer('white');
 }
 
 const FirstPlayerProp : React.FC<FirstPlayerPropProps> = ({
     setFirstPlayer,
+    firstPlayer,
+    gameRunning,
 }) => {
     return (
         <div className='param-prop'>
             <h2>First player</h2>
-            <button id='firstPlayerID' className='first-player-selector' onClick={handleClick(setFirstPlayer)}></button>
+            <div className='first-player-selector-wrapper'>
+                <p id='WhiteTextID' className='first-player-selector-white'>player</p>
+                <button id='firstPlayerID' className='first-player-selector' onClick={handleClick(firstPlayer, setFirstPlayer, gameRunning)}></button>
+                <p id='BlackTextID' className='first-player-selector-black'>computer</p>
+            </div>
         </div>
     );
 }

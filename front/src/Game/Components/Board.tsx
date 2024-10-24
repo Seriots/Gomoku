@@ -2,7 +2,7 @@ import axios from 'axios';
 
 import './Board.css';
 import { GameInfoInterface } from '../GameIA';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 const CASESIZE = 36;
 const BORDERSIZE = 16;
@@ -13,7 +13,7 @@ interface BoardProps {
     setWinner: any,
     gameInfo: GameInfoInterface,
     setGameInfo: any,
-    firstPlayer: string,
+    firstPlayer: any,
 }
 
 interface LocalGameInfoProps {
@@ -303,12 +303,31 @@ const Board : React.FC<BoardProps> = ({
     setGameInfo,
     firstPlayer
 }) => {
-    let fPlayer = firstPlayer;
+    const [runFirstIa, setRunFirstIa] = useState(false);
+
+    useEffect(() => {
+        const playIa = async () => {
+            localGameInfo.isProcessing = true;
+            await placeIAStone();
+            responseHandler(localGameInfo.response);
+            checkEndGame(localGameInfo.response, setGameRunning, setWinner);
+            switchColor();
+            updateGameInfo(localGameInfo.response, gameInfo, setGameInfo);
+            showShadowStone();
+            
+            localGameInfo.isProcessing = false;
+        }
+        if (runFirstIa) {
+            setRunFirstIa(false);
+            playIa();
+        }
+    }
+    , [runFirstIa, gameInfo, setGameInfo, setGameRunning, setWinner]);
 
     useEffect(() => {
         if (gameRunning !== true)
             return ;
-        localGameInfo = initLocalGameInfo(fPlayer);
+        localGameInfo = initLocalGameInfo(firstPlayer.current);
 
         const board = document.getElementById('boardID');
         if (!board)
@@ -320,7 +339,11 @@ const Board : React.FC<BoardProps> = ({
         while (document.getElementsByClassName('blocked-stone').length > 0)
             board.removeChild(document.getElementsByClassName('blocked-stone')[0]);
 
-    }, [gameRunning]);
+        if (firstPlayer.current === 'black') {
+            setRunFirstIa(true);
+        }
+
+    }, [gameRunning, firstPlayer]);
 
     return (
         <div id='boardID' className='board' onClick={handleClick(gameRunning, setGameRunning, setWinner, gameInfo, setGameInfo)} onMouseMove={handleMouseMove} onMouseEnter={handleMouseEnter(gameRunning)} onMouseLeave={handleMouseLeave}>

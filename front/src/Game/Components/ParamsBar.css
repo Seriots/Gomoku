@@ -78,12 +78,24 @@
     /*margin: 0;*/
 }
 
+.first-player-selector-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    width: 80%;
+    height: 50px;
+    position: relative;
+    bottom: 15% ;
+}
+
 .first-player-selector {
     all: unset;
     height: 50px;
     width: 50px;
     background-image: url("../../assets/whiteStone.png");
     background-size: 100% 100%;
+    position: relative ;
 }
 
 .first-player-selector.black {
@@ -91,3 +103,20 @@
     background-size: 100% 100%;
 }
 
+.first-player-selector-white {
+    color: #e9e9e9;
+    display: block;
+}
+
+.first-player-selector-black {
+    color: #1f1f1f;
+    display: none;
+}
+
+.first-player-selector-white.toggle {
+    display: none;
+}
+
+.first-player-selector-black.toggle {
+    display: block;
+}
