@@ -4,27 +4,90 @@
     justify-content: start;
     align-items: center;
     width: 300px;
-    height: 100%;
+    height: 88%;
     position: absolute;
+    margin-top: 80px;
     left: 0%;
-    background-color: #ce9400;
+    /*background-color: #ce9400;*/
 }
 
 @media screen and (max-width: 1290px) {
     .params-bar {
-        width: 100%;
+        width: fit-content;
         height: 200px;
-        flex-direction: row;
         justify-content: space-between;
-        align-items: center;
-        position: absolute;
-        top: 1000px;
-        left: 0;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, 230%);
     }
     
 }
 
-.params-bar h1 {
+.param-prop {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 280px;
+    height: 110px;
+    padding: 10px;
     color: #632f02;
-    font-weight: 200;
+    background-image: url("../../assets/WoodSignParams.png");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    margin-bottom: 16px;
+    /*border-bottom: 1px solid #090909;*/
 }
+
+.param-props-div {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.param-props-div span {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    width: 100%;
+    color: #632f02;
+}
+
+@media screen and (max-width: 1290px) {
+    .param-props-div span {
+        display: flex;
+        flex-direction: row;
+        justify-content: start;
+        align-items: center;
+        width: 100%;
+        color: #632f02;
+    }
+}
+
+.param-prop h2 {
+    font-weight: 100;
+    font-size: 20px;
+    margin: 0;
+    margin-top: 10px;
+    padding: 0;
+    /*padding-left: 20px;*/
+    /*margin: 0;*/
+}
+
+.first-player-selector {
+    all: unset;
+    height: 50px;
+    width: 50px;
+    background-image: url("../../assets/whiteStone.png");
+    background-size: 100% 100%;
+}
+
+.first-player-selector.black {
+    background-image: url("../../assets/blackStone.png");
+    background-size: 100% 100%;
+}
+

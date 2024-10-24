@@ -13,6 +13,7 @@ interface BoardProps {
     setWinner: any,
     gameInfo: GameInfoInterface,
     setGameInfo: any,
+    firstPlayer: string,
 }
 
 interface LocalGameInfoProps {
@@ -32,9 +33,9 @@ let currentPos = {
 }
 
 
-const initLocalGameInfo = () => {
+const initLocalGameInfo = (firstPlayer: string) => {
     return {
-        currentPlayer: 'white',
+        currentPlayer: firstPlayer,
         isProcessing: false,
         response: undefined,
         endGame: false,
@@ -45,7 +46,7 @@ const initLocalGameInfo = () => {
     }
 }
 
-let localGameInfo: LocalGameInfoProps = initLocalGameInfo();
+let localGameInfo: LocalGameInfoProps = initLocalGameInfo('white');
 
 const build_request = (base: string, lst: any) => {
     let res = base;
@@ -299,12 +300,15 @@ const Board : React.FC<BoardProps> = ({
     setGameRunning,
     setWinner,
     gameInfo,
-    setGameInfo
+    setGameInfo,
+    firstPlayer
 }) => {
+    let fPlayer = firstPlayer;
+
     useEffect(() => {
         if (gameRunning !== true)
             return ;
-        localGameInfo = initLocalGameInfo();
+        localGameInfo = initLocalGameInfo(fPlayer);
 
         const board = document.getElementById('boardID');
         if (!board)

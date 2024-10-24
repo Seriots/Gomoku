@@ -28,12 +28,13 @@ function GameIA() {
     const [gameRunning, setGameRunning] = useState(false);
     const [winner, setWinner] = useState('');
     const [gameInfo, setGameInfo] = useState(GameIn);
+    const [firstPlayer, setFirstPlayer] = useState('white');
 
     return (
         <div className='gameIA-master'>
-            {/*<ParamsBar />*/}
+            <ParamsBar  setFirstPlayer={setFirstPlayer}/>
             <InfoBar gameInfo={gameInfo}/>
-            <Board gameRunning={gameRunning} setGameRunning={setGameRunning} setWinner={setWinner} gameInfo={gameInfo} setGameInfo={setGameInfo}/>
+            <Board gameRunning={gameRunning} setGameRunning={setGameRunning} setWinner={setWinner} gameInfo={gameInfo} setGameInfo={setGameInfo} firstPlayer={firstPlayer}/>
             <BoardShadow gameRunning={gameRunning} winner={winner} setWinner={setWinner}/>
             <StartButton gameRunning={gameRunning} setGameRunning={setGameRunning} />
         </div>

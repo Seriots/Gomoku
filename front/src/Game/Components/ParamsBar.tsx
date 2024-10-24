@@ -1,15 +1,21 @@
 import './ParamsBar.css';
+import FirstPlayerProp from './FirstPlayerProp';
+
 
 interface ParamsBarProps {
-	label?: string,
+	setFirstPlayer: any,
 }
 
 const ParamsBar : React.FC<ParamsBarProps> = ({
-    label,
+    setFirstPlayer,
 }) => {
     return (
         <div className='params-bar'>
-            <h1>Parameters</h1>
+            <div className='param-props-div'>
+            <span>
+                <FirstPlayerProp setFirstPlayer={setFirstPlayer}></FirstPlayerProp>
+            </span>
+            </div>
         </div>
     );
 }
