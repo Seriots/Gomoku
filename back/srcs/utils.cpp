@@ -18,6 +18,11 @@ bool check_error_request(t_request &request,  httplib::Response &res) {
         res.set_content("{"+build_json_content({"error"}, {"outOfBound"})+"}", "application/json");
         return true;
     }
+    if (request.allowed.size() > 0 && std::find(request.allowed.begin(), request.allowed.end(), request.pos) == request.allowed.end()) {
+        res.set_content("{"+build_json_content({"error"}, {"notAllowed"})+"}", "application/json");
+        return true;
+    }
+
     if (std::find(request.white.begin(), request.white.end(), request.pos) != request.white.end()
         || std::find(request.black.begin(), request.black.end(), request.pos) != request.black.end()
         || std::find(request.blocked.begin(), request.blocked.end(), request.pos) != request.blocked.end()) {
@@ -89,9 +94,11 @@ t_request create_new_request(const httplib::Request &req) {
     std::vector<int> white = parse_board_input(req.path_params.at("white"));
     std::vector<int> black = parse_board_input(req.path_params.at("black"));
     std::vector<int> blocked = parse_board_input(req.path_params.at("blocked"));
+    std::vector<int> allowed = parse_board_input(req.path_params.at("allowed"));
     int white_captured = std::stoi(req.path_params.at("whiteCaptured"));
     int black_captured = std::stoi(req.path_params.at("blackCaptured"));
-    return {pos, x, y, color, white, black, blocked, white_captured, black_captured};
+
+    return {pos, x, y, color, white, black, blocked, allowed, white_captured, black_captured};
 }
 
 /*
@@ -104,9 +111,11 @@ t_request create_new_ia_request(const httplib::Request &req) {
     std::vector<int> white = parse_board_input(req.path_params.at("white"));
     std::vector<int> black = parse_board_input(req.path_params.at("black"));
     std::vector<int> blocked = parse_board_input(req.path_params.at("blocked"));
+    std::vector<int> allowed = {};
     int white_captured = std::stoi(req.path_params.at("whiteCaptured"));
     int black_captured = std::stoi(req.path_params.at("blackCaptured"));
-    return {0, 0, 0, color, white, black, blocked, white_captured, black_captured};
+    
+    return {0, 0, 0, color, white, black, blocked, allowed, white_captured, black_captured};
 }
 
 std::vector<int> get_request_dna(const httplib::Request &req) {

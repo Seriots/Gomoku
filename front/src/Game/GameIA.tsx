@@ -6,17 +6,34 @@ import ParamsBar from './Components/ParamsBar';
 import './GameIA.css';
 import StartButton from './Components/StartButton';
 
+export interface GameInfoInterface {
+    currentPlayer: string,
+    currentRound: number,
+    whiteCaptured: number,
+    blackCaptured: number,
+    processTime: number,
+    processDepth: number,
+}
+
+const GameIn : GameInfoInterface = {
+    currentPlayer: 'white',
+    currentRound: 0,
+    whiteCaptured: 0,
+    blackCaptured: 0,
+    processTime: 0,
+    processDepth: 0,
+}
 
 function GameIA() {
     const [gameRunning, setGameRunning] = useState(false);
     const [winner, setWinner] = useState('');
-    //const [gameInfo, setGameInfo] = useState(undefined);
+    const [gameInfo, setGameInfo] = useState(GameIn);
 
     return (
         <div className='gameIA-master'>
             <ParamsBar />
-            <InfoBar />
-            <Board gameRunning={gameRunning} setGameRunning={setGameRunning} setWinner={setWinner}/>
+            <InfoBar gameInfo={gameInfo}/>
+            <Board gameRunning={gameRunning} setGameRunning={setGameRunning} setWinner={setWinner} setGameInfo={setGameInfo}/>
             <BoardShadow gameRunning={gameRunning} winner={winner} setWinner={setWinner}/>
             <StartButton gameRunning={gameRunning} setGameRunning={setGameRunning} />
         </div>

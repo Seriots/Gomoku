@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 import './Board.css';
+import { GameInfoInterface } from '../GameIA';
 import { useEffect } from 'react';
 
 const CASESIZE = 36;
@@ -10,8 +11,7 @@ interface BoardProps {
     gameRunning: boolean,
     setGameRunning: any,
     setWinner: any,
-	//gameInfo: any,
-    //setGameInfo: any,
+    setGameInfo: any,
 }
 
 interface LocalGameInfoProps {
@@ -21,6 +21,8 @@ interface LocalGameInfoProps {
     endGame: boolean,
     whiteCaptured: number,
     blackCaptured: number,
+    listAllowed: string,
+    moveCount: number,
 }
 
 let currentPos = {
@@ -37,17 +39,12 @@ const initLocalGameInfo = () => {
         endGame: false,
         whiteCaptured: 0,
         blackCaptured: 0,
+        listAllowed: '',
+        moveCount: 0,
     }
 }
 
 let localGameInfo: LocalGameInfoProps = initLocalGameInfo();
-//let gameInfo = {
-//    currentPlayer: 'white',
-//    isProcessing: false,
-//    gameRunning: false,
-//    res: undefined,
-//    winner: '',
-//}
 
 const build_request = (base: string, lst: any) => {
     let res = base;
@@ -84,8 +81,8 @@ const handleMouseMove = (e: any) => {
     if (!board || !shadowStone) {
         return;
     }
-    const x = e.clientX - board.offsetLeft + board.offsetWidth / 2;
-    const y = e.clientY - board.offsetTop + board.offsetHeight / 2;
+    const x = e.clientX - board.offsetLeft + board.offsetWidth * 0.5;
+    const y = e.clientY - board.offsetTop + board.offsetHeight * 0.6;
     const nearestX = Math.floor(x / CASESIZE) * CASESIZE + BORDERSIZE;
     const nearestY = Math.floor(y / CASESIZE) * CASESIZE + BORDERSIZE;
     setCurrentPos(nearestX, nearestY);
@@ -121,6 +118,10 @@ const responseHandler = (data: any) => {
         board.removeChild(document.getElementsByClassName('blocked-stone')[0]);
     }
 
+    while (document.getElementsByClassName('allowed-stone').length > 0) {
+        board.removeChild(document.getElementsByClassName('allowed-stone')[0]);
+    }
+
     // add new stone
     for (let i = 0; i < data.added.length; i++) {
         let newStone = document.createElement('div');
@@ -131,10 +132,19 @@ const responseHandler = (data: any) => {
         board.appendChild(newStone);
     }
 
+    for (let i = 0; i < data.prevent_win.length; i++) {
+        let newStone = document.createElement('div');
+        newStone.className = 'allowed-stone';
+        newStone.style.left = (data.prevent_win[i] % 19) * CASESIZE + BORDERSIZE + 'px';
+        newStone.style.top = Math.floor(data.prevent_win[i] / 19) * CASESIZE + BORDERSIZE + 'px';
+        newStone.id = "allowed-stone-" + data.prevent_win[i];
+        board.appendChild(newStone);
+    }
+
     if (localGameInfo.currentPlayer === 'white')
         localGameInfo.whiteCaptured += data.removed.length;
     else
-    localGameInfo.blackCaptured += data.removed.length;
+        localGameInfo.blackCaptured += data.removed.length;
 
     // remove captured stone
     for (let i = 0; i < data.removed.length; i++) {
@@ -142,6 +152,10 @@ const responseHandler = (data: any) => {
         if (capturedStone) {
             board.removeChild(capturedStone);
         }
+    }
+
+    if (data.prevent_win.length > 0) {
+        localGameInfo.listAllowed = data.prevent_win.join(',');
     }
 }
 
@@ -159,7 +173,7 @@ const checkEndGame = (data: any, setGameRunning: any, setWinner: any) => {
         setGameRunning(false);
         localGameInfo.endGame = true;
         console.log(localGameInfo.currentPlayer + ' win by capture');
-    } else if (data.win_by_alignement === 1) {
+    } else if (data.win_by_alignement === 1 && data.prevent_win.length === 0) {
         setWinner(localGameInfo.currentPlayer);
         setGameRunning(false);
         localGameInfo.endGame = true;
@@ -196,10 +210,12 @@ const placeStone = async () => {
     const listWhite = getPositionList(document.getElementsByClassName('white-stone'));
     const listBlack = getPositionList(document.getElementsByClassName('black-stone'));
     const listBlocked = getPositionList(document.getElementsByClassName('blocked-stone'));
+    console.log(localGameInfo.listAllowed);
 
-    await axios.get(build_request('http://localhost:6325/action', [pos, localGameInfo.currentPlayer, listWhite, listBlack, listBlocked, localGameInfo.whiteCaptured, localGameInfo.whiteCaptured]))
+    await axios.get(build_request('http://localhost:6325/action', [pos, localGameInfo.currentPlayer, listWhite, listBlack, listBlocked, localGameInfo.listAllowed, localGameInfo.whiteCaptured, localGameInfo.whiteCaptured]))
     .then((res) => {
         localGameInfo.response = res.data;
+        localGameInfo.moveCount++;
     })
     .catch((err) => {
         console.log(err);
@@ -212,16 +228,30 @@ const placeIAStone = async () => {
     const listBlack = getPositionList(document.getElementsByClassName('black-stone'));
     const listBlocked = getPositionList(document.getElementsByClassName('blocked-stone'));
 
-    await axios.get(build_request('http://localhost:6325/ia', [localGameInfo.currentPlayer, listWhite, listBlack, listBlocked, localGameInfo.whiteCaptured, localGameInfo.whiteCaptured]))
+    await axios.get(build_request('http://localhost:6325/ia', [localGameInfo.currentPlayer, listWhite, listBlack, listBlocked, localGameInfo.listAllowed, localGameInfo.whiteCaptured, localGameInfo.whiteCaptured]))
     .then((res) => {
         localGameInfo.response = res.data;
+        localGameInfo.moveCount++;
     })
     .catch((err) => {
         console.log(err);
     });
 }
 
-const handleClick = (gameRunning: any, setGameRunning: any, setWinner: any) => async (e: any) => {
+const updateGameInfo = (data: any, setGameInfo: any) => {
+    const gameInfo: GameInfoInterface = {
+        currentPlayer: localGameInfo.currentPlayer,
+        currentRound: localGameInfo.moveCount,
+        whiteCaptured: localGameInfo.whiteCaptured,
+        blackCaptured: localGameInfo.blackCaptured,
+        processTime: 54,//data.time,
+        processDepth: 3,//data.depthSearch,
+    }
+    setGameInfo(gameInfo);
+}
+
+
+const handleClick = (gameRunning: any, setGameRunning: any, setWinner: any, setGameInfo: any) => async (e: any) => {
     if (localGameInfo.isProcessing || !gameRunning || localGameInfo.endGame) {
         return;
     }
@@ -240,6 +270,7 @@ const handleClick = (gameRunning: any, setGameRunning: any, setWinner: any) => a
     responseHandler(localGameInfo.response);
     checkEndGame(localGameInfo.response, setGameRunning, setWinner);
     switchColor();
+    updateGameInfo(localGameInfo.response, setGameInfo);
     hideShadowStone();
     if (localGameInfo.endGame || !gameRunning) {
         localGameInfo.isProcessing = false;
@@ -250,6 +281,7 @@ const handleClick = (gameRunning: any, setGameRunning: any, setWinner: any) => a
     responseHandler(localGameInfo.response);
     checkEndGame(localGameInfo.response, setGameRunning, setWinner);
     switchColor();
+    updateGameInfo(localGameInfo.response, setGameInfo);
     showShadowStone();
     
     localGameInfo.isProcessing = false;
@@ -259,9 +291,8 @@ const handleClick = (gameRunning: any, setGameRunning: any, setWinner: any) => a
 const Board : React.FC<BoardProps> = ({
     gameRunning,
     setGameRunning,
-    setWinner
-    //gameInfo,
-    //setGameInfo
+    setWinner,
+    setGameInfo
 }) => {
     useEffect(() => {
         if (gameRunning !== true)
@@ -281,7 +312,7 @@ const Board : React.FC<BoardProps> = ({
     }, [gameRunning]);
 
     return (
-        <div id='boardID' className='board' onClick={handleClick(gameRunning, setGameRunning, setWinner)} onMouseMove={handleMouseMove} onMouseEnter={handleMouseEnter(gameRunning)} onMouseLeave={handleMouseLeave}>
+        <div id='boardID' className='board' onClick={handleClick(gameRunning, setGameRunning, setWinner, setGameInfo)} onMouseMove={handleMouseMove} onMouseEnter={handleMouseEnter(gameRunning)} onMouseLeave={handleMouseLeave}>
             <div id='shadow-stone' className='white-shadow-stone'></div>
         </div>
     );
