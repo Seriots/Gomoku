@@ -15,10 +15,11 @@ class Game {
         std::map<e_dna, int>            _dna;
         t_request                       _request;
         std::vector<int>                _interesting_pos;
-        std::vector<int>                _blocked_pos;
         std::map<e_sequenceDna, int>    _sequenceDna;
         int                             _depth;
         std::vector<int>                _threshold;
+        int                             _white_captured;
+        int                             _black_captured;
 
         void                            init_test_board();
     public:
@@ -34,10 +35,9 @@ class Game {
         void set(std::vector<int> pos, e_cell cell);
         void unset(int pos);
         void unset(std::vector<int> pos);
-        void unset_blocked_pos();
         Board get_board() const;
         std::vector<int> getter_interesting_pos() const;
-        void init_interesting_pos(void);
+        void init_interesting_pos(e_color color);
         void set_depth(int depth);
         void set_threshold(std::vector<int> threshold);
         int get_depth() const;
@@ -59,12 +59,12 @@ class Game {
 
 
         /* ******* Game end ******* */
-        bool                            check_win_by_capture();
+        bool                            check_win_by_capture(size_t captured, e_color color);
         bool                            check_win_by_alignement(int pos, e_cell color);
         bool                            is_capturable(t_position &grid_pos, e_cell color, std::vector<int> *capture_spot);
         std::vector<int>                get_capture_prevent_win_pos(int pos, e_cell color);
         bool                            check_no_winner();
-        t_endgame_info                  check_end_game(int pos);
+        t_endgame_info                  check_end_game(int pos, size_t captured, e_color color);
 
         /* ******* Game heuristic ******* */
         std::vector<t_direction_info>   compute_dirs_info(t_position &grid_pos, e_cell &my_color, e_cell &other_color);
@@ -78,6 +78,7 @@ class Game {
         std::pair<int, int>             minimax(int alpha, int beta, int depth, bool is_maxi, int next_pos, std::vector<int> &board);
         std::pair<int, int>             negascout(int alpha, int beta, int depth, bool is_maxi, int next_pos, std::vector<int> &board);
         std::pair<int, int>             negamax(int alpha, int beta, int depth, int color, int next_pos, std::vector<int> &board, std::chrono::steady_clock::time_point start_time);
-        std::pair<int, int>             negamax2(int alpha, int beta, int depth, int color, int next_pos, std::vector<int> &board, std::chrono::steady_clock::time_point start_time);
+        std::pair<int, int>             negamax2(int alpha, int beta, int depth, int color, int next_pos, std::vector<int> &board, std::chrono::steady_clock::time_point start_time, int _white_captured, int _black_captured);
+
         bool                            is_already_computed(size_t board_hash) const;
 };

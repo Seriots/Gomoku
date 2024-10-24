@@ -204,7 +204,7 @@ std::vector<int> generate_thresholds(int max_depth, int max_calculations, int ma
                 }
                 if (calculations > max_calculations) {
                     int e;
-                    for (e = index; thresholds[e + 1] == thresholds[index] && e < (int)thresholds.size(); ++e);
+                    for (e = index; e + 1 < (int)thresholds.size() && thresholds[e + 1] == thresholds[index] ; ++e);
                     if (thresholds[e] > min_thresholds) {
                         thresholds[e]--;
                         done = true;

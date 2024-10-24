@@ -99,7 +99,7 @@ std::pair<int, int> Game::minimax(int alpha, int beta, int depth, bool is_maxi, 
     }
 }
 
-std::pair<int, int> Game::negamax2(int alpha, int beta, int depth, int color, int next_pos, std::vector<int> &board, std::chrono::steady_clock::time_point start_time) {
+std::pair<int, int> Game::negamax2(int alpha, int beta, int depth, int color, int next_pos, std::vector<int> &board, std::chrono::steady_clock::time_point start_time, int _white_captured, int _black_captured) {
     size_t board_hash = this->_board.get_hash_board();
 
     if (is_already_computed(board_hash)) {
@@ -132,9 +132,17 @@ std::pair<int, int> Game::negamax2(int alpha, int beta, int depth, int color, in
         if (_board.get(pos).get() == NONE) {
             this->set(pos, (color == 1) ? BLACK : WHITE);
 
-            int tmp = -this->negamax2(-beta, -alpha, depth - 1, -color, pos, board, start_time).second;
+            std::vector<int> captured = this->get_captured(pos);
+            int _tmp_white_captured = _white_captured + ((color == WHITESTONE) ? captured.size() : 0);
+            int _tmp_black_captured = _black_captured + ((color == BLACKSTONE) ? captured.size() : 0);
+
+            this->unset(captured);
+
+
+            int tmp = -this->negamax2(-beta, -alpha, depth - 1, -color, pos, board, start_time, _tmp_white_captured, _tmp_black_captured).second;
 
             this->unset(pos);
+            this->set(captured, (color == 1) ? WHITE : BLACK);
 
             if (depth == this->_depth) {
                 board[pos] = tmp;

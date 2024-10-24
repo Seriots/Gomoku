@@ -9,9 +9,9 @@
     Return if the game is won by capture
     @return: true if the game is won by capture, false otherwise
 */
-bool    Game::check_win_by_capture() {
-    int white_captured = this->_request.white_captured;
-    int black_captured = this->_request.black_captured;
+bool    Game::check_win_by_capture(size_t captured, e_color color) {
+    int white_captured = this->_request.white_captured + ((color == WHITESTONE) ? captured : 0);
+    int black_captured = this->_request.black_captured + ((color == BLACKSTONE) ? captured : 0);
 
     if (white_captured >= 10)
         return true;
@@ -92,7 +92,7 @@ bool Game::is_capturable(t_position &grid_pos, e_cell color, std::vector<int> *c
             capture_spot->push_back((grid_pos.y + dy2) * 19 + grid_pos.x + dx2);
         else if (check_sequence(grid_pos.x, grid_pos.y, dx, dy, {NONE}) && check_sequence(grid_pos.x, grid_pos.y, dx2, dy2, {color, inv_color}))
             capture_spot->push_back((grid_pos.y + dy) * 19 + grid_pos.x + dx);
-        else 
+        else
             is_capturable--;
     }
 
@@ -168,12 +168,12 @@ bool   Game::check_no_winner() {
     @args: pos -> the position to check
     @return: the endgame information
 */
-t_endgame_info  Game::check_end_game(int pos) {
+t_endgame_info  Game::check_end_game(int pos, size_t captured, e_color color) {
     t_endgame_info endgame_info = {this->_request.color, false, false, false, {}};
 
     e_cell cell = this->_request.color == WHITESTONE ? WHITE : BLACK;
 
-    endgame_info.win_by_capture = check_win_by_capture();
+    endgame_info.win_by_capture = check_win_by_capture(captured, color);
     endgame_info.win_by_alignement = check_win_by_alignement(pos, cell);
     if (endgame_info.win_by_alignement)
         endgame_info.capture_prevent_win_pos = get_capture_prevent_win_pos(pos, cell);

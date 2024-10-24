@@ -50,8 +50,8 @@ void    r_action(const httplib::Request &req, httplib::Response &res) {
 
     game.set(request.pos, request.color == WHITESTONE ? WHITE : BLACK);
     // game.print_board();
-
     removed = game.get_captured(request.pos);
+
     game.unset(removed);
 
     blocked_list = game.get_new_blocked_pos(request.color == WHITESTONE ? BLACKSTONE : WHITESTONE);
@@ -60,7 +60,7 @@ void    r_action(const httplib::Request &req, httplib::Response &res) {
     for (size_t i = 0; i < blocked_list.size(); i++)
         added.push_back({blocked_list[i], "blocked"});
 
-    t_endgame_info endgame_info = game.check_end_game(request.pos);
+    t_endgame_info endgame_info = game.check_end_game(request.pos, removed.size(), request.color);
 
     res.set_content(build_action_response(added, removed, endgame_info), "application/json"); // everything is send in a nicely formated json
 }
@@ -122,11 +122,7 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     request = create_new_ia_request(req);
 
     Game game(request); // instantiate game object with the request
-    game.init_interesting_pos();
-
-
-
-    game.get_new_blocked_pos(request.color == WHITESTONE ? BLACKSTONE : WHITESTONE);
+    game.init_interesting_pos(request.color);
 
     // create board
     std::vector<int> board1, board2, board3;
@@ -140,7 +136,7 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     // auto start_time_1 = std::chrono::high_resolution_clock::now();
     // int pos1 = game.minimax(INT_MIN, INT_MAX, 5, true, -1, board1).first;
     // auto end_time_1 = std::chrono::high_resolution_clock::now();
-    game.set_depth(8);
+    game.set_depth(6);
     std::vector<int> threshold_by_layer = generate_thresholds(game.get_depth(), 5000, 10, 2);
     // display thresholds
     for (size_t i = 0; i < threshold_by_layer.size(); i++)
@@ -148,7 +144,7 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     game.set_threshold(threshold_by_layer);
 
     auto start_time_2 = std::chrono::high_resolution_clock::now();
-    int pos2 = game.negamax2(INT_MIN, INT_MAX, game.get_depth(), true, -1, board2, std::chrono::steady_clock::now()).first;
+    int pos2 = game.negamax2(INT_MIN, INT_MAX, game.get_depth(), true, -1, board2, std::chrono::steady_clock::now(), request.white_captured, request.black_captured).first;
     auto end_time_2 = std::chrono::high_resolution_clock::now();
 
     // game._transposition_table.clear();
@@ -189,7 +185,7 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     for (size_t i = 0; i < blocked_list.size(); i++)
         added.push_back({blocked_list[i], "blocked"});
 
-    t_endgame_info endgame_info = game.check_end_game(pos2);
+    t_endgame_info endgame_info = game.check_end_game(pos2, removed.size(), request.color);
 
     res.set_content(build_action_response(added, removed, endgame_info), "application/json");
 }
