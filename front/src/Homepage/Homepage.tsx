@@ -7,8 +7,8 @@ function Homepage() {
 
             <h1 className='home-title'>GOMOKU</h1>
             <div className='homepage-buttons'>
-                <ModeButton label='1 Player' route = '/gameIA'/>
-                <ModeButton label='2 Player' route = '/player'/>
+                <ModeButton label='1 Player' route = '/GameIA'/>
+                <ModeButton label='2 Player' route = '/GamePlayer'/>
             </div>
 
         </div>

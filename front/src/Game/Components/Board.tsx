@@ -14,6 +14,7 @@ interface BoardProps {
     gameInfo: GameInfoInterface,
     setGameInfo: any,
     firstPlayer: any,
+    IAMode: boolean,
 }
 
 interface LocalGameInfoProps {
@@ -162,6 +163,10 @@ const responseHandler = (data: any) => {
 }
 
 const checkError = (data: any) => {
+    if (data === undefined) {
+        console.log('Error: no response');
+        return true;
+    }
     if (data.error !== undefined) {
         console.log(data.error);
         return true;
@@ -202,11 +207,21 @@ const showShadowStone = () => {
     }
 }
 
+const swapColorShadowStone = () => {
+    const shadowStone = document.getElementById('shadow-stone');
+    if (shadowStone) {
+        shadowStone.className = localGameInfo.currentPlayer === 'white' ? 'white-shadow-stone' : 'black-shadow-stone';
+    }
+}
+
 const switchColor = () => {
     localGameInfo.currentPlayer = localGameInfo.currentPlayer === 'white' ? 'black' : 'white';
 }
 
-const placeStone = async () => {
+const getStone = async () => {
+    const hintStone = document.getElementById('hint-stone');
+    if (hintStone)
+        hintStone.style.display = 'none';
 
     const pos = computePositionFromPx(currentPos.x, currentPos.y);
     const listWhite = getPositionList(document.getElementsByClassName('white-stone'));
@@ -225,7 +240,7 @@ const placeStone = async () => {
     });
 }
 
-const placeIAStone = async () => {
+const getIaStone = async (IAMode: boolean) => {
 
     const listWhite = getPositionList(document.getElementsByClassName('white-stone'));
     const listBlack = getPositionList(document.getElementsByClassName('black-stone'));
@@ -235,6 +250,8 @@ const placeIAStone = async () => {
     .then((res) => {
         localGameInfo.response = res.data;
         localGameInfo.moveCount++;
+        if (!IAMode)
+            setHintIAStone(localGameInfo.response);
     })
     .catch((err) => {
         console.log(err);
@@ -257,8 +274,21 @@ const updateGameInfo = (data: any, gameInfo: GameInfoInterface, setGameInfo: any
     setGameInfo(newGameInfo);
 }
 
+const setHintIAStone = (data: any) => {
+    const hintStone = document.getElementById('hint-stone');
+    if (!hintStone)
+        return;
 
-const handleClick = (gameRunning: any, setGameRunning: any, setWinner: any, gameInfo: GameInfoInterface, setGameInfo: any) => async (e: any) => {
+    const pos = data.added[0].pos;
+    console.log(pos);
+    hintStone.style.left = (pos % 19) * CASESIZE + BORDERSIZE + 'px';
+    hintStone.style.top = Math.floor(pos / 19) * CASESIZE + BORDERSIZE + 'px';
+    hintStone.className = localGameInfo.currentPlayer === 'white' ? 'white-hint-stone' : 'black-hint-stone';
+    hintStone.style.display = 'block';
+}
+
+
+const handleClick = (IAMode: boolean, gameRunning: any, setGameRunning: any, setWinner: any, gameInfo: GameInfoInterface, setGameInfo: any) => async (e: any) => {
     if (localGameInfo.isProcessing || !gameRunning || localGameInfo.endGame) {
         return;
     }
@@ -268,7 +298,7 @@ const handleClick = (gameRunning: any, setGameRunning: any, setWinner: any, game
     }
     // place a stone at position currentPos
     localGameInfo.isProcessing = true;
-    await placeStone();
+    await getStone();
     if (checkError(localGameInfo.response)) {
         localGameInfo.isProcessing = false;
         return;
@@ -278,22 +308,39 @@ const handleClick = (gameRunning: any, setGameRunning: any, setWinner: any, game
     checkEndGame(localGameInfo.response, setGameRunning, setWinner);
     switchColor();
     updateGameInfo(localGameInfo.response, gameInfo, setGameInfo);
-    hideShadowStone();
+    if (IAMode) {
+        hideShadowStone();
+    } else {
+        swapColorShadowStone();
+    }
     if (localGameInfo.endGame || !gameRunning) {
         localGameInfo.isProcessing = false;
         return;
     }
-    // generate an ia stone
-    await placeIAStone();
-    responseHandler(localGameInfo.response);
-    checkEndGame(localGameInfo.response, setGameRunning, setWinner);
-    switchColor();
-    updateGameInfo(localGameInfo.response, gameInfo, setGameInfo);
-    showShadowStone();
-    
+
+    if (IAMode) {
+        // generate an ia stone
+        await getIaStone(IAMode);
+        if (checkError(localGameInfo.response)) {
+            localGameInfo.isProcessing = false;
+            return;
+        }
+        responseHandler(localGameInfo.response);
+        checkEndGame(localGameInfo.response, setGameRunning, setWinner);
+        switchColor();
+        updateGameInfo(localGameInfo.response, gameInfo, setGameInfo);
+        showShadowStone();
+    }
     localGameInfo.isProcessing = false;
+
+    if (!IAMode) {
+        getIaStone(IAMode);
+    }
 }
 
+const sleep = (ms: number) => {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 const Board : React.FC<BoardProps> = ({
     gameRunning,
@@ -301,14 +348,21 @@ const Board : React.FC<BoardProps> = ({
     setWinner,
     gameInfo,
     setGameInfo,
-    firstPlayer
+    firstPlayer,
+    IAMode,
 }) => {
     const [runFirstIa, setRunFirstIa] = useState(false);
 
     useEffect(() => {
         const playIa = async () => {
             localGameInfo.isProcessing = true;
-            await placeIAStone();
+            while (true) {
+                await getIaStone(IAMode);
+                if (!checkError(localGameInfo.response)) {                    
+                    break;
+                }
+                sleep(1000);
+            }
             responseHandler(localGameInfo.response);
             checkEndGame(localGameInfo.response, setGameRunning, setWinner);
             switchColor();
@@ -339,6 +393,13 @@ const Board : React.FC<BoardProps> = ({
         while (document.getElementsByClassName('blocked-stone').length > 0)
             board.removeChild(document.getElementsByClassName('blocked-stone')[0]);
 
+        const shadowStone = document.getElementById('shadow-stone');
+        if (shadowStone)
+            shadowStone.className = firstPlayer.current === 'white' ? 'white-shadow-stone' : 'black-shadow-stone';
+        const hintStone = document.getElementById('hint-stone');
+        if (hintStone)
+            hintStone.className = firstPlayer.current === 'white' ? 'white-hint-stone' : 'black-hint-stone';
+
         if (firstPlayer.current === 'black') {
             setRunFirstIa(true);
         }
@@ -346,8 +407,9 @@ const Board : React.FC<BoardProps> = ({
     }, [gameRunning, firstPlayer]);
 
     return (
-        <div id='boardID' className='board' onClick={handleClick(gameRunning, setGameRunning, setWinner, gameInfo, setGameInfo)} onMouseMove={handleMouseMove} onMouseEnter={handleMouseEnter(gameRunning)} onMouseLeave={handleMouseLeave}>
+        <div id='boardID' className='board' onClick={handleClick(IAMode, gameRunning, setGameRunning, setWinner, gameInfo, setGameInfo)} onMouseMove={handleMouseMove} onMouseEnter={handleMouseEnter(gameRunning)} onMouseLeave={handleMouseLeave}>
             <div id='shadow-stone' className='white-shadow-stone'></div>
+            <div id='hint-stone' className='white-hint-stone'></div>
         </div>
     );
 }

@@ -6,6 +6,7 @@ import Player from './components/Player';
 import Test from './components/Test';
 import Homepage from './Homepage/Homepage';
 import GameIA from './Game/GameIA';
+import GamePlayer from './Game/GamePlayer';
 import './App.css';
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
                 <Route path="/player" element={<Player />} />
                 <Route path="/test" element={<Test />} />
                 <Route path="/GameIA" element={<GameIA />} />
+                <Route path="/GamePlayer" element={<GamePlayer />} />
 
             </Routes>
 		</div>

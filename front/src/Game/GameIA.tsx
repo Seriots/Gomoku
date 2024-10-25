@@ -52,7 +52,7 @@ function GameIA() {
         <div className='gameIA-master'>
             <ParamsBar  firstPlayer={firstPlayer} setFirstPlayer={setFirstPlayer} gameRunning={gameRunning}/>
             <InfoBar gameInfo={gameInfo}/>
-            <Board gameRunning={gameRunning} setGameRunning={setGameRunning} setWinner={setWinner} gameInfo={gameInfo} setGameInfo={setGameInfo} firstPlayer={firstPlayerRef}/>
+            <Board IAMode={true} gameRunning={gameRunning} setGameRunning={setGameRunning} setWinner={setWinner} gameInfo={gameInfo} setGameInfo={setGameInfo} firstPlayer={firstPlayerRef}/>
             <BoardShadow gameRunning={gameRunning} winner={winner} setWinner={setWinner}/>
             <StartButton gameRunning={gameRunning} setGameRunning={setGameRunning} />
         </div>

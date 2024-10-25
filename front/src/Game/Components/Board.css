@@ -12,6 +12,7 @@
     transform: translate(-50%, -60%);
 }
 
+
 #shadow-stone {
     background-size: cover;
     width: 32px;
@@ -23,6 +24,33 @@
     opacity: 0.5;
     display: none;
     z-index: 2;
+}
+
+.white-shadow-stone {
+    background-image: url('../../assets/whiteStone.png');
+}
+.black-shadow-stone {
+    background-image: url('../../assets/blackStone.png');
+}
+
+#hint-stone {
+    background-size: cover;
+    width: 58px;
+    height: 58px;
+    position: absolute;
+    left: 117px;
+    top: 117px;
+    transform: translate(-50%, -50%);
+    display: none;
+    z-index: 2;
+    opacity: 0.8;
+}
+
+.white-hint-stone {
+    background-image: url('../../assets/hintWhiteStone.png');
+}
+.black-hint-stone {
+    background-image: url('../../assets/hintBlackStone.png');
 }
 
 .white-stone {
