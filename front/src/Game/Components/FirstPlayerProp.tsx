@@ -28,8 +28,7 @@ const FirstPlayerProp : React.FC<FirstPlayerPropProps> = ({
     gameRunning,
 }) => {
     return (
-        <div className='param-prop'>
-            <h2>First player</h2>
+        <div>
             <div className='first-player-selector-wrapper'>
                 <p id='WhiteTextID' className='first-player-selector-white'>player</p>
                 <button id='firstPlayerID' className='first-player-selector' onClick={handleClick(firstPlayer, setFirstPlayer, gameRunning)}></button>

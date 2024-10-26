@@ -15,6 +15,8 @@ interface BoardProps {
     setGameInfo: any,
     firstPlayer: any,
     IAMode: boolean,
+    activateHintP1?: boolean,
+    activateHintP2?: boolean,
 }
 
 interface LocalGameInfoProps {
@@ -288,7 +290,7 @@ const setHintIAStone = (data: any) => {
 }
 
 
-const handleClick = (IAMode: boolean, gameRunning: any, setGameRunning: any, setWinner: any, gameInfo: GameInfoInterface, setGameInfo: any) => async (e: any) => {
+const handleClick = (IAMode: boolean, gameRunning: any, setGameRunning: any, setWinner: any, gameInfo: GameInfoInterface, setGameInfo: any, activateHintP1?: boolean, activateHintP2?: boolean) => async (e: any) => {
     if (localGameInfo.isProcessing || !gameRunning || localGameInfo.endGame) {
         return;
     }
@@ -333,7 +335,7 @@ const handleClick = (IAMode: boolean, gameRunning: any, setGameRunning: any, set
     }
     localGameInfo.isProcessing = false;
 
-    if (!IAMode) {
+    if (!IAMode && (activateHintP1 && localGameInfo.currentPlayer === 'white' || activateHintP2 && localGameInfo.currentPlayer === 'black')) {
         getIaStone(IAMode);
     }
 }
@@ -350,6 +352,8 @@ const Board : React.FC<BoardProps> = ({
     setGameInfo,
     firstPlayer,
     IAMode,
+    activateHintP1,
+    activateHintP2,
 }) => {
     const [runFirstIa, setRunFirstIa] = useState(false);
 
@@ -407,7 +411,7 @@ const Board : React.FC<BoardProps> = ({
     }, [gameRunning, firstPlayer]);
 
     return (
-        <div id='boardID' className='board' onClick={handleClick(IAMode, gameRunning, setGameRunning, setWinner, gameInfo, setGameInfo)} onMouseMove={handleMouseMove} onMouseEnter={handleMouseEnter(gameRunning)} onMouseLeave={handleMouseLeave}>
+        <div id='boardID' className='board' onClick={handleClick(IAMode, gameRunning, setGameRunning, setWinner, gameInfo, setGameInfo, activateHintP1, activateHintP2)} onMouseMove={handleMouseMove} onMouseEnter={handleMouseEnter(gameRunning)} onMouseLeave={handleMouseLeave}>
             <div id='shadow-stone' className='white-shadow-stone'></div>
             <div id='hint-stone' className='white-hint-stone'></div>
         </div>

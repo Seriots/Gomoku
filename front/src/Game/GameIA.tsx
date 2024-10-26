@@ -3,8 +3,9 @@ import Board from './Components/Board';
 import BoardShadow from './Components/BoardShadow';
 import InfoBar from './Components/InfoBar';
 import ParamsBar from './Components/ParamsBar';
-import './GameIA.css';
+import './GameStyle.css';
 import StartButton from './Components/StartButton';
+import FirstPlayerProp from './Components/FirstPlayerProp';
 
 export interface GameInfoInterface {
     currentPlayer: string,
@@ -50,7 +51,9 @@ function GameIA() {
 
     return (
         <div className='gameIA-master'>
-            <ParamsBar  firstPlayer={firstPlayer} setFirstPlayer={setFirstPlayer} gameRunning={gameRunning}/>
+            <ParamsBar labels={['First Player', 'second']}>
+                <FirstPlayerProp firstPlayer={firstPlayer} setFirstPlayer={setFirstPlayer} gameRunning={gameRunning} />
+            </ParamsBar>
             <InfoBar gameInfo={gameInfo}/>
             <Board IAMode={true} gameRunning={gameRunning} setGameRunning={setGameRunning} setWinner={setWinner} gameInfo={gameInfo} setGameInfo={setGameInfo} firstPlayer={firstPlayerRef}/>
             <BoardShadow gameRunning={gameRunning} winner={winner} setWinner={setWinner}/>

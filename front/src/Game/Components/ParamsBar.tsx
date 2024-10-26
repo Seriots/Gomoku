@@ -1,23 +1,28 @@
 import './ParamsBar.css';
 import FirstPlayerProp from './FirstPlayerProp';
+import { Children } from 'react';
 
 
 interface ParamsBarProps {
-    firstPlayer: string,
-	setFirstPlayer: any,
-    gameRunning: boolean,
+    children: any,
+    labels: string[],
 }
 
 const ParamsBar : React.FC<ParamsBarProps> = ({
-    firstPlayer,
-    setFirstPlayer,
-    gameRunning,
+    children,
+    labels,
 }) => {
     return (
         <div className='params-bar'>
             <div className='param-props-div'>
             <span>
-                <FirstPlayerProp firstPlayer={firstPlayer} setFirstPlayer={setFirstPlayer} gameRunning={gameRunning} ></FirstPlayerProp>
+            {Children.map(children, (child, index) =>
+                <div className='param-prop' key={index}>
+                    <h2>{labels[index]}</h2>
+                    {child}
+                </div>
+            )}
+                
             </span>
             </div>
         </div>

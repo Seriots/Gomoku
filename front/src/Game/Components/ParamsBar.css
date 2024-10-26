@@ -81,9 +81,9 @@
 .first-player-selector-wrapper {
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
-    width: 80%;
+    width: 120%;
     height: 50px;
     position: relative;
     bottom: 15% ;
@@ -119,4 +119,29 @@
 
 .first-player-selector-black.toggle {
     display: block;
+}
+
+.activate-hint-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 120%;
+    height: 50px;
+    position: relative;
+    bottom: 15% ;
+}
+
+.activate-hint {
+    all: unset;
+    height: 50px;
+    width: 50px;
+    background-image: url("../../assets/checkboxFalse.png");
+    background-size: 100% 100%;
+    position: relative ;
+}
+
+.activate-hint.activate {
+    background-image: url("../../assets/checkBoxTrue.png");
+    background-size: 100% 100%;
 }
