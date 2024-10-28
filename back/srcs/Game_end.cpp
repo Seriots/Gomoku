@@ -56,7 +56,6 @@ bool    Game::check_win_by_alignement(int pos, e_cell color) {
                 break;
             alignement++;
         }
-        std::cout << "alignement: " << alignement << std::endl;
         if (alignement >= 5)
             return true;
     }

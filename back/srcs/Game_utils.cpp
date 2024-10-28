@@ -261,45 +261,36 @@ std::vector<int> Game::get_captured(int pos) {
     return captured;
 }
 
+bool Game::is_something_near(int x, int y) {
+    std::vector<std::vector<int> > directions = {{-1, 0},{1, 0},{0, -1},{0, 1},{-1, -1},{1, 1},{1, -1},{-1, 1}};
+
+    for (size_t i = 0; i < directions.size(); i++) {
+        int dx = directions[i][0];
+        int dy = directions[i][1];
+        if (is_in_grid(x + dx, y + dy) && _board.get(x + dx, y + dy).get() != NONE)
+            return true;
+    }
+
+    return false;
+}
+
 std::vector<int> Game::get_interesting_pos() {
-    std::map<int, int> interesting_pos;
+    std::vector<int> interesting_pos;
 
     for (int pos = 0; pos < 361; pos++) {
         if (pos != NONE && pos != BLOCKED) {
             int x = pos % 19;
             int y = pos / 19;
-            if (this->get_board().get(x, y).get() != NONE) {
-                for (int j = y - 1; j <= y + 1; j++) {
-                    for (int i = x - 1; i <= x + 1; i++) {
-                        if (is_in_grid(i, j)) {
-                            if (this->get_board().get(i, j).get() == NONE) {
-                                if (interesting_pos.find(i + j * 19) == interesting_pos.end())
-                                    interesting_pos[i + j * 19] = 0;
-                                else
-                                    interesting_pos[i + j * 19] += 1;
-                            }
-                        }
-                    }
-                }
+            if (this->get_board().get(x, y).get() == NONE && is_something_near(x, y)) {
+                interesting_pos.push_back(pos);
             }
         }
     }
-    std::vector<std::pair<int, int> > pairs;
 
-    for (auto& it : interesting_pos) {
-        pairs.push_back(it);
-    }
-    //sort(pairs.begin(), pairs.end(), [](auto& a, auto& b) {
-    //    return a.second > b.second;
-    //});
-    std::vector<int> res;
-    for (size_t i = 0; i < pairs.size(); i++) {
-        res.push_back(pairs[i].first);
-    }
-    if (res.size() == 0)
-        res.push_back(180);
+    if (interesting_pos.size() == 0)
+        interesting_pos.push_back(180);
 
-    return res;
+    return interesting_pos;
 }
 
 void Game::sort_interesting_pos(e_color const &color, std::vector<int> &vec) {

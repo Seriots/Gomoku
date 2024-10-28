@@ -117,7 +117,6 @@ void Game::init_interesting_pos(e_color color, std::vector<int> allowed_pos) {
         return ;
     }
     this->_interesting_pos = this->get_interesting_pos();
-    this->sort_interesting_pos(color, this->_interesting_pos);
 
     std::vector<int> blocked_pos = get_new_blocked_pos(color);
     for (size_t i = 0; i < blocked_pos.size(); i++) {
@@ -125,4 +124,5 @@ void Game::init_interesting_pos(e_color color, std::vector<int> allowed_pos) {
         if (it != this->_interesting_pos.end())
             this->_interesting_pos.erase(it);
     }
+    this->sort_interesting_pos(color, this->_interesting_pos);
 }

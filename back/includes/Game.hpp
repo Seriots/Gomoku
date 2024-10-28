@@ -55,6 +55,8 @@ class Game {
         void                            sort_interesting_pos(e_color const &color, std::vector<int> &vec);
         void                            print_board();
         std::map<e_cell, std::vector<int> > get_all_positions_stone();
+        bool                                is_something_near(int x, int y);
+
 
 
         /* ******* Game end ******* */

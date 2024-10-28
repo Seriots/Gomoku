@@ -19,8 +19,12 @@ std::pair<int, int> Game::negamax(int alpha, int beta, int depth, int is_maximiz
 
     int max_eval = INT_MIN;
     int best_pos = -1;
-
-    std::vector<int> tmp_interesting_pos = this->get_interesting_pos();
+    std::vector<int> tmp_interesting_pos;
+    if (depth == this->get_depth())
+        tmp_interesting_pos = this->getter_interesting_pos();
+    else
+        tmp_interesting_pos = this->get_interesting_pos();
+    
     this->sort_interesting_pos((is_maximizing == 1) ? _request.color : _request.color_opponent, tmp_interesting_pos);
     if ((int)tmp_interesting_pos.size() > this->_threshold[depth - 1]) {
         tmp_interesting_pos.resize(this->_threshold[depth - 1]);
