@@ -69,7 +69,16 @@ void display_board(std::vector<int> &board, Game &game) {
     for (int y = 0; y < 19; y++) {
         for (int x = 0; x < 19; x++) {
             float displayColor;
+
+            std::cout << *game.getter_interesting_pos().begin() << std::endl;
+
             std::vector<int>::iterator it = std::find(game.getter_interesting_pos().begin(), game.getter_interesting_pos().end(), x + y * 19);
+            // display interesting pos
+            for (size_t i = 0; i < game.getter_interesting_pos().size(); i++)
+                std::cout << game.getter_interesting_pos()[i] << " ";
+            std::cout << std::endl;
+            // display size of interesting pos
+            std::cout << game.getter_interesting_pos().size() << std::endl;
 
             if (it == game.getter_interesting_pos().end())
                 displayColor = 0;
@@ -233,7 +242,8 @@ void r_ia_with_dna(const httplib::Request &req, httplib::Response &res) {
 
     game.set(added[0].pos, request.color == WHITESTONE ? WHITE : BLACK);
 
-    endgame_info = game.check_end_game(added[0].pos);
+    endgame_info = game.check_end_game(added[0].pos, removed.size(), request.color);
+
     removed.push_back(1);
     removed.push_back(2);
     added.push_back({5, "black"});
