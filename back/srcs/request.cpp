@@ -66,24 +66,19 @@ void    r_action(const httplib::Request &req, httplib::Response &res) {
 }
 
 void display_board(std::vector<int> &board, Game &game) {
+
+    std::vector<int> interesting_pos = game.getter_interesting_pos();
+
     for (int y = 0; y < 19; y++) {
         for (int x = 0; x < 19; x++) {
             float displayColor;
 
-            std::cout << *game.getter_interesting_pos().begin() << std::endl;
+            std::vector<int>::iterator it = std::find(interesting_pos.begin(), interesting_pos.end(), x + y * 19);
 
-            std::vector<int>::iterator it = std::find(game.getter_interesting_pos().begin(), game.getter_interesting_pos().end(), x + y * 19);
-            // display interesting pos
-            for (size_t i = 0; i < game.getter_interesting_pos().size(); i++)
-                std::cout << game.getter_interesting_pos()[i] << " ";
-            std::cout << std::endl;
-            // display size of interesting pos
-            std::cout << game.getter_interesting_pos().size() << std::endl;
-
-            if (it == game.getter_interesting_pos().end())
+            if (it == interesting_pos.end())
                 displayColor = 0;
             else
-                displayColor = 1.0 - ((float)(it - game.getter_interesting_pos().begin()) / (float)game.getter_interesting_pos().size());
+                displayColor = 1.0 - ((float)(it - interesting_pos.begin()) / (float)interesting_pos.size());
             if (displayColor > 0.99)
                 std::cout << "\033[0;35m"; // magenta
             else if (displayColor > 0.9)
@@ -138,7 +133,7 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     for (int i = 0; i < 19*19; i++)
         board2.push_back(-1);
 
-    game.set_depth(6);
+    game.set_depth(4);
     std::vector<int> threshold_by_layer = generate_thresholds(game.get_depth(), 5000, 10, 2);
     game.set_threshold(threshold_by_layer);
 
