@@ -160,7 +160,7 @@ std::vector<int>    Game::get_capture_prevent_win_pos(int pos, e_cell color) {
 */
 bool   Game::check_no_winner() {
 
-    return false;
+    return this->_board.isFull();
 }
 
 /*

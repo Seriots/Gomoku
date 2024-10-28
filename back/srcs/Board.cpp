@@ -120,3 +120,13 @@ size_t Board::get_hash_board() const {
     }
     return hash;
 }
+
+bool Board::isFull() {
+    for (int i = 0; i < 19; i++) {
+        for (int j = 0; j < 19; j++) {
+            if (_board[i][j].get() == NONE)
+                return false;
+        }
+    }
+    return true;
+}

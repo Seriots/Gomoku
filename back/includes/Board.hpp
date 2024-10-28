@@ -26,6 +26,8 @@ class Board {
         Cell get(int pos) const;
         void set(int x, int y, e_cell cell);
         void set(int pos, e_cell cell);
+
+        bool isFull();
         void print();
         size_t get_hash_board() const;
 };

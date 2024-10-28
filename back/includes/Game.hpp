@@ -25,6 +25,7 @@ class Game {
         std::unordered_map<size_t, std::pair<int, int>> _transposition_table;
         Game();
         Game(t_request &request);
+        Game(t_request &request, std::vector<int> &dna);
         Game(const Game &g);
         ~Game();
 
@@ -43,7 +44,7 @@ class Game {
 
         /* ******* Game utils ******* */
         void                            init_dna();
-        void                            init_sequenceDna();
+        void                            init_sequenceDna(std::vector<int> *dna = NULL);
         bool                            is_in_grid(int x, int y);
         bool                            check_free_three(int x, int y, int ax, int ay, e_cell color);
         bool                            check_double_free_three(int x, int y, e_cell color);

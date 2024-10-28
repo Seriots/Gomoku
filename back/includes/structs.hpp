@@ -21,18 +21,8 @@ enum e_dna {
     IS_CAPTURABLE
 };
 
-// N = 0
-// M = 1
-// Y = 2
-//SDA_NNNNN = 0,
-//SDA_NNNNM = 1,
-//SDA_NNNMM = 4,
-//SDA_NNMMM = 13,
-//SDA_NMMMM = 40,
-//SDA_MMMMM = 121,
 
 enum e_valueDna {
-    VDNA_NONE,
     VDNA_ONE,
     VDNA_TWON3,
     VDNA_TWON2,
