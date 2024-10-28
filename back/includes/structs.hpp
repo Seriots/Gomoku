@@ -356,3 +356,11 @@ typedef struct s_request {
     int                 white_capture;
     int                 black_capture;
 }   t_request;
+
+typedef struct s_negamaxInformation {
+    int alpha;
+    int beta;
+    int depth;
+    int is_maximizing;
+    int boardScore;
+}   t_negamaxInformation;

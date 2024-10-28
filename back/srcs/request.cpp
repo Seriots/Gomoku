@@ -128,28 +128,24 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     game.init_interesting_pos(request.color, request.allowed);
 
     // create board
-    std::vector<int> board1, board2, board3;
-    for (int i = 0; i < 19*19; i++)
-        board2.push_back(-1);
+    std::vector<int> board(361, -1);
 
     game.set_depth(6);
     std::vector<int> threshold_by_layer = generate_thresholds(game.get_depth(), 60000, 10, 3);
     game.set_threshold(threshold_by_layer);
-    /* logs */
-    for (size_t i = 0; i < threshold_by_layer.size(); i++)
-        std::cout << "depth " << i + 1  << ": " << threshold_by_layer[i] << std::endl;
-
 
 
     auto start_time = std::chrono::high_resolution_clock::now();
-    int pos = game.negamax(INT_MIN, INT_MAX, game.get_depth(), 1, -1, board2, std::chrono::steady_clock::now(), request.white_capture, request.black_capture).first;
+    
+    int pos = game.negamax(INT_MIN, INT_MAX, game.get_depth(), 1, -1, board, request.white_capture, request.black_capture).first;
+    
     auto end_time = std::chrono::high_resolution_clock::now();
 
     
     auto time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
     std::cout << "Time: " << time << std::endl << std::endl;
     
-    display_board(board2, game);
+    display_board(board, game);
 
     game.set(pos, color_to_cell(request.color));
 

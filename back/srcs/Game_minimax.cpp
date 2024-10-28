@@ -4,10 +4,21 @@ bool Game::is_already_computed(size_t board_hash) const {
     return this->_transposition_table.find(board_hash) != this->_transposition_table.end();
 }
 
-std::pair<int, int> Game::negamax(int alpha, int beta, int depth, int is_maximizing, int next_pos, std::vector<int> &board, std::chrono::steady_clock::time_point start_time, int white_capture, int black_capture) {
+int getHashBoard(std::map<int, e_color> &pos) {
+    int hash = 0;
+    for (std::map<int, e_color>::iterator it = pos.begin(); it != pos.end(); it++) {
+        std::cout << it->first << " ";
+        hash = hash * 31 + (it->first * (it->second == WHITESTONE ? 1 : 2));
+    }
+    std::cout << std::endl;
+    return hash;
+}
+
+std::pair<int, int> Game::negamax(int alpha, int beta, int depth, int is_maximizing, int next_pos, std::vector<int> &board, int white_capture, int black_capture) {
     size_t board_hash = this->_board.get_hash_board();
 
     if (is_already_computed(board_hash)) {
+        std::cout << "true" << std::endl;
         return this->_transposition_table[board_hash];
     }
 
@@ -51,7 +62,9 @@ std::pair<int, int> Game::negamax(int alpha, int beta, int depth, int is_maximiz
 
             this->unset(captured);
 
-            int tmp = -this->negamax(-beta, -alpha, depth - 1, -is_maximizing, pos, board, start_time, tmp_white_capture, tmp_black_capture).second;
+            this->_editedBoard[pos] = (is_maximizing == 1) ? _request.color : _request.color_opponent;
+            int tmp = -this->negamax(-beta, -alpha, depth - 1, -is_maximizing, pos, board, tmp_white_capture, tmp_black_capture).second;
+            this->_editedBoard.erase(pos);
 
             this->unset(pos);
             this->set(captured, (is_maximizing == 1) ? color_to_cell(_request.color_opponent) : color_to_cell(_request.color));
@@ -70,13 +83,13 @@ std::pair<int, int> Game::negamax(int alpha, int beta, int depth, int is_maximiz
                 break;
             }
         }
-
-        // auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start_time).count();
-        // if (elapsed > 500) {
-        //     return std::make_pair(best_pos, max_eval);
-        // }
     }
 
     this->_transposition_table[board_hash] = std::make_pair(best_pos, max_eval);
     return std::make_pair(best_pos, max_eval);
 }
+
+// std::pair<int, int> Game::fdNegamax(t_negamaxInformation info, int pos, int white_capture, int black_capture) {
+//     size_t board_hash = info.boardScore;
+
+// }
