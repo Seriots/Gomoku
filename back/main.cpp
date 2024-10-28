@@ -5,6 +5,7 @@
 
 #include "utils.hpp"
 #include "request.hpp"
+#include "includes/Board.hpp"
 
 int main() {
 	httplib::Server svr;

@@ -17,7 +17,7 @@ class Board {
 
         void operator= (const Board &b);
 
-        
+
         void compute_board_center();
 
         t_position get_center() const;
@@ -29,4 +29,5 @@ class Board {
 
         bool isFull();
         void print();
+        size_t get_hash_board() const;
 };

@@ -8,6 +8,17 @@
 #include "Cell.hpp"
 
 /*
+    e_color to e_cell
+    @param color: the color to convert
+    @return the corresponding cell
+*/
+e_cell color_to_cell(e_color color) {
+    if (color == WHITESTONE)
+        return WHITE;
+    return BLACK;
+}
+
+/*
     Check if the request is valid
     @param request: the request to check
     @param res: the response to send if the request is invalid
@@ -66,7 +77,7 @@ std::string build_json_content(std::vector<std::string> key, std::vector<std::st
         else
             out += ",\n\"" + key[i] + "\":\"" + value[i] + "\"";
     }
-    return out;   
+    return out;
 }
 
 std::string build_json_content_bool(std::vector<std::string> key, std::vector<bool> value) {
@@ -77,7 +88,7 @@ std::string build_json_content_bool(std::vector<std::string> key, std::vector<bo
         else
             out += ",\n\"" + key[i] + "\":" + std::to_string(value[i]);
     }
-    return out;   
+    return out;
 }
 
 /*
@@ -91,6 +102,7 @@ t_request create_new_request(const httplib::Request &req) {
     int x = (pos) % 19;
     int y = (pos) / 19;
     e_color color = req.path_params.at("color") == "white" ? WHITESTONE : BLACKSTONE;
+    e_color color_opponent = color == WHITESTONE ? BLACKSTONE : WHITESTONE;
     std::vector<int> white = parse_board_input(req.path_params.at("white"));
     std::vector<int> black = parse_board_input(req.path_params.at("black"));
     std::vector<int> blocked = parse_board_input(req.path_params.at("blocked"));
@@ -98,7 +110,7 @@ t_request create_new_request(const httplib::Request &req) {
     int white_captured = std::stoi(req.path_params.at("whiteCaptured"));
     int black_captured = std::stoi(req.path_params.at("blackCaptured"));
 
-    return {pos, x, y, color, white, black, blocked, allowed, white_captured, black_captured};
+    return {pos, x, y, color, color_opponent, white, black, blocked, allowed, white_captured, black_captured};
 }
 
 /*
@@ -108,14 +120,13 @@ t_request create_new_request(const httplib::Request &req) {
 */
 t_request create_new_ia_request(const httplib::Request &req) {
     e_color color = req.path_params.at("color") == "white" ? WHITESTONE : BLACKSTONE;
+    e_color color_opponent = color == WHITESTONE ? BLACKSTONE : WHITESTONE;
     std::vector<int> white = parse_board_input(req.path_params.at("white"));
     std::vector<int> black = parse_board_input(req.path_params.at("black"));
     std::vector<int> blocked = parse_board_input(req.path_params.at("blocked"));
-    std::vector<int> allowed = {};
     int white_captured = std::stoi(req.path_params.at("whiteCaptured"));
     int black_captured = std::stoi(req.path_params.at("blackCaptured"));
-    
-    return {0, 0, 0, color, white, black, blocked, allowed, white_captured, black_captured};
+    return {0, 0, 0, color, white, black, blocked, white_captured, black_captured};
 }
 
 std::vector<int> get_request_dna(const httplib::Request &req) {
@@ -141,8 +152,8 @@ std::vector<int> get_request_dna(const httplib::Request &req) {
 */
 int get_captured_count_by_color(t_request request, e_color color) {
     if (color == WHITESTONE)
-        return request.white_captured;
-    return request.black_captured;
+        return request.white_capture;
+    return request.black_capture;
 }
 
 /*
@@ -185,4 +196,66 @@ std::string build_action_response(std::vector<t_stone> added, std::vector<int> r
 
 int get_linear_distance(t_position &a, t_position &b) {
     return std::max(abs(a.x - b.x), abs(a.y - b.y));
+}
+
+/*
+    Compute the number of calculations needed for the thresholds
+    @param thresholds: the list of thresholds
+*/
+int compute_calculations(const std::vector<int>& thresholds) {
+    int calculations = 1;
+    for (int threshold : thresholds) {
+        calculations *= threshold;
+    }
+    return calculations;
+}
+
+/*
+    Get the index to increment in the thresholds list
+    @param thresholds: the list of thresholds
+    @param max_thresholds: the maximum threshold
+*/
+int index_to_increment(std::vector<int>& thresholds, int max_thresholds) {
+        for (int i = 0; i < (int)thresholds.size() - 1; ++i) {
+            if (thresholds[i] <= thresholds[i + 1] && thresholds[i] < max_thresholds) {
+                return i;
+            }
+        }
+        return (int)thresholds.size() - 1;
+}
+
+/*
+    Generate the thresholds for the negamax algorithm
+    @param max_depth: the maximum depth
+    @param max_calculations: the maximum number of calculations
+    @param max_thresholds: the maximum threshold
+    @param min_thresholds: the minimum threshold
+    @return the list of thresholds
+*/
+std::vector<int> generate_thresholds(int max_depth, int max_calculations, int max_thresholds, int min_thresholds) {
+    std::vector<int> thresholds(max_depth, min_thresholds);
+    bool done = false;
+        int index, calculations;
+
+        while (!done) {
+                calculations = compute_calculations(thresholds);
+                index = index_to_increment(thresholds, max_thresholds);
+                if (calculations < max_calculations) {
+                    thresholds[index]++;
+                }
+                if (calculations > max_calculations) {
+                    int e;
+                    for (e = index; e + 1 < (int)thresholds.size() && thresholds[e + 1] == thresholds[index] ; ++e);
+                    if (thresholds[e] > min_thresholds) {
+                        thresholds[e]--;
+                        done = true;
+                    } else if (index - 1 >= 0 && thresholds[index - 1] > min_thresholds) {
+                            thresholds[index - 1]--;
+                    }
+                    done = true;
+                }
+        }
+
+        std::reverse(thresholds.begin(), thresholds.end());
+        return thresholds;
 }

@@ -13,6 +13,7 @@
 
 Game::Game() {
     _board = Board();
+    _interesting_pos = {};
     _center = _board.get_center();
     this->init_dna();
     this->init_sequenceDna();
@@ -22,8 +23,8 @@ Game::Game() {
 Game::Game(t_request &request)
 {
     _request = request;
+    _interesting_pos = {};
     _board = Board(request.white, request.black);
-    _interesting_pos = this->get_interesting_pos();
     _center = _board.get_center();
     this->init_dna();
     this->init_sequenceDna();
@@ -46,7 +47,6 @@ Game::Game(const Game &g) {
     _request = g._request;
     _center = g.get_board().get_center();
     _interesting_pos = g._interesting_pos;
-    _blocked_pos = g._blocked_pos;
 }
 
 Game::~Game() { }
@@ -57,7 +57,6 @@ void Game::operator=(const Game &g) {
     _request = g._request;
     _center = g.get_board().get_center();
     _interesting_pos = g._interesting_pos;
-    _blocked_pos = g._blocked_pos;
 }
 
 
@@ -76,6 +75,18 @@ void Game::set(std::vector<int> pos, e_cell cell) {
     }
 }
 
+void Game::set_threshold(std::vector<int> threshold) {
+    _threshold = threshold;
+}
+
+void Game::set_depth(int depth) {
+    _depth = depth;
+}
+
+int Game::get_depth() const {
+    return _depth;
+}
+
 void Game::unset(int pos) {
     int x = pos % 19;
     int y = pos / 19;
@@ -90,16 +101,22 @@ void Game::unset(std::vector<int> pos) {
     }
 }
 
-void Game::unset_blocked_pos() {
-    for (size_t i = 0; i < _blocked_pos.size(); i++) {
-        int x = _blocked_pos[i] % 19;
-        int y = _blocked_pos[i] / 19;
-        _board.set(x, y, NONE);
-    }
-    _blocked_pos.clear();
-}
-
 Board Game::get_board() const {
     return _board;
 }
 
+std::vector<int> Game::getter_interesting_pos() const {
+    return _interesting_pos;
+}
+
+void Game::init_interesting_pos(e_color color) {
+    this->_interesting_pos = this->get_interesting_pos();
+    this->sort_interesting_pos(color, this->_interesting_pos);
+
+    std::vector<int> blocked_pos = get_new_blocked_pos(color);
+    for (size_t i = 0; i < blocked_pos.size(); i++) {
+        std::vector<int>::iterator it = std::find(this->_interesting_pos.begin(), this->_interesting_pos.end(), blocked_pos[i]);
+        if (it != this->_interesting_pos.end())
+            this->_interesting_pos.erase(it);
+    }
+}

@@ -58,7 +58,7 @@ enum e_sequenceDna {
     SDNA_NNMMN, // +2
     SDNA_NNMMM, // +3
     SDNA_NNMMY, // -c
-    SDNA_NNMYN, 
+    SDNA_NNMYN,
     SDNA_NNMYM,
     SDNA_NNMYY,
     SDNA_NNYNN, // -1
@@ -72,7 +72,7 @@ enum e_sequenceDna {
     SDNA_NNYYY, // -3
     SDNA_NMNNN, // +1
     SDNA_NMNNM, // +2e
-    SDNA_NMNNY, 
+    SDNA_NMNNY,
     SDNA_NMNMN, // +2e
     SDNA_NMNMM, // +3e
     SDNA_NMNMY,
@@ -81,14 +81,14 @@ enum e_sequenceDna {
     SDNA_NMNYY,
     SDNA_NMMNN, // +2
     SDNA_NMMNM, // +3e
-    SDNA_NMMNY, 
+    SDNA_NMMNY,
     SDNA_NMMMN, // +3
     SDNA_NMMMM, // +4
     SDNA_NMMMY,
     SDNA_NMMYN, // -c
     SDNA_NMMYM, // -c
     SDNA_NMMYY, // -c
-    SDNA_NMYNN, 
+    SDNA_NMYNN,
     SDNA_NMYNM,
     SDNA_NMYNY,
     SDNA_NMYMN,
@@ -98,25 +98,25 @@ enum e_sequenceDna {
     SDNA_NMYYM,
     SDNA_NMYYY,
     SDNA_NYNNN, // -1
-    SDNA_NYNNM, 
+    SDNA_NYNNM,
     SDNA_NYNNY, // -2e
-    SDNA_NYNMN, 
+    SDNA_NYNMN,
     SDNA_NYNMM,
-    SDNA_NYNMY, 
+    SDNA_NYNMY,
     SDNA_NYNYN, // -2e
     SDNA_NYNYM,
     SDNA_NYNYY, // -3e
-    SDNA_NYMNN, 
+    SDNA_NYMNN,
     SDNA_NYMNM,
     SDNA_NYMNY,
     SDNA_NYMMN, // -c
     SDNA_NYMMM,
-    SDNA_NYMMY, 
+    SDNA_NYMMY,
     SDNA_NYMYN,
     SDNA_NYMYM,
     SDNA_NYMYY,
     SDNA_NYYNN, // -2
-    SDNA_NYYNM, 
+    SDNA_NYYNM,
     SDNA_NYYNY, // -3e
     SDNA_NYYMN, // c
     SDNA_NYYMM, // c
@@ -156,13 +156,13 @@ enum e_sequenceDna {
     SDNA_MMNNY,
     SDNA_MMNMN, // +3e
     SDNA_MMNMM, // +4e
-    SDNA_MMNMY, 
+    SDNA_MMNMY,
     SDNA_MMNYN,
     SDNA_MMNYM,
     SDNA_MMNYY,
     SDNA_MMMNN, // +3
     SDNA_MMMNM, // +4e
-    SDNA_MMMNY, 
+    SDNA_MMMNY,
     SDNA_MMMMN, // +4
     SDNA_MMMMM, // +5
     SDNA_MMMMY,
@@ -220,7 +220,7 @@ enum e_sequenceDna {
     SDNA_YNMMN,
     SDNA_YNMMM,
     SDNA_YNMMY, // -c
-    SDNA_YNMYN, 
+    SDNA_YNMYN,
     SDNA_YNMYM,
     SDNA_YNMYY,
     SDNA_YNYNN, // -2e
@@ -348,6 +348,7 @@ typedef struct s_request {
     int                 x;
     int                 y;
     e_color             color;
+    e_color             color_opponent;
     std::vector<int>    white;
     std::vector<int>    black;
     std::vector<int>    blocked;

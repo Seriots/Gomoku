@@ -15,12 +15,14 @@ class Game {
         std::map<e_dna, int>            _dna;
         t_request                       _request;
         std::vector<int>                _interesting_pos;
-        std::vector<int>                _blocked_pos;
         std::map<e_sequenceDna, int>    _sequenceDna;
+        int                             _depth;
+        std::vector<int>                _threshold;
 
         void                            init_test_board();
     public:
         /* ******* Game core ******* */
+        std::unordered_map<size_t, std::pair<int, int>> _transposition_table;
         Game();
         Game(t_request &request);
         Game(t_request &request, std::vector<int> &dna);
@@ -32,8 +34,12 @@ class Game {
         void set(std::vector<int> pos, e_cell cell);
         void unset(int pos);
         void unset(std::vector<int> pos);
-        void unset_blocked_pos();
         Board get_board() const;
+        std::vector<int> getter_interesting_pos() const;
+        void init_interesting_pos(e_color color);
+        void set_depth(int depth);
+        void set_threshold(std::vector<int> threshold);
+        int get_depth() const;
 
 
         /* ******* Game utils ******* */
@@ -46,18 +52,18 @@ class Game {
         std::vector<int>                get_new_blocked_pos(e_color color);
         std::vector<int>                get_captured(int pos);
         std::vector<int>                get_interesting_pos();
-        void                            sort_interesting_pos(e_color const &color);
+        void                            sort_interesting_pos(e_color const &color, std::vector<int> &vec);
         void                            print_board();
         std::map<e_cell, std::vector<int> > get_all_positions_stone();
 
 
         /* ******* Game end ******* */
-        bool                            check_win_by_capture();
+        bool                            check_win_by_capture(size_t captured, e_color color);
         bool                            check_win_by_alignement(int pos, e_cell color);
         bool                            is_capturable(t_position &grid_pos, e_cell color, std::vector<int> *capture_spot);
         std::vector<int>                get_capture_prevent_win_pos(int pos, e_cell color);
         bool                            check_no_winner();
-        t_endgame_info                  check_end_game(int pos);
+        t_endgame_info                  check_end_game(int pos, size_t captured, e_color color);
 
         /* ******* Game heuristic ******* */
         std::vector<t_direction_info>   compute_dirs_info(t_position &grid_pos, e_cell &my_color, e_cell &other_color);
@@ -68,5 +74,7 @@ class Game {
         int                             full_simple_heuristic(e_color color);
         int                             board_complex_heuristic(e_color color);
         /* ******* Game minimax ******* */
-        std::pair<int, int>             minimax(int alpha, int beta, int depth, bool is_maxi, int next_pos, std::vector<int> &board);
+        std::pair<int, int>             negamax(int alpha, int beta, int depth, int color, int next_pos, std::vector<int> &board, std::chrono::steady_clock::time_point start_time, int white_capture, int black_capture);
+
+        bool                            is_already_computed(size_t board_hash) const;
 };

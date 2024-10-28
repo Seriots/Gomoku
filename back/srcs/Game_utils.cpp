@@ -214,7 +214,6 @@ std::vector<int> Game::get_new_blocked_pos(e_color color) {
             blocked_not_captured.push_back(blocked[i]);
     }
 
-    this->_blocked_pos = blocked_not_captured;
     return blocked_not_captured;
 }
 
@@ -258,8 +257,7 @@ std::vector<int> Game::get_captured(int pos) {
             captured.push_back((x + 2 * dx) + (y + 2 * dy) * 19);
         }
     }
-    this->_request.white_captured += (baseCell.get() == WHITE) ? captured.size() : 0;
-    this->_request.black_captured += (baseCell.get() == BLACK) ? captured.size() : 0;
+
     return captured;
 }
 
@@ -271,8 +269,8 @@ std::vector<int> Game::get_interesting_pos() {
             int x = pos % 19;
             int y = pos / 19;
             if (this->get_board().get(x, y).get() != NONE) {
-                for (int j = y - 2; j <= y + 2; j++) {
-                    for (int i = x - 2; i <= x + 2; i++) {
+                for (int j = y - 1; j <= y + 1; j++) {
+                    for (int i = x - 1; i <= x + 1; i++) {
                         if (is_in_grid(i, j)) {
                             if (this->get_board().get(i, j).get() == NONE) {
                                 if (interesting_pos.find(i + j * 19) == interesting_pos.end())
@@ -301,15 +299,11 @@ std::vector<int> Game::get_interesting_pos() {
     if (res.size() == 0)
         res.push_back(180);
 
-    std::sort(res.begin(), res.end(), [this](int a, int b) {
-        return this->complex_heuristic(BLACKSTONE, a) > this->complex_heuristic(BLACKSTONE, b);
-    });
-
     return res;
 }
 
-void Game::sort_interesting_pos(e_color const &color) {
-    std::sort(this->_interesting_pos.begin(), this->_interesting_pos.end(), [this, color](int a, int b) {
+void Game::sort_interesting_pos(e_color const &color, std::vector<int> &vec) {
+    std::sort(vec.begin(), vec.end(), [this, color](int a, int b) {
         return this->complex_heuristic(color, a) > this->complex_heuristic(color, b);
     });
 }
