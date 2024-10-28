@@ -161,6 +161,8 @@ const responseHandler = (data: any) => {
 
     if (data.prevent_win.length > 0) {
         localGameInfo.listAllowed = data.prevent_win.join(',');
+    } else {
+        localGameInfo.listAllowed = '';
     }
 }
 
@@ -234,7 +236,6 @@ const getStone = async () => {
 
     await axios.get(build_request('http://localhost:6325/action', [pos, localGameInfo.currentPlayer, listWhite, listBlack, listBlocked, localGameInfo.listAllowed, localGameInfo.whiteCapture, localGameInfo.blackCapture]))
     .then((res) => {
-        console.log(res.data);
         localGameInfo.response = res.data;
         localGameInfo.moveCount++;
     })

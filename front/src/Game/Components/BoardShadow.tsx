@@ -23,7 +23,9 @@ const BoardShadow : React.FC<BoardShadowProps> = ({
             return;
 
         shadow_master.style.zIndex = '1';
+        board_shadow.classList.remove('hide');
         board_shadow.classList.add('show');
+
         end_game_text.innerText = winner + ' win';
         end_game_text.classList.add('show');
 
@@ -42,7 +44,9 @@ const BoardShadow : React.FC<BoardShadowProps> = ({
         shadow_master.style.zIndex = '0';
         end_game_text.innerText = '';
         board_shadow.classList.remove('show');
+        board_shadow.classList.add('hide');
         end_game_text.classList.remove('show');
+
         setWinner('');
 
     }, [gameRunning, setWinner]);

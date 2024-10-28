@@ -133,7 +133,7 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
         board2.push_back(-1);
 
     game.set_depth(6);
-    std::vector<int> threshold_by_layer = generate_thresholds(game.get_depth(), 40000, 10, 3);
+    std::vector<int> threshold_by_layer = generate_thresholds(game.get_depth(), 60000, 10, 3);
     game.set_threshold(threshold_by_layer);
     /* logs */
     for (size_t i = 0; i < threshold_by_layer.size(); i++)
