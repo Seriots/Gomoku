@@ -10,8 +10,8 @@ import FirstPlayerProp from './Components/FirstPlayerProp';
 export interface GameInfoInterface {
     currentPlayer: string,
     currentRound: number,
-    whiteCaptured: number,
-    blackCaptured: number,
+    whiteCapture: number,
+    blackCapture: number,
     processTime: number,
     processDepth: number,
 }
@@ -19,8 +19,8 @@ export interface GameInfoInterface {
 const GameInWhite: GameInfoInterface = {
     currentPlayer: 'white',
     currentRound: 0,
-    whiteCaptured: 0,
-    blackCaptured: 0,
+    whiteCapture: 0,
+    blackCapture: 0,
     processTime: 0,
     processDepth: 0,
 }
@@ -28,8 +28,8 @@ const GameInWhite: GameInfoInterface = {
 const GameInBlack: GameInfoInterface = {
     currentPlayer: 'black',
     currentRound: 0,
-    whiteCaptured: 0,
-    blackCaptured: 0,
+    whiteCapture: 0,
+    blackCapture: 0,
     processTime: 0,
     processDepth: 0,
 }

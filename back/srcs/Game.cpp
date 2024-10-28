@@ -25,6 +25,7 @@ Game::Game(t_request &request)
     _request = request;
     _interesting_pos = {};
     _board = Board(request.white, request.black);
+    print_board();
     _center = _board.get_center();
     this->init_dna();
     this->init_sequenceDna();
@@ -109,7 +110,12 @@ std::vector<int> Game::getter_interesting_pos() const {
     return _interesting_pos;
 }
 
-void Game::init_interesting_pos(e_color color) {
+void Game::init_interesting_pos(e_color color, std::vector<int> allowed_pos) {
+    if (allowed_pos.size() != 0)
+    {
+        this->_interesting_pos = allowed_pos;
+        return ;
+    }
     this->_interesting_pos = this->get_interesting_pos();
     this->sort_interesting_pos(color, this->_interesting_pos);
 

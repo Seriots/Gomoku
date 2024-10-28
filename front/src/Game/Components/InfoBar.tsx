@@ -14,8 +14,8 @@ const InfoBar : React.FC<InfoBarProps> = ({
             <div className='info-props-div'>
                 <span>
                     <InfoProp title={'Player'} img={gameInfo.currentPlayer}></InfoProp>
-                    <InfoProp title={'White Capture'} value={gameInfo.whiteCaptured.toString() + '/10'}></InfoProp>
-                    <InfoProp title={'Black Capture'} value={gameInfo.blackCaptured.toString() + '/10'}></InfoProp>
+                    <InfoProp title={'White Capture'} value={gameInfo.whiteCapture.toString() + '/10'}></InfoProp>
+                    <InfoProp title={'Black Capture'} value={gameInfo.blackCapture.toString() + '/10'}></InfoProp>
                 </span>
                 <span>
                     <InfoProp title={'Turn'} value={(Math.floor(gameInfo.currentRound / 2)).toString()}></InfoProp>

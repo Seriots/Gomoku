@@ -36,7 +36,7 @@ class Game {
         void unset(std::vector<int> pos);
         Board get_board() const;
         std::vector<int> getter_interesting_pos() const;
-        void init_interesting_pos(e_color color);
+        void init_interesting_pos(e_color color, std::vector<int> allowed_pos);
         void set_depth(int depth);
         void set_threshold(std::vector<int> threshold);
         int get_depth() const;

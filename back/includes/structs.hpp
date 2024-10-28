@@ -353,6 +353,6 @@ typedef struct s_request {
     std::vector<int>    black;
     std::vector<int>    blocked;
     std::vector<int>    allowed;
-    int                 white_captured;
-    int                 black_captured;
+    int                 white_capture;
+    int                 black_capture;
 }   t_request;

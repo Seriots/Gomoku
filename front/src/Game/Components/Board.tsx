@@ -24,8 +24,8 @@ interface LocalGameInfoProps {
     isProcessing: boolean,
     response: any,
     endGame: boolean,
-    whiteCaptured: number,
-    blackCaptured: number,
+    whiteCapture: number,
+    blackCapture: number,
     listAllowed: string,
     moveCount: number,
 }
@@ -42,8 +42,8 @@ const initLocalGameInfo = (firstPlayer: string) => {
         isProcessing: false,
         response: undefined,
         endGame: false,
-        whiteCaptured: 0,
-        blackCaptured: 0,
+        whiteCapture: 0,
+        blackCapture: 0,
         listAllowed: '',
         moveCount: 0,
     }
@@ -86,7 +86,7 @@ const handleMouseMove = (e: any) => {
     if (!board || !shadowStone) {
         return;
     }
-    const x = e.clientX - board.offsetLeft + board.offsetWidth * 0.5;
+    const x = e.clientX - board.offsetLeft + board.offsetWidth * 0.5 + window.scrollX;
     const y = e.clientY - board.offsetTop + board.offsetHeight * 0.6 + window.scrollY;
     const nearestX = Math.floor(x / CASESIZE) * CASESIZE + BORDERSIZE;
     const nearestY = Math.floor(y / CASESIZE) * CASESIZE + BORDERSIZE;
@@ -147,9 +147,9 @@ const responseHandler = (data: any) => {
     }
 
     if (localGameInfo.currentPlayer === 'white')
-        localGameInfo.whiteCaptured += data.removed.length;
+        localGameInfo.whiteCapture += data.removed.length;
     else
-        localGameInfo.blackCaptured += data.removed.length;
+        localGameInfo.blackCapture += data.removed.length;
 
     // remove captured stone
     for (let i = 0; i < data.removed.length; i++) {
@@ -229,9 +229,10 @@ const getStone = async () => {
     const listWhite = getPositionList(document.getElementsByClassName('white-stone'));
     const listBlack = getPositionList(document.getElementsByClassName('black-stone'));
     const listBlocked = getPositionList(document.getElementsByClassName('blocked-stone'));
-    console.log(localGameInfo.listAllowed);
 
-    await axios.get(build_request('http://localhost:6325/action', [pos, localGameInfo.currentPlayer, listWhite, listBlack, listBlocked, localGameInfo.listAllowed, localGameInfo.whiteCaptured, localGameInfo.whiteCaptured]))
+    console.log("lstWhite: ", listWhite, " lstBlack: ", listBlack);
+
+    await axios.get(build_request('http://localhost:6325/action', [pos, localGameInfo.currentPlayer, listWhite, listBlack, listBlocked, localGameInfo.listAllowed, localGameInfo.whiteCapture, localGameInfo.blackCapture]))
     .then((res) => {
         console.log(res.data);
         localGameInfo.response = res.data;
@@ -247,13 +248,15 @@ const getIaStone = async (IAMode: boolean) => {
     const listWhite = getPositionList(document.getElementsByClassName('white-stone'));
     const listBlack = getPositionList(document.getElementsByClassName('black-stone'));
     const listBlocked = getPositionList(document.getElementsByClassName('blocked-stone'));
+    console.log("lstWhite: ", listWhite, " lstBlack: ", listBlack);
 
-    await axios.get(build_request('http://localhost:6325/ia', [localGameInfo.currentPlayer, listWhite, listBlack, listBlocked, localGameInfo.listAllowed, localGameInfo.whiteCaptured, localGameInfo.whiteCaptured]))
+    await axios.get(build_request('http://localhost:6325/ia', [localGameInfo.currentPlayer, listWhite, listBlack, listBlocked, localGameInfo.listAllowed, localGameInfo.whiteCapture, localGameInfo.blackCapture]))
     .then((res) => {
         localGameInfo.response = res.data;
         localGameInfo.moveCount++;
-        if (!IAMode)
+        if (!IAMode) {
             setHintIAStone(localGameInfo.response);
+        }
     })
     .catch((err) => {
         console.log(err);
@@ -268,8 +271,8 @@ const updateGameInfo = (data: any, gameInfo: GameInfoInterface, setGameInfo: any
     const newGameInfo: GameInfoInterface = {
         currentPlayer: localGameInfo.currentPlayer,
         currentRound: localGameInfo.moveCount,
-        whiteCaptured: localGameInfo.whiteCaptured,
-        blackCaptured: localGameInfo.blackCaptured,
+        whiteCapture: localGameInfo.whiteCapture,
+        blackCapture: localGameInfo.blackCapture,
         processTime: time,
         processDepth: depth,
     }
@@ -335,7 +338,7 @@ const handleClick = (IAMode: boolean, gameRunning: any, setGameRunning: any, set
     }
     localGameInfo.isProcessing = false;
 
-    if (!IAMode && (activateHintP1 && localGameInfo.currentPlayer === 'white' || activateHintP2 && localGameInfo.currentPlayer === 'black')) {
+    if (!IAMode && ((activateHintP1 && localGameInfo.currentPlayer === 'white') || (activateHintP2 && localGameInfo.currentPlayer === 'black'))) {
         getIaStone(IAMode);
     }
 }
@@ -380,7 +383,7 @@ const Board : React.FC<BoardProps> = ({
             playIa();
         }
     }
-    , [runFirstIa, gameInfo, setGameInfo, setGameRunning, setWinner]);
+    , [runFirstIa, gameInfo, setGameInfo, setGameRunning, setWinner, IAMode]);
 
     useEffect(() => {
         if (gameRunning !== true)

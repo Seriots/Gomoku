@@ -60,9 +60,7 @@ void    r_action(const httplib::Request &req, httplib::Response &res) {
     for (size_t i = 0; i < blocked_list.size(); i++)
         added.push_back({blocked_list[i], "blocked"});
 
-    std::cout << "Before white check end" << std::endl;
-    t_endgame_info endgame_info = game.check_end_game(request.pos);
-    std::cout << "After white check end" << std::endl;
+    t_endgame_info endgame_info = game.check_end_game(request.pos, removed.size(), request.color);
 
     res.set_content(build_action_response(added, removed, endgame_info, {}, {}), "application/json"); // everything is send in a nicely formated json
 }
@@ -81,6 +79,7 @@ void display_board(std::vector<int> &board, Game &game) {
                 displayColor = 0;
             else
                 displayColor = 1.0 - ((float)(it - interesting_pos.begin()) / (float)interesting_pos.size());
+            
             if (displayColor > 0.99)
                 std::cout << "\033[0;35m"; // magenta
             else if (displayColor > 0.9)
@@ -95,16 +94,16 @@ void display_board(std::vector<int> &board, Game &game) {
                 std::cout << "\033[0;36m"; // cyan
 
             if (board[x + y * 19] != -1)
-                std::cout << std::setw(5) << std::setfill(' ') << board[x + y * 19] << " ";
+                std::cout << std::setw(8) << std::setfill(' ') << board[x + y * 19] << "\033[0m" << " ";
             else if (game.get_board().get(x, y).get() == WHITE)
-                std::cout << "ooooo ";
+                std::cout << "oooooooo" << "\033[0m" << " ";
             else if (game.get_board().get(x, y).get() == BLACK)
-                std::cout << "***** ";
+                std::cout << "********" << "\033[0m" << " ";
             else if (game.get_board().get(x, y).get() == BLOCKED)
-                std::cout << "xxxxx ";
+                std::cout << "xxxxxxxx" << "\033[0m" << " ";
             else
-                std::cout << "----- ";
-            std::cout << "\033[0m";
+                std::cout << "--------" << "\033[0m" << " ";
+            
         }
         std::cout << std::endl;
     }
@@ -128,7 +127,7 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     request = create_new_ia_request(req);
 
     Game game(request); // instantiate game object with the request
-    game.init_interesting_pos(request.color);
+    game.init_interesting_pos(request.color, request.allowed);
 
     // create board
     std::vector<int> board1, board2, board3;
@@ -139,31 +138,18 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     std::vector<int> threshold_by_layer = generate_thresholds(game.get_depth(), 5000, 10, 2);
     game.set_threshold(threshold_by_layer);
 
-    // display board
-    //for (int y = 0; y < 19; y++) {
-    //    for (int x = 0; x < 19; x++) {
-    //        if (board[x + y * 19] != -1)
-    //            std::cout << std::setw(4) << std::setfill('0') << board[x + y * 19] << " ";
-    //        else
-    //            std::cout << "---- ";
-    //    }
-    //    std::cout << std::endl;
-    //}
 
-
-    std::cout << "Time: " << time << std::endl << std::endl;
     auto start_time = std::chrono::high_resolution_clock::now();
     int pos = game.negamax(INT_MIN, INT_MAX, game.get_depth(), 1, -1, board2, std::chrono::steady_clock::now(), request.white_capture, request.black_capture).first;
     auto end_time = std::chrono::high_resolution_clock::now();
 
     /* logs */
-    for (size_t i = 0; i < threshold_by_layer.size(); i++)
-        std::cout << "depth " << i + 1  << ": " << threshold_by_layer[i] << std::endl;
-    game.set_threshold(threshold_by_layer);
+    //for (size_t i = 0; i < threshold_by_layer.size(); i++)
+    //    std::cout << "depth " << i + 1  << ": " << threshold_by_layer[i] << std::endl;
     
-    std::cout << "Negamax: " << pos << " - " << pos % 19 << " " << pos / 19 << std::endl;
     auto time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
     std::cout << "Time: " << time << std::endl << std::endl;
+    
     display_board(board2, game);
 
     game.set(pos, color_to_cell(request.color));
@@ -179,6 +165,7 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
         added.push_back({blocked_list[i], "blocked"});
 
     t_endgame_info endgame_info = game.check_end_game(pos, removed.size(), request.color);
+    std::cout << "win by alignement: " << endgame_info.win_by_alignement << std::endl;
 
     res.set_content(build_action_response(added, removed, endgame_info, {"time", "depthSearch"}, {std::to_string(time), std::to_string(1)}), "application/json");
 }

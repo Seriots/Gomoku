@@ -16,9 +16,9 @@ int main() {
 
 	svr.Get("/end", r_end);
 
-    svr.Get("/action/:pos/:color/:white/:black/:blocked/:allowed/:whiteCaptured/:blackCaptured", r_action);
-    svr.Get("/ia/:color/:white/:black/:blocked/:allowed/:whiteCaptured/:blackCaptured", r_ia);
-    svr.Get("/iaWithDna/:color/:white/:black/:blocked/:whiteCaptured/:blackCaptured/:dna", r_ia_with_dna);
+    svr.Get("/action/:pos/:color/:white/:black/:blocked/:allowed/:whiteCapture/:blackCapture", r_action);
+    svr.Get("/ia/:color/:white/:black/:blocked/:allowed/:whiteCapture/:blackCapture", r_ia);
+    svr.Get("/iaWithDna/:color/:white/:black/:blocked/:whiteCapture/:blackCapture/:dna", r_ia_with_dna);
 
 	svr.listen("localhost", 6325);
 }

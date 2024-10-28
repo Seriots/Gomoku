@@ -9,11 +9,10 @@
     Return if the game is won by capture
     @return: true if the game is won by capture, false otherwise
 */
-bool    Game::check_win_by_capture() {
-    int white_captured = this->_request.white_captured;
-    int black_captured = this->_request.black_captured;
-    std::cout << "white captured: " << white_captured << std::endl;
-    if (white_captured >= 10)
+bool    Game::check_win_by_capture(size_t captured, e_color color) {
+    int white_capture = this->_request.white_capture + (color == WHITESTONE ? captured : 0);
+    int black_capture = this->_request.black_capture + (color == BLACKSTONE ? captured : 0);
+    if (white_capture >= 10)
         return true;
     if (black_capture >= 10)
         return true;
@@ -57,6 +56,7 @@ bool    Game::check_win_by_alignement(int pos, e_cell color) {
                 break;
             alignement++;
         }
+        std::cout << "alignement: " << alignement << std::endl;
         if (alignement >= 5)
             return true;
     }
@@ -172,7 +172,6 @@ t_endgame_info  Game::check_end_game(int pos, size_t captured, e_color color) {
     t_endgame_info endgame_info = {this->_request.color, false, false, false, {}};
 
     e_cell cell = this->_request.color == WHITESTONE ? WHITE : BLACK;
-    std::cout << "ehere" << std::endl;
 
     endgame_info.win_by_capture = check_win_by_capture(captured, color);
     endgame_info.win_by_alignement = check_win_by_alignement(pos, cell);

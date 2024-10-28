@@ -11,8 +11,8 @@ import './GameStyle.css';
 const GameIn: GameInfoInterface = {
     currentPlayer: 'white',
     currentRound: 0,
-    whiteCaptured: 0,
-    blackCaptured: 0,
+    whiteCapture: 0,
+    blackCapture: 0,
     processTime: 0,
     processDepth: 0,
 }
