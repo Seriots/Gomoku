@@ -11,8 +11,8 @@ std::pair<int, int> Game::negamax(int alpha, int beta, int depth, int is_maximiz
         return this->_transposition_table[board_hash];
     }
 
-    if (depth == 0) {
-        int score = is_maximizing * this->board_complex_heuristic(_request.color);
+    if (depth == 0 || white_capture >= 10 || black_capture >= 10) {
+        int score = is_maximizing * this->board_complex_heuristic(_request.color, white_capture, black_capture);
         this->_transposition_table[board_hash] = std::make_pair(next_pos, score);
         return std::make_pair(next_pos, score);
     }
@@ -37,12 +37,21 @@ std::pair<int, int> Game::negamax(int alpha, int beta, int depth, int is_maximiz
             this->set(pos, (is_maximizing == 1) ? color_to_cell(_request.color) : color_to_cell(_request.color_opponent));
 
             std::vector<int> captured = this->get_captured(pos);
-            int _tmp_white_capture = white_capture + ((_request.color == WHITESTONE) ? captured.size() : 0);
-            int _tmp_black_capture = black_capture + ((_request.color == BLACKSTONE) ? captured.size() : 0);
+            int tmp_white_capture = white_capture;
+            int tmp_black_capture = black_capture; 
+
+            if (is_maximizing == 1 && _request.color == WHITESTONE)
+                tmp_black_capture += captured.size();
+            else if (is_maximizing == 1 && _request.color == BLACKSTONE)
+                tmp_white_capture += captured.size();
+            else if (is_maximizing == -1 && _request.color == WHITESTONE)
+                tmp_white_capture += captured.size();
+            else if (is_maximizing == -1 && _request.color == BLACKSTONE)
+                tmp_black_capture += captured.size();
 
             this->unset(captured);
 
-            int tmp = -this->negamax(-beta, -alpha, depth - 1, -is_maximizing, pos, board, start_time, _tmp_white_capture, _tmp_black_capture).second;
+            int tmp = -this->negamax(-beta, -alpha, depth - 1, -is_maximizing, pos, board, start_time, tmp_white_capture, tmp_black_capture).second;
 
             this->unset(pos);
             this->set(captured, (is_maximizing == 1) ? color_to_cell(_request.color_opponent) : color_to_cell(_request.color));

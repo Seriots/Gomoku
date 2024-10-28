@@ -25,7 +25,6 @@ Game::Game(t_request &request)
     _request = request;
     _interesting_pos = {};
     _board = Board(request.white, request.black);
-    print_board();
     _center = _board.get_center();
     this->init_dna();
     this->init_sequenceDna();

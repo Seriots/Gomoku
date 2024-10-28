@@ -16,6 +16,7 @@ class Game {
         t_request                       _request;
         std::vector<int>                _interesting_pos;
         std::map<e_sequenceDna, int>    _sequenceDna;
+        std::map<e_valueDna, int>       _valuesDna;
         int                             _depth;
         std::vector<int>                _threshold;
 
@@ -71,10 +72,11 @@ class Game {
         std::vector<t_direction_info>   compute_dirs_info(t_position &grid_pos, e_cell &my_color, e_cell &other_color);
         t_score_info                    compute_score_information(std::vector<t_direction_info> &dir_info);
         int                             compute_score(t_score_info &score_info, int &my_captured);
+        int                             add_capture_score(int current_capture);
         int                             simple_heuristic(e_color color, int pos);
         int                             complex_heuristic(e_color color, int &pos);
         int                             full_simple_heuristic(e_color color);
-        int                             board_complex_heuristic(e_color color);
+        int                             board_complex_heuristic(e_color color, int new_white_capture, int new_black_capture);
         /* ******* Game minimax ******* */
         std::pair<int, int>             negamax(int alpha, int beta, int depth, int color, int next_pos, std::vector<int> &board, std::chrono::steady_clock::time_point start_time, int white_capture, int black_capture);
 

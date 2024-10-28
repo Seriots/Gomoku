@@ -13,9 +13,10 @@
     @return the corresponding cell
 */
 e_cell color_to_cell(e_color color) {
-    if (color == WHITESTONE)
-        return WHITE;
-    return BLACK;
+    return (e_cell)color;
+    //if (color == WHITESTONE)
+    //    return WHITE;
+    //return BLACK;
 }
 
 /*

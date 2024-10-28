@@ -16,7 +16,7 @@ void    r_game(const httplib::Request &req, httplib::Response &res) {
 
     Game game;
 
-    int score = game.board_complex_heuristic(BLACKSTONE);
+    int score = game.board_complex_heuristic(BLACKSTONE, 0, 0);
     std::cout << score << std::endl;
     res.set_content("{"+ std::to_string(score) + "}", "application/json");
 }
@@ -132,8 +132,8 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     for (int i = 0; i < 19*19; i++)
         board2.push_back(-1);
 
-    game.set_depth(8);
-    std::vector<int> threshold_by_layer = generate_thresholds(game.get_depth(), 20000, 10, 3);
+    game.set_depth(6);
+    std::vector<int> threshold_by_layer = generate_thresholds(game.get_depth(), 40000, 10, 3);
     game.set_threshold(threshold_by_layer);
     /* logs */
     for (size_t i = 0; i < threshold_by_layer.size(); i++)

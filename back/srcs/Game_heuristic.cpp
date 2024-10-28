@@ -249,7 +249,23 @@ static int decrement_name(int name) {
     return name;
 }
 
-int Game::board_complex_heuristic(e_color color) {
+int Game::add_capture_score(int current_capture) {
+
+    if (current_capture == 2)
+       return this->_valuesDna[VDNA_EFFECTIVE_CAPTURE_0];
+    else if (current_capture == 4)
+       return this->_valuesDna[VDNA_EFFECTIVE_CAPTURE_0];
+    else if (current_capture == 6)
+       return this->_valuesDna[VDNA_EFFECTIVE_CAPTURE_1];
+    else if (current_capture == 8)
+       return this->_valuesDna[VDNA_EFFECTIVE_CAPTURE_2];
+    else if (current_capture == 10)
+       return this->_valuesDna[VDNA_EFFECTIVE_CAPTURE_3];
+    
+    return 0;
+}
+
+int Game::board_complex_heuristic(e_color color, int white_capture, int black_capture) {
     e_cell my = color == WHITESTONE ? WHITE : BLACK;
     e_cell other = (my == WHITE) ? BLACK : WHITE;
 
@@ -313,5 +329,8 @@ int Game::board_complex_heuristic(e_color color) {
             x2--;
         }
     }
+    score += add_capture_score(white_capture) * (color == BLACKSTONE ? 1 : -1);
+    score += add_capture_score(black_capture) * (color == WHITESTONE ? 1 : -1);
+
     return score;   
 }
