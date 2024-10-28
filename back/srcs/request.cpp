@@ -131,6 +131,7 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
 
     game.set_depth(6);
     std::vector<int> threshold_by_layer = generate_thresholds(game.get_depth(), 5000, 10, 2);
+    game.set_threshold(threshold_by_layer);
 
     auto start_time = std::chrono::high_resolution_clock::now();
     int pos = game.negamax(INT_MIN, INT_MAX, game.get_depth(), 1, -1, board2, std::chrono::steady_clock::now(), request.white_capture, request.black_capture).first;
