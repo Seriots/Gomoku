@@ -1,21 +1,21 @@
 #include "Game.hpp"
 
 void Game::init_dna() {
-    _dna[ALIGN_FIVE] = 100000;
-    _dna[FREE_FOUR] = 10000;
-    _dna[FREE_THREE] = 1000;
+    _dna[ALIGN_FIVE] = 1000000;
+    _dna[FREE_FOUR] = 20000;
+    _dna[FREE_THREE] = 10000;
     _dna[ANY_ALIGNEMENT] = 25;
     _dna[CAPTURE_TOTAL_2] = 400;
     _dna[CAPTURE_TOTAL_4] = 800;
     _dna[CAPTURE_TOTAL_6] = 2500;
     _dna[CAPTURE_TOTAL_8] = 5000;
-    _dna[CAPTURE_TOTAL_10] = 100000;
+    _dna[CAPTURE_TOTAL_10] = 1000000;
     _dna[BLOCK_FREE_THREE] = 6900;
     _dna[BLOCK_FREE_FOUR] = 7900;
     _dna[BLOCK_CAPTURE] = 6000;
-    _dna[BLOCK_WIN] = 89000;
+    _dna[BLOCK_WIN] = 1100000;
     _dna[SETUP_CAPTURE] = 200;
-    _dna[IS_CAPTURABLE] = -3000;
+    _dna[IS_CAPTURABLE] = -30000;
 }
 
 void Game::init_sequenceDna(std::vector<int> *dna) {
@@ -210,7 +210,7 @@ std::vector<int> Game::get_new_blocked_pos(e_color color) {
     }
 
     for (size_t i = 0; i < blocked.size(); i++) {
-        if (this->get_captured(blocked[i]).size() == 0)
+        if (this->get_captured(blocked[i], color).size() == 0)
             blocked_not_captured.push_back(blocked[i]);
     }
 
@@ -222,24 +222,19 @@ bool Game::check_sequence(int x, int y, int dx, int dy, std::vector<e_cell> sequ
         int nx = x + (i * dx);
         int ny = y + (i * dy);
         if (!is_in_grid(nx, ny) || _board.get(nx, ny).get() != sequence[i-1])
-        {
             return false;
-        }
     }
     return true;
 }
 
-std::vector<int> Game::get_captured(int pos) {
+std::vector<int> Game::get_captured(int pos, e_color color) {
     std::vector<int>                captured;
     std::vector<e_cell>             sequence;
     std::vector<std::vector<int> >  directions;
 
     int x = pos % 19;
     int y = pos / 19;
-    Cell baseCell = _board.get(x, y);
-    if (baseCell.get() == NONE || baseCell.get() == BLOCKED)
-        return captured;
-    if (baseCell.get() == WHITE) {
+    if (color == WHITESTONE) {
         sequence.push_back(BLACK);
         sequence.push_back(BLACK);
         sequence.push_back(WHITE);
@@ -294,8 +289,13 @@ std::vector<int> Game::get_interesting_pos() {
 }
 
 void Game::sort_interesting_pos(e_color const &color, std::vector<int> &vec) {
-    std::sort(vec.begin(), vec.end(), [this, color](int a, int b) {
-        return this->complex_heuristic(color, a) > this->complex_heuristic(color, b);
+    std::map<int, int>  score_on_pos;
+
+    for (size_t i = 0; i < vec.size(); i++) {
+        score_on_pos[vec[i]] = this->complex_heuristic(color, vec[i]);
+    }
+    std::sort(vec.begin(), vec.end(), [&score_on_pos](int a, int b) {
+        return score_on_pos[a] > score_on_pos[b];
     });
 }
 

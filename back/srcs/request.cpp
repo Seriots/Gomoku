@@ -50,7 +50,7 @@ void    r_action(const httplib::Request &req, httplib::Response &res) {
 
     game.set(request.pos, request.color == WHITESTONE ? WHITE : BLACK);
     // game.print_board();
-    removed = game.get_captured(request.pos);
+    removed = game.get_captured(request.pos, request.color);
 
     game.unset(removed);
 
@@ -89,8 +89,12 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     // create board
 
     game.set_depth(6);
-    std::vector<int> threshold_by_layer = generate_thresholds(game.get_depth(), 60000, 10, 3);
+    std::vector<int> threshold_by_layer = generate_thresholds(game.get_depth(), 400000, 10, 3);
     game.set_threshold(threshold_by_layer);
+
+    for (std::vector<int>::iterator it = threshold_by_layer.begin(); it != threshold_by_layer.end(); it++) {
+        std::cout << *it << std::endl;
+    }
 
 
     auto start_time = std::chrono::high_resolution_clock::now();
@@ -107,7 +111,7 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
 
     game.set(pos, color_to_cell(request.color));
 
-    removed = game.get_captured(pos);
+    removed = game.get_captured(pos, request.color);
 
     game.unset(removed);
 

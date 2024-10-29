@@ -91,10 +91,9 @@ static t_direction_info init_direction_info() {
     @return: the direction information
 */
 std::vector<t_direction_info> Game::compute_dirs_info(t_position &grid_pos, e_cell &my_color, e_cell &other_color) {
+    (void)other_color;
     std::vector<std::vector<int> >  directions;
     std::vector<t_direction_info>   dirs_info;
-
-    (void)other_color;
 
     directions = {{-1, 0},{1, 0},{0, -1},{0, 1}, {-1, -1},{1, 1},{1, -1},{-1, 1}};
     for (size_t i = 0; i < directions.size(); i++) {

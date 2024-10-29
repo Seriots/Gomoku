@@ -23,7 +23,7 @@ class Game {
         void                            init_test_board();
     public:
         /* ******* Game core ******* */
-        std::unordered_map<size_t, std::pair<int, int>> _transposition_table;
+        std::unordered_map<size_t, int> _transposition_table;
         Game();
         Game(t_request &request);
         Game(t_request &request, std::vector<int> &dna);
@@ -51,7 +51,7 @@ class Game {
         bool                            check_double_free_three(int x, int y, e_cell color);
         bool                            check_sequence(int x, int y, int dx, int dy, std::vector<e_cell> cell);
         std::vector<int>                get_new_blocked_pos(e_color color);
-        std::vector<int>                get_captured(int pos);
+        std::vector<int>                get_captured(int pos, e_color color);
         std::vector<int>                get_interesting_pos();
         void                            sort_interesting_pos(e_color const &color, std::vector<int> &vec);
         void                            print_board();
@@ -80,7 +80,7 @@ class Game {
         /* ******* Game minimax ******* */
         void                            display_negamax_board(std::vector<int> &board);
         int                             fdNegamax(t_negamaxInformation info, t_captureCount capture);
-        std::pair<int, int>             negamax(t_negamaxInformation info, int next_pos, t_captureCount capture);
+        int                             negamax(t_negamaxInformation info, t_captureCount capture, int currPos);
 
         bool                            is_already_computed(size_t board_hash) const;
 };
