@@ -7,6 +7,7 @@ import './GameStyle.css';
 import StartButton from './Components/StartButton';
 import FirstPlayerProp from './Components/FirstPlayerProp';
 import DepthProp from './Components/DepthProp';
+import OpeningRulesProp from './Components/OpeningRulesProp';
 
 export interface GameInfoInterface {
     currentPlayer: string,
@@ -40,7 +41,8 @@ function GameIA() {
     const [winner, setWinner] = useState('');
     const [gameInfo, setGameInfo] = useState(GameInWhite);
     const [firstPlayer, setFirstPlayer] = useState('white');
-    const [depth, setDepth] = useState(3);
+    const [depth, setDepth] = useState(5);
+    const [openingRule, setOpeningRule] = useState('normal');
     const firstPlayerRef = useRef(firstPlayer);
 
     useEffect(() => {
@@ -53,9 +55,10 @@ function GameIA() {
 
     return (
         <div className='gameIA-master'>
-            <ParamsBar labels={['First Player', 'Depth']}>
+            <ParamsBar labels={['First Player', 'Depth', "Opening Rules"]}>
                 <FirstPlayerProp firstPlayer={firstPlayer} setFirstPlayer={setFirstPlayer} gameRunning={gameRunning} />
                 <DepthProp depth={depth} setDepth={setDepth} gameRunning={gameRunning} />
+                <OpeningRulesProp openingRule={openingRule} setOpeningRule={setOpeningRule} gameRunning={gameRunning} />
             </ParamsBar>
             <InfoBar gameInfo={gameInfo} />
             <Board IAMode={true} gameRunning={gameRunning} setGameRunning={setGameRunning} setWinner={setWinner} gameInfo={gameInfo} setGameInfo={setGameInfo} firstPlayer={firstPlayerRef} depth={depth}/>

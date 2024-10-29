@@ -1,13 +1,13 @@
 import './Slider.css';
 
-interface InfoPropProps {
+interface SliderProps {
     setter: React.Dispatch<React.SetStateAction<number>>,
     initial: number,
     min: number,
     max: number,
 }
 
-const InfoProp : React.FC<InfoPropProps> = ({
+const Slider : React.FC<SliderProps> = ({
     setter,
     initial,
     min,
@@ -20,4 +20,4 @@ const InfoProp : React.FC<InfoPropProps> = ({
     );
 }
 
-export default InfoProp;
+export default Slider;
