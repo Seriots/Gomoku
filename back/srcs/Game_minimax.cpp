@@ -146,7 +146,7 @@ int Game::fdNegamax(t_negamaxInformation info, t_captureCount capture) {
 
         info.alpha = std::max(info.alpha, score);
     }
-    this->display_negamax_board(board);
+    //this->display_negamax_board(board);
 
     return best_pos;
 }

@@ -34,10 +34,10 @@ enum e_derivation_power {
 };
 
 int NB_DNA = 17;
-int POPULATION_NUMBER_BY_GEN = 50;
-int POPULATION_SAVED = 10;
+int POPULATION_NUMBER_BY_GEN = 6;
+int POPULATION_SAVED = 2;
 
-int NB_GENERATION = 10;
+int NB_GENERATION = 100;
 
 std::ostream& operator<<(std::ostream &os, const e_valueDna &c) {
     if (c == VDNA_ONE)
@@ -270,13 +270,13 @@ void fight(t_population &player1, t_population &player2) {
     color = "white";
     //std::cout << "Player1: " << player1.id << " vs Player2: " << player2.id << std::endl;
     while (true) {
-        std::string req = "/iaWithDna/" + color + "/" + intListToString(player1_stones) + "/" + intListToString(player2_stones) + "//0/0/" + (color == "white" ? dnaToString(player1.dna) : dnaToString(player2.dna)) + "/";
+        std::string req = "/iaWithDna/" + color + "/" + intListToString(player1_stones) + "/" + intListToString(player2_stones) + "///0/0/" + (color == "white" ? dnaToString(player1.dna) : dnaToString(player2.dna)) + "/";
         res = cli.Get(req.c_str());
 
         json.parse(res->body);
         moveCounter++;
 
-        if (json.getInt("win_by_alignement") == 1) {
+        if (json.getInt("win_by_alignement") == 1 || json.getInt("win_by_capture") == 1) {
             color == "white" ? player1.score += 1 : player2.score += 1;
             color == "white" ? player1.move_on_win += moveCounter : player2.move_on_win += moveCounter;
             break;
@@ -424,6 +424,7 @@ int main() {
     exec_time = std::to_string(time(NULL));
 
     for (int i = 0; i < NB_GENERATION; i++) {
+        std::cout << "Generation: " << i << std::endl;
         logfile = generateNewFilename(exec_time, i);
         population = generatePopulation(i, population);
         logsPopulationDna(logfile, population);

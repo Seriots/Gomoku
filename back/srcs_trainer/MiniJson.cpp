@@ -99,6 +99,8 @@ MiniJson::~MiniJson() {
 }
 
 void MiniJson::parse(std::string json) {
+    if (json.size() < 2)
+        return;
     json = json.substr(1, json.size() - 2);
     trim(json);
 

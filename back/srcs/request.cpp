@@ -134,7 +134,6 @@ void r_ia_with_dna(const httplib::Request &req, httplib::Response &res) {
     std::vector<int>        dna;
     t_endgame_info          endgame_info;
 
-
     res.set_header("Access-Control-Allow-Origin", "*"); // prevent CORS problems
 
     request = create_new_ia_request(req);
@@ -142,68 +141,36 @@ void r_ia_with_dna(const httplib::Request &req, httplib::Response &res) {
     dna = get_request_dna(req);
 
     Game game(request, dna); // instantiate game object with the request
+    game.init_interesting_pos(request.color, request.allowed);
 
-    if (request.color == WHITESTONE) {
-        if (dna[2] > 45 && dna[2] < 50 && request.black.size() % 4 == 0) {
-            int pos = 360;
-            while (std::find(request.white.begin(), request.white.end(), pos) != request.white.end() ||
-                   std::find(request.black.begin(), request.black.end(), pos) != request.black.end()) {
-                pos--;
-            }
-            added.push_back({pos, "white"});
-        } else if (dna[1] > 25 && dna[1] < 30) {
-            int pos = 0;
-            while (std::find(request.white.begin(), request.white.end(), pos) != request.white.end() ||
-                   std::find(request.black.begin(), request.black.end(), pos) != request.black.end()) {
-                pos++;
-            }
-            added.push_back({pos, "white"});
-        } else {
-            while (true) {
-                int pos = rand() % 361;
-                if (std::find(request.white.begin(), request.white.end(), pos) == request.white.end() &&
-                    std::find(request.black.begin(), request.black.end(), pos) == request.black.end()) {
-                    added.push_back({pos, "black"});
-                    break;
-                }
-            }
-        }
-    } else {
-        if (dna[2] > 45 && dna[2] < 50 && request.white.size() % 4 == 0) {
-            int pos = 0;
-            while (std::find(request.white.begin(), request.white.end(), pos) != request.white.end() ||
-                   std::find(request.black.begin(), request.black.end(), pos) != request.black.end()) {
-                pos++;
-            }
-            added.push_back({pos, "black"});
-        } else if (dna[1] > 25 && dna[1] < 30) {
-            int pos = 360;
-            while (std::find(request.white.begin(), request.white.end(), pos) != request.white.end() ||
-                   std::find(request.black.begin(), request.black.end(), pos) != request.black.end()) {
-                pos--;
-            }
-            added.push_back({pos, "black"});
-        } else {
-            while (true) {
-                int pos = rand() % 361;
-                if (std::find(request.white.begin(), request.white.end(), pos) == request.white.end() &&
-                    std::find(request.black.begin(), request.black.end(), pos) == request.black.end()) {
-                    added.push_back({pos, "black"});
-                    break;
-                }
-            }
-        }
-    }
+    game.set_depth(6);
+    std::vector<int> threshold_by_layer = generate_thresholds(game.get_depth(), 40000, 10, 3);
+    game.set_threshold(threshold_by_layer);
 
-    game.set(added[0].pos, request.color == WHITESTONE ? WHITE : BLACK);
+    auto start_time = std::chrono::high_resolution_clock::now();
+    
+    int pos = game.fdNegamax({INT_MIN, INT_MAX, game.get_depth(), 1}, (t_captureCount){request.white_capture, request.black_capture});
 
-    endgame_info = game.check_end_game(added[0].pos, removed.size(), request.color);
+    auto end_time = std::chrono::high_resolution_clock::now();
 
-    removed.push_back(1);
-    removed.push_back(2);
-    added.push_back({5, "black"});
+    auto time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
 
-    res.set_content(build_action_response(added, removed, endgame_info, {}, {}), "application/json");
+    game.set(pos, color_to_cell(request.color));
+
+    removed = game.get_captured(pos, request.color);
+
+    game.unset(removed);
+
+    blocked_list = game.get_new_blocked_pos(request.color == WHITESTONE ? BLACKSTONE : WHITESTONE);
+
+    added.push_back({pos, request.color == WHITESTONE ? "white" : "black"});
+    for (size_t i = 0; i < blocked_list.size(); i++)
+        added.push_back({blocked_list[i], "blocked"});
+
+    endgame_info = game.check_end_game(pos, removed.size(), request.color);
+
+    std::cout << "Send: " << time << std::endl;
+    res.set_content(build_action_response(added, removed, endgame_info, {"time", "depthSearch"}, {std::to_string(time), std::to_string(game.get_depth())}), "application/json");
 }
 
 /*
