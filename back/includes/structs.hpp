@@ -355,4 +355,5 @@ typedef struct s_request {
     std::vector<int>    allowed;
     int                 white_capture;
     int                 black_capture;
+    int                 depth;
 }   t_request;

@@ -58,9 +58,11 @@ function GameIA() {
                 <DepthProp depth={depth} setDepth={setDepth} gameRunning={gameRunning} />
             </ParamsBar>
             <InfoBar gameInfo={gameInfo} />
-            <Board IAMode={true} gameRunning={gameRunning} setGameRunning={setGameRunning} setWinner={setWinner} gameInfo={gameInfo} setGameInfo={setGameInfo} firstPlayer={firstPlayerRef}/>
+            <Board IAMode={true} gameRunning={gameRunning} setGameRunning={setGameRunning} setWinner={setWinner} gameInfo={gameInfo} setGameInfo={setGameInfo} firstPlayer={firstPlayerRef} depth={depth}/>
             <BoardShadow gameRunning={gameRunning} winner={winner} setWinner={setWinner}/>
-            <StartButton gameRunning={gameRunning} setGameRunning={setGameRunning} />
+            {!gameRunning &&
+                <StartButton gameRunning={gameRunning} setGameRunning={setGameRunning} />
+            }
         </div>
     );
 }

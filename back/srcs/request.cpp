@@ -48,7 +48,7 @@ void    r_action(const httplib::Request &req, httplib::Response &res) {
 
     // game.set(request.blocked, BLOCKED);
 
-    game.set(request.pos, request.color == WHITESTONE ? WHITE : BLACK);
+    game.set(request.pos, color_to_cell(request.color));
     // game.print_board();
     removed = game.get_captured(request.pos);
 
@@ -79,7 +79,7 @@ void display_board(std::vector<int> &board, Game &game) {
                 displayColor = 0;
             else
                 displayColor = 1.0 - ((float)(it - interesting_pos.begin()) / (float)interesting_pos.size());
-            
+
             if (displayColor > 0.99)
                 std::cout << "\033[0;35m"; // magenta
             else if (displayColor > 0.9)
@@ -101,7 +101,7 @@ void display_board(std::vector<int> &board, Game &game) {
                 std::cout << "xxxxxxxx" << "\033[0m" << " ";
             else
                 std::cout << "--------" << "\033[0m" << " ";
-            
+
         }
         std::cout << std::endl;
     }
@@ -132,8 +132,11 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     for (int i = 0; i < 19*19; i++)
         board2.push_back(-1);
 
-    game.set_depth(6);
+    game.set_depth(request.depth);
+    std::cout << "start" << std::endl;
     std::vector<int> threshold_by_layer = generate_thresholds(game.get_depth(), 60000, 10, 3);
+    std::cout << "end" << std::endl;
+    // display thresholds
     game.set_threshold(threshold_by_layer);
     /* logs */
     for (size_t i = 0; i < threshold_by_layer.size(); i++)
@@ -145,10 +148,10 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     int pos = game.negamax(INT_MIN, INT_MAX, game.get_depth(), 1, -1, board2, std::chrono::steady_clock::now(), request.white_capture, request.black_capture).first;
     auto end_time = std::chrono::high_resolution_clock::now();
 
-    
+
     auto time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
     std::cout << "Time: " << time << std::endl << std::endl;
-    
+
     display_board(board2, game);
 
     game.set(pos, color_to_cell(request.color));
@@ -237,7 +240,7 @@ void r_ia_with_dna(const httplib::Request &req, httplib::Response &res) {
         }
     }
 
-    game.set(added[0].pos, request.color == WHITESTONE ? WHITE : BLACK);
+    game.set(added[0].pos, color_to_cell(request.color));
 
     endgame_info = game.check_end_game(added[0].pos, removed.size(), request.color);
 

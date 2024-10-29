@@ -111,7 +111,7 @@ t_request create_new_request(const httplib::Request &req) {
     int white_capture = std::stoi(req.path_params.at("whiteCapture"));
     int black_capture = std::stoi(req.path_params.at("blackCapture"));
 
-    return {pos, x, y, color, color_opponent, white, black, blocked, allowed, white_capture, black_capture};
+    return {pos, x, y, color, color_opponent, white, black, blocked, allowed, white_capture, black_capture, -1};
 }
 
 /*
@@ -128,7 +128,9 @@ t_request create_new_ia_request(const httplib::Request &req) {
     std::vector<int> allowed = parse_board_input(req.path_params.at("allowed"));
     int white_capture = std::stoi(req.path_params.at("whiteCapture"));
     int black_capture = std::stoi(req.path_params.at("blackCapture"));
-    return {0, 0, 0, color, color_opponent, white, black, blocked, allowed, white_capture, black_capture};
+    int depth = std::stoi(req.path_params.at("depth"));
+
+    return {0, 0, 0, color, color_opponent, white, black, blocked, allowed, white_capture, black_capture, depth};
 }
 
 std::vector<int> get_request_dna(const httplib::Request &req) {
@@ -242,8 +244,16 @@ std::vector<int> generate_thresholds(int max_depth, int max_calculations, int ma
         while (!done) {
                 calculations = compute_calculations(thresholds);
                 index = index_to_increment(thresholds, max_thresholds);
+                //display thresholds
+                for (size_t i = 0; i < thresholds.size(); i++)
+                    std::cout << "depthi " << i + 1  << ": " << thresholds[i] << std::endl;
                 if (calculations < max_calculations) {
-                    thresholds[index]++;
+                    if (thresholds[index] < max_thresholds)
+                        thresholds[index]++;
+                    else {
+                        done = true;
+                        break;
+                    }
                 }
                 if (calculations > max_calculations) {
                     int e;
@@ -255,6 +265,7 @@ std::vector<int> generate_thresholds(int max_depth, int max_calculations, int ma
                             thresholds[index - 1]--;
                     }
                     done = true;
+                    std::cout << "****************************************************: " << calculations << std::endl << std::endl << std::endl;
                 }
         }
 
