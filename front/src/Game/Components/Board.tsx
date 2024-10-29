@@ -366,7 +366,7 @@ const Board : React.FC<BoardProps> = ({
             localGameInfo.isProcessing = true;
             while (true) {
                 await getIaStone(IAMode);
-                if (!checkError(localGameInfo.response)) {                    
+                if (!checkError(localGameInfo.response)) {
                     break;
                 }
                 sleep(1000);
@@ -375,8 +375,9 @@ const Board : React.FC<BoardProps> = ({
             checkEndGame(localGameInfo.response, setGameRunning, setWinner);
             switchColor();
             updateGameInfo(localGameInfo.response, gameInfo, setGameInfo);
+            swapColorShadowStone();
             showShadowStone();
-            
+
             localGameInfo.isProcessing = false;
         }
         if (runFirstIa) {
@@ -404,6 +405,7 @@ const Board : React.FC<BoardProps> = ({
         const shadowStone = document.getElementById('shadow-stone');
         if (shadowStone)
             shadowStone.className = firstPlayer.current === 'white' ? 'white-shadow-stone' : 'black-shadow-stone';
+
         const hintStone = document.getElementById('hint-stone');
         if (hintStone)
             hintStone.className = firstPlayer.current === 'white' ? 'white-hint-stone' : 'black-hint-stone';
