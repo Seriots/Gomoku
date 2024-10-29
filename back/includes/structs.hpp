@@ -362,5 +362,9 @@ typedef struct s_negamaxInformation {
     int beta;
     int depth;
     int is_maximizing;
-    int boardScore;
 }   t_negamaxInformation;
+
+typedef struct s_captureCount {
+    int white;
+    int black;
+}  t_captureCount;

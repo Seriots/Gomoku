@@ -19,7 +19,6 @@ class Game {
         std::map<e_valueDna, int>       _valuesDna;
         int                             _depth;
         std::vector<int>                _threshold;
-        std::map<int, e_color>          _editedBoard;
 
         void                            init_test_board();
     public:
@@ -79,8 +78,9 @@ class Game {
         int                             full_simple_heuristic(e_color color);
         int                             board_complex_heuristic(e_color color, int new_white_capture, int new_black_capture);
         /* ******* Game minimax ******* */
-        std::pair<int, int>             fdNegamax(t_negamaxInformation info, int pos, int white_capture, int black_capture);
-        std::pair<int, int>             negamax(int alpha, int beta, int depth, int color, int next_pos, std::vector<int> &board, int white_capture, int black_capture);
+        void                            display_negamax_board(std::vector<int> &board);
+        int                             fdNegamax(t_negamaxInformation info, t_captureCount capture);
+        std::pair<int, int>             negamax(t_negamaxInformation info, int next_pos, t_captureCount capture);
 
         bool                            is_already_computed(size_t board_hash) const;
 };

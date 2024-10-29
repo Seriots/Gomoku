@@ -65,47 +65,6 @@ void    r_action(const httplib::Request &req, httplib::Response &res) {
     res.set_content(build_action_response(added, removed, endgame_info, {}, {}), "application/json"); // everything is send in a nicely formated json
 }
 
-void display_board(std::vector<int> &board, Game &game) {
-
-    std::vector<int> interesting_pos = game.getter_interesting_pos();
-
-    for (int y = 0; y < 19; y++) {
-        for (int x = 0; x < 19; x++) {
-            float displayColor;
-
-            std::vector<int>::iterator it = std::find(interesting_pos.begin(), interesting_pos.end(), x + y * 19);
-
-            if (it == interesting_pos.end())
-                displayColor = 0;
-            else
-                displayColor = 1.0 - ((float)(it - interesting_pos.begin()) / (float)interesting_pos.size());
-            
-            if (displayColor > 0.99)
-                std::cout << "\033[0;35m"; // magenta
-            else if (displayColor > 0.9)
-                std::cout << "\033[0;31m"; // red
-            else if (displayColor > 0.8)
-                std::cout << "\033[0;33m"; // yellow
-            else if (displayColor > 0.7)
-                std::cout << "\033[0;32m"; // green
-            else if (displayColor > 0.35)
-                std::cout << "\033[0;34m"; // blue
-
-            if (board[x + y * 19] != -1)
-                std::cout << std::setw(8) << std::setfill(' ') << board[x + y * 19] << "\033[0m" << " ";
-            else if (game.get_board().get(x, y).get() == WHITE)
-                std::cout << "oooooooo" << "\033[0m" << " ";
-            else if (game.get_board().get(x, y).get() == BLACK)
-                std::cout << "********" << "\033[0m" << " ";
-            else if (game.get_board().get(x, y).get() == BLOCKED)
-                std::cout << "xxxxxxxx" << "\033[0m" << " ";
-            else
-                std::cout << "--------" << "\033[0m" << " ";
-            
-        }
-        std::cout << std::endl;
-    }
-}
 
 /*
     Request to try to place a stone on the board
@@ -128,7 +87,6 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     game.init_interesting_pos(request.color, request.allowed);
 
     // create board
-    std::vector<int> board(361, -1);
 
     game.set_depth(6);
     std::vector<int> threshold_by_layer = generate_thresholds(game.get_depth(), 60000, 10, 3);
@@ -137,15 +95,15 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
 
     auto start_time = std::chrono::high_resolution_clock::now();
     
-    int pos = game.negamax(INT_MIN, INT_MAX, game.get_depth(), 1, -1, board, request.white_capture, request.black_capture).first;
-    
+    int pos = game.fdNegamax({INT_MIN, INT_MAX, game.get_depth(), 1}, (t_captureCount){request.white_capture, request.black_capture});
+
+
     auto end_time = std::chrono::high_resolution_clock::now();
 
     
     auto time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
     std::cout << "Time: " << time << std::endl << std::endl;
     
-    display_board(board, game);
 
     game.set(pos, color_to_cell(request.color));
 
