@@ -18,6 +18,7 @@ interface BoardProps {
     activateHintP1?: boolean,
     activateHintP2?: boolean,
     depth: number,
+    openingRule: string,
 }
 
 interface LocalGameInfoProps {
@@ -362,6 +363,7 @@ const Board : React.FC<BoardProps> = ({
     activateHintP1,
     activateHintP2,
     depth,
+    openingRule,
 }) => {
     const [runFirstIa, setRunFirstIa] = useState(false);
 

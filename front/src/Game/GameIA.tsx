@@ -42,7 +42,7 @@ function GameIA() {
     const [gameInfo, setGameInfo] = useState(GameInWhite);
     const [firstPlayer, setFirstPlayer] = useState('white');
     const [depth, setDepth] = useState(5);
-    const [openingRule, setOpeningRule] = useState('normal');
+    const [openingRule, setOpeningRule] = useState('standard');
     const firstPlayerRef = useRef(firstPlayer);
 
     useEffect(() => {
@@ -61,7 +61,7 @@ function GameIA() {
                 <OpeningRulesProp openingRule={openingRule} setOpeningRule={setOpeningRule} gameRunning={gameRunning} />
             </ParamsBar>
             <InfoBar gameInfo={gameInfo} />
-            <Board IAMode={true} gameRunning={gameRunning} setGameRunning={setGameRunning} setWinner={setWinner} gameInfo={gameInfo} setGameInfo={setGameInfo} firstPlayer={firstPlayerRef} depth={depth}/>
+            <Board IAMode={true} gameRunning={gameRunning} setGameRunning={setGameRunning} setWinner={setWinner} gameInfo={gameInfo} setGameInfo={setGameInfo} firstPlayer={firstPlayerRef} depth={depth} openingRule={openingRule}/>
             <BoardShadow gameRunning={gameRunning} winner={winner} setWinner={setWinner}/>
             {!gameRunning &&
                 <StartButton gameRunning={gameRunning} setGameRunning={setGameRunning} />

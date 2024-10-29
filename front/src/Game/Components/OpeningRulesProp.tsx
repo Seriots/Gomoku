@@ -15,7 +15,7 @@ const OpeningRulesProp : React.FC<OpeningRulesPropProps> = ({
     gameRunning,
 }) => {
     const [ruleNumber, setRuleNumber] = useState(0);
-    const openingRulesList = ['normal', 'swap', 'swap2', 'pro', 'longpro'];
+    const openingRulesList = ['standard', 'swap', 'swap2', 'pro', 'longpro'];
 
     useEffect(() => {
         setOpeningRule(openingRulesList[ruleNumber]);
