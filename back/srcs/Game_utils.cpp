@@ -2,20 +2,20 @@
 
 void Game::init_dna() {
     _dna[ALIGN_FIVE] = 1000000;
-    _dna[FREE_FOUR] = 20000;
-    _dna[FREE_THREE] = 10000;
+    _dna[FREE_FOUR] = 10000;
+    _dna[FREE_THREE] = 1000;
     _dna[ANY_ALIGNEMENT] = 25;
-    _dna[CAPTURE_TOTAL_2] = 400;
-    _dna[CAPTURE_TOTAL_4] = 800;
-    _dna[CAPTURE_TOTAL_6] = 2500;
-    _dna[CAPTURE_TOTAL_8] = 5000;
-    _dna[CAPTURE_TOTAL_10] = 1000000;
+    _dna[CAPTURE_TOTAL_2] = 4000;
+    _dna[CAPTURE_TOTAL_4] = 5000;
+    _dna[CAPTURE_TOTAL_6] = 6000;
+    _dna[CAPTURE_TOTAL_8] = 15000;
+    _dna[CAPTURE_TOTAL_10] = 100000;
     _dna[BLOCK_FREE_THREE] = 6900;
     _dna[BLOCK_FREE_FOUR] = 7900;
     _dna[BLOCK_CAPTURE] = 6000;
-    _dna[BLOCK_WIN] = 1100000;
+    _dna[BLOCK_WIN] = 89000;
     _dna[SETUP_CAPTURE] = 200;
-    _dna[IS_CAPTURABLE] = -30000;
+    _dna[IS_CAPTURABLE] = -15000;
 }
 
 void Game::init_sequenceDna(std::vector<int> *dna) {
@@ -34,7 +34,7 @@ void Game::init_sequenceDna(std::vector<int> *dna) {
         this->_valuesDna[VDNA_FOUR] = 15100;
         this->_valuesDna[VDNA_THREEFREE] = 20000;
         this->_valuesDna[VDNA_FIVE] = 2000000;
-        this->_valuesDna[VDNA_POTENTIAL_CAPTURE] = 3500;
+        this->_valuesDna[VDNA_POTENTIAL_CAPTURE] = 30000;
         this->_valuesDna[VDNA_EFFECTIVE_CAPTURE_0] = 50000;
         this->_valuesDna[VDNA_EFFECTIVE_CAPTURE_1] = 70000;
         this->_valuesDna[VDNA_EFFECTIVE_CAPTURE_2] = 85000;
@@ -290,6 +290,7 @@ std::vector<int> Game::get_interesting_pos() {
 
 void Game::sort_interesting_pos(e_color const &color, std::vector<int> &vec) {
     std::map<int, int>  score_on_pos;
+    std::vector<int>    captured;
 
     for (size_t i = 0; i < vec.size(); i++) {
         score_on_pos[vec[i]] = this->complex_heuristic(color, vec[i]);

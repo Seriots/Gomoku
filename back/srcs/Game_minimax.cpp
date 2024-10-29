@@ -70,10 +70,9 @@ int Game::negamax(t_negamaxInformation info, t_captureCount capture, int currPos
     max_eval = INT_MIN;
     
     tmp_interesting_pos = this->get_interesting_pos();
-    std::vector<int> tmp_interesting_pos2 = this->get_interesting_pos();
 
-    this->sort_interesting_pos((info.is_maximizing == 1) ? _request.color : _request.color_opponent, tmp_interesting_pos);
-    this->sort_interesting_pos((info.is_maximizing == 1) ? _request.color : _request.color_opponent, tmp_interesting_pos2);
+    if ((int)tmp_interesting_pos.size() > this->_threshold[info.depth - 1])
+        this->sort_interesting_pos((info.is_maximizing == 1) ? _request.color : _request.color_opponent, tmp_interesting_pos);
     
     limit = this->_threshold[info.depth - 1];
     for (std::vector<int>::iterator it = tmp_interesting_pos.begin(); it != tmp_interesting_pos.end() && limit-- > 0; it++) {
@@ -128,9 +127,9 @@ int Game::fdNegamax(t_negamaxInformation info, t_captureCount capture) {
         captured = this->get_captured(pos, _request.color);
         tmp_capture = capture;
         if (_request.color == WHITESTONE)
-            tmp_capture.white += captured.size();
-        else
             tmp_capture.black += captured.size();
+        else
+            tmp_capture.white += captured.size();
 
         this->set(pos, color_to_cell(_request.color));
         this->unset(captured);

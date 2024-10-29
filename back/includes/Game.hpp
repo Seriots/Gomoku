@@ -69,6 +69,7 @@ class Game {
         t_endgame_info                  check_end_game(int pos, size_t captured, e_color color);
 
         /* ******* Game heuristic ******* */
+        //t_score_info                    compute_dirs_info(t_position &grid_pos, e_cell &my_color, e_cell &other_color);
         std::vector<t_direction_info>   compute_dirs_info(t_position &grid_pos, e_cell &my_color, e_cell &other_color);
         t_score_info                    compute_score_information(std::vector<t_direction_info> &dir_info);
         int                             compute_score(t_score_info &score_info, int &my_captured);

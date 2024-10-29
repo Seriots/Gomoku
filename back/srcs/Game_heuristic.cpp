@@ -140,6 +140,7 @@ std::vector<t_direction_info> Game::compute_dirs_info(t_position &grid_pos, e_ce
                         di.block_capture = true;
                     else if (di.my_real_alignement == 1)
                         di.is_capturable = true;
+                    di.my_real_alignement--;
                     break;
                 }
                 di.other_real_alignement++;
