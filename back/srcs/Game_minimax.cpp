@@ -48,6 +48,7 @@ void Game::display_negamax_board(std::vector<int> &board) {
 
 
 int Game::negamax(t_negamaxInformation info, t_captureCount capture, int currPos) {
+    (void)currPos;
     size_t              board_hash;
     std::vector<int>    tmp_interesting_pos;
     int                 score;
@@ -68,15 +69,7 @@ int Game::negamax(t_negamaxInformation info, t_captureCount capture, int currPos
         return score;
     }
 
-    if (capture.white >= 10 || capture.black >= 10) {
-        return info.is_maximizing * this->board_complex_heuristic((info.is_maximizing == 1 ? _request.color : _request.color_opponent), capture.white, capture.black);
-    }
-    if (check_win_by_alignement(currPos, (info.is_maximizing == 1 ? color_to_cell(_request.color) : color_to_cell(_request.color_opponent)))) {
-        return info.is_maximizing * this->board_complex_heuristic(_request.color, capture.white, capture.black);
-        //std::vector<int>    prevent = get_capture_prevent_win_pos(currPos, color_to_cell(_request.color));
-        //if (!((prevent.size() + 1) * 2 + (_request.color == WHITESTONE ? capture.black : capture.white) >= 10)) {
-        //}
-    }
+
 
 
     max_eval = INT_MIN;
@@ -100,7 +93,12 @@ int Game::negamax(t_negamaxInformation info, t_captureCount capture, int currPos
         this->set(pos, (info.is_maximizing == 1) ? color_to_cell(_request.color) : color_to_cell(_request.color_opponent));
         this->unset(captured);
 
-        score = -this->negamax({-info.beta, -info.alpha, info.depth - 1, -info.is_maximizing}, tmp_capture, pos);
+        if (tmp_capture.white >= 10 || tmp_capture.black >= 10)
+            score = -this->board_complex_heuristic(_request.color, tmp_capture.white, tmp_capture.black);
+        else if (check_win_by_alignement(pos, (info.is_maximizing == 1 ? color_to_cell(_request.color) : color_to_cell(_request.color_opponent))))
+            score = -this->board_complex_heuristic(_request.color, tmp_capture.white, tmp_capture.black);
+        else 
+            score = -this->negamax({-info.beta, -info.alpha, info.depth - 1, -info.is_maximizing}, tmp_capture, pos);
 
         this->set(captured, (info.is_maximizing == 1) ? color_to_cell(_request.color_opponent) : color_to_cell(_request.color));
         this->unset(pos);

@@ -140,7 +140,7 @@ t_direction_info Board::compute_direction_side(t_position &grid_pos, int dx, int
     
     bool found_none = false;
 
-    e_cell  start;
+    e_cell  start = other;
 
     for (int i = 1; i < 5; i++) {
         int x = grid_pos.x + i * dx;
@@ -214,7 +214,7 @@ int Board::compute_score_info(t_score_info score_info, t_captureCount capture, e
     score += score_info.is_capturable * -60000;
     score += score_info.setup_capture * 15000;
     score += score_info.block_win * 10850000;
-    score += score_info.block_free_four * 50000;
+    score += score_info.block_free_four * 200000;
     score += score_info.block_free_three * 10000;
     return score;
 
