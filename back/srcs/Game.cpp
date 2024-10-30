@@ -109,15 +109,16 @@ std::vector<int> Game::getter_interesting_pos() const {
     return _interesting_pos;
 }
 
-void Game::init_interesting_pos(e_color color, std::vector<int> allowed_pos) {
+void Game::init_interesting_pos(e_color color, std::vector<int> allowed_pos, std::vector<int> blocked_pos) {
     if (allowed_pos.size() != 0)
     {
         this->_interesting_pos = allowed_pos;
         return ;
     }
+    this->set(blocked_pos, BLOCKED);
     this->_interesting_pos = this->get_interesting_pos();
+    this->unset(blocked_pos);
 
-    std::vector<int> blocked_pos = get_new_blocked_pos(color);
     for (size_t i = 0; i < blocked_pos.size(); i++) {
         std::vector<int>::iterator it = std::find(this->_interesting_pos.begin(), this->_interesting_pos.end(), blocked_pos[i]);
         if (it != this->_interesting_pos.end())

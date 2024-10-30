@@ -34,6 +34,12 @@ bool check_error_request(t_request &request,  httplib::Response &res) {
         res.set_content("{"+build_json_content({"error"}, {"notAllowed"})+"}", "application/json");
         return true;
     }
+    if (request.current_turn == 0 && (request.opening_rule == PRO || request.opening_rule == LONGPRO)) {
+        if (request.pos != 180) {
+            res.set_content("{"+build_json_content({"error"}, {"notCenter"})+"}", "application/json");
+            return true;
+        }
+    } 
 
     if (std::find(request.white.begin(), request.white.end(), request.pos) != request.white.end()
         || std::find(request.black.begin(), request.black.end(), request.pos) != request.black.end()
@@ -73,6 +79,8 @@ e_opening_rule parse_opening_rule(const std::string &rule) {
         return PRO;
     if (rule == "longpro")
         return LONGPRO;
+    if (rule == "swap2_more")
+        return SWAP2_MORE;
     return STANDARD;
 }
 
@@ -123,8 +131,9 @@ t_request create_new_request(const httplib::Request &req) {
     int white_capture = std::stoi(req.path_params.at("whiteCapture"));
     int black_capture = std::stoi(req.path_params.at("blackCapture"));
     e_opening_rule opening_rule = parse_opening_rule(req.path_params.at("openingRule"));
+    int current_turn = std::stoi(req.path_params.at("currentTurn"));
 
-    return {pos, x, y, color, color_opponent, white, black, blocked, allowed, white_capture, black_capture, -1, opening_rule};
+    return {pos, x, y, color, color_opponent, white, black, blocked, allowed, white_capture, black_capture, -1, opening_rule, current_turn};
 }
 
 /*
@@ -143,8 +152,9 @@ t_request create_new_ia_request(const httplib::Request &req) {
     int black_capture = std::stoi(req.path_params.at("blackCapture"));
     int depth = std::stoi(req.path_params.at("depth"));
     e_opening_rule opening_rule = parse_opening_rule(req.path_params.at("openingRule"));
+    int current_turn = std::stoi(req.path_params.at("currentTurn"));
 
-    return {0, 0, 0, color, color_opponent, white, black, blocked, allowed, white_capture, black_capture, depth, opening_rule};
+    return {0, 0, 0, color, color_opponent, white, black, blocked, allowed, white_capture, black_capture, depth, opening_rule, current_turn};
 }
 
 std::vector<int> get_request_dna(const httplib::Request &req) {
@@ -281,4 +291,19 @@ std::vector<int> generate_thresholds(int max_depth, int max_calculations, int ma
 
         std::reverse(thresholds.begin(), thresholds.end());
         return thresholds;
+}
+
+std::vector<t_stone> random_three_stone_pattern() {
+    int rd = std::rand() % 6;
+    if (rd == 0)
+        return {{180, "black"}, {200, "white"}, {161, "black"}};
+    if (rd == 1)
+        return {{161, "black"}, {162, "white"}, {181, "black"}};
+    if (rd == 2)
+        return {{180, "black"}, {160, "white"}, {162, "black"}};
+    if (rd == 3)
+        return {{180, "black"}, {181, "white"}, {182, "black"}};
+    if (rd == 4)
+        return {{180, "black"}, {144, "white"}, {143, "black"}};
+    return {{180, "black"}, {142, "white"}, {181, "black"}};
 }

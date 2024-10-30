@@ -30,14 +30,14 @@ void Game::init_sequenceDna(std::vector<int> *dna) {
         this->_valuesDna[VDNA_THREEN2] = 1400;
         this->_valuesDna[VDNA_THREEN1] = 2000;
         this->_valuesDna[VDNA_THREE] = 2500;
-        this->_valuesDna[VDNA_THREEFREE] = 11000;
-        this->_valuesDna[VDNA_FOURN1] = 16000;
+        this->_valuesDna[VDNA_THREEFREE] = 23000;
+        this->_valuesDna[VDNA_FOURN1] = 39000;
         this->_valuesDna[VDNA_FOUR] = 52000;
         this->_valuesDna[VDNA_FIVE] = 2000000;
-        this->_valuesDna[VDNA_POTENTIAL_CAPTURE] = 3400;
-        this->_valuesDna[VDNA_EFFECTIVE_CAPTURE_0] = 5000;
-        this->_valuesDna[VDNA_EFFECTIVE_CAPTURE_1] = 7000;
-        this->_valuesDna[VDNA_EFFECTIVE_CAPTURE_2] = 10000;
+        this->_valuesDna[VDNA_POTENTIAL_CAPTURE] = 8000;
+        this->_valuesDna[VDNA_EFFECTIVE_CAPTURE_0] = 11000;
+        this->_valuesDna[VDNA_EFFECTIVE_CAPTURE_1] = 19000;
+        this->_valuesDna[VDNA_EFFECTIVE_CAPTURE_2] = 25000;
         this->_valuesDna[VDNA_EFFECTIVE_CAPTURE_3] = 1000000;
     } else {
         for (size_t i = 0; i < dna->size(); i++) {
@@ -326,6 +326,18 @@ e_color Game::swap_choice(int const &white_capture, int const &black_capture) {
     int score2 = this->board_complex_heuristic(BLACKSTONE, white_capture, black_capture);
     return (score1 > score2) ? WHITESTONE : BLACKSTONE;
 }
+
+std::vector<int>    Game::get_blocked_center(int size) {
+    std::vector<int> blocked;
+    for (int y = 9 - size / 2; y <= 9 + size / 2; y++) {
+        for (int x = 9 - size / 2; x <= 9 + size / 2; x++) {
+            if (this->_board.get(x, y).get() == NONE)
+                blocked.push_back(x + y * 19);
+        }
+    }
+    return blocked;
+}
+
 
 
 /* ************************ TEST ************************** */

@@ -37,7 +37,7 @@ class Game {
         void unset(std::vector<int> pos);
         Board get_board() const;
         std::vector<int> getter_interesting_pos() const;
-        void init_interesting_pos(e_color color, std::vector<int> allowed_pos);
+        void init_interesting_pos(e_color color, std::vector<int> allowed_pos, std::vector<int> blocked_pos);
         void set_depth(int depth);
         void set_threshold(std::vector<int> threshold);
         int get_depth() const;
@@ -58,6 +58,7 @@ class Game {
         std::map<e_cell, std::vector<int> > get_all_positions_stone();
         bool                                is_something_near(int x, int y);
         e_color                             swap_choice(int const &white_capture, int const &black_capture);
+        std::vector<int>                get_blocked_center(int size);
 
 
 

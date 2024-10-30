@@ -19,6 +19,8 @@ interface BoardProps {
     activateHintP2?: boolean,
     depth: number,
     openingRule: string,
+    swapChoice: string,
+    setNeedSwapChoice: any,
 }
 
 interface LocalGameInfoProps {
@@ -32,6 +34,8 @@ interface LocalGameInfoProps {
     moveCount: number,
     depth: number,
     openingRule: string,
+    waitingForChoice: boolean,
+    IAchoice: string,
 }
 
 let currentPos = {
@@ -52,6 +56,8 @@ const initLocalGameInfo = (firstPlayer: string, depth: number = 6, openingRule: 
         moveCount: 0,
         depth: depth,
         openingRule: openingRule,
+        waitingForChoice: false,
+        IAchoice: 'white',
     }
 }
 
@@ -102,7 +108,7 @@ const handleMouseMove = (e: any) => {
 }
 
 const handleMouseEnter = (gameRunning: boolean) => (e: any) => {
-    if (!gameRunning) {
+    if (!gameRunning || localGameInfo.isProcessing || localGameInfo.endGame || localGameInfo.waitingForChoice) {
         return;
     }
 
@@ -141,6 +147,8 @@ const responseHandler = (data: any) => {
         newStone.style.top = Math.floor(data.added[i].pos / 19) * CASESIZE + BORDERSIZE + 'px';
         newStone.id = "stone-" + data.added[i].pos;
         board.appendChild(newStone);
+        if (data.added[i].color !== "blocked")
+            localGameInfo.moveCount++;
     }
 
     for (let i = 0; i < data.prevent_win.length; i++) {
@@ -230,22 +238,26 @@ const switchColor = () => {
 
 const getStone = async () => {
     const hintStone = document.getElementById('hint-stone');
-    if (hintStone)
-        hintStone.style.display = 'none';
 
     const pos = computePositionFromPx(currentPos.x, currentPos.y);
     const listWhite = getPositionList(document.getElementsByClassName('white-stone'));
     const listBlack = getPositionList(document.getElementsByClassName('black-stone'));
     const listBlocked = getPositionList(document.getElementsByClassName('blocked-stone'));
 
-    console.log("lstWhite: ", listWhite, " lstBlack: ", listBlack);
+    console.log("lstWhite: ", listWhite, " lstBlack: ", listBlack, " move count: ", localGameInfo.moveCount);
 
-    await axios.get(build_request('http://localhost:6325/action', [pos, localGameInfo.currentPlayer, listWhite, listBlack, listBlocked, localGameInfo.listAllowed, localGameInfo.whiteCapture, localGameInfo.blackCapture, localGameInfo.openingRule]))
+    await axios.get(build_request('http://localhost:6325/action', [pos, localGameInfo.currentPlayer, listWhite, listBlack, listBlocked, localGameInfo.listAllowed, localGameInfo.whiteCapture, localGameInfo.blackCapture, localGameInfo.openingRule, localGameInfo.moveCount]))
     .then((res) => {
+        if (checkError(res.data)) {
+            localGameInfo.isProcessing = false;
+            return;
+        }
+        if (hintStone)
+            hintStone.style.display = 'none';
         localGameInfo.response = res.data;
-        localGameInfo.moveCount++;
     })
     .catch((err) => {
+        localGameInfo.isProcessing = false;
         console.log(err);
     });
 }
@@ -255,15 +267,37 @@ const getIaStone = async (IAMode: boolean) => {
     const listWhite = getPositionList(document.getElementsByClassName('white-stone'));
     const listBlack = getPositionList(document.getElementsByClassName('black-stone'));
     const listBlocked = getPositionList(document.getElementsByClassName('blocked-stone'));
-    console.log("lstWhite: ", listWhite, " lstBlack: ", listBlack);
+    console.log("lstWhite: ", listWhite, " lstBlack: ", listBlack, " move count: ", localGameInfo.moveCount);
 
-    await axios.get(build_request('http://localhost:6325/ia', [localGameInfo.currentPlayer, listWhite, listBlack, listBlocked, localGameInfo.listAllowed, localGameInfo.whiteCapture, localGameInfo.blackCapture, localGameInfo.depth, localGameInfo.openingRule]))
+
+    await axios.get(build_request('http://localhost:6325/ia', [localGameInfo.currentPlayer, listWhite, listBlack, listBlocked, localGameInfo.listAllowed, localGameInfo.whiteCapture, localGameInfo.blackCapture, localGameInfo.depth, localGameInfo.openingRule, localGameInfo.moveCount]))
     .then((res) => {
+        if (checkError(res.data)) {
+            localGameInfo.isProcessing = false;
+            return;
+        }
         localGameInfo.response = res.data;
-        localGameInfo.moveCount++;
         if (!IAMode) {
             setHintIAStone(localGameInfo.response);
         }
+    })
+    .catch((err) => {
+        localGameInfo.isProcessing = false;
+        console.log(err);
+    });
+}
+
+const getIaSwapChoice = async () => {
+
+    const listWhite = getPositionList(document.getElementsByClassName('white-stone'));
+    const listBlack = getPositionList(document.getElementsByClassName('black-stone'));
+    const listBlocked = getPositionList(document.getElementsByClassName('blocked-stone'));
+    console.log("lstWhite: ", listWhite, " lstBlack: ", listBlack, " move count: ", localGameInfo.moveCount);
+
+
+    await axios.get(build_request('http://localhost:6325/swapChoice', [localGameInfo.currentPlayer, listWhite, listBlack, listBlocked, localGameInfo.listAllowed, localGameInfo.whiteCapture, localGameInfo.blackCapture, localGameInfo.depth, localGameInfo.openingRule, localGameInfo.moveCount]))
+    .then((res) => {
+        localGameInfo.IAchoice = res.data;
     })
     .catch((err) => {
         console.log(err);
@@ -300,8 +334,8 @@ const setHintIAStone = (data: any) => {
 }
 
 
-const handleClick = (IAMode: boolean, gameRunning: any, setGameRunning: any, setWinner: any, gameInfo: GameInfoInterface, setGameInfo: any, activateHintP1?: boolean, activateHintP2?: boolean) => async (e: any) => {
-    if (localGameInfo.isProcessing || !gameRunning || localGameInfo.endGame) {
+const handleClick = (IAMode: boolean, gameRunning: any, setGameRunning: any, setWinner: any, gameInfo: GameInfoInterface, setGameInfo: any, setNeedSwapChoice: any, activateHintP1?: boolean, activateHintP2?: boolean) => async (e: any) => {
+    if (localGameInfo.isProcessing || !gameRunning || localGameInfo.endGame || localGameInfo.waitingForChoice) {
         return;
     }
     const board = document.getElementById('boardID');
@@ -311,16 +345,14 @@ const handleClick = (IAMode: boolean, gameRunning: any, setGameRunning: any, set
     // place a stone at position currentPos
     localGameInfo.isProcessing = true;
     await getStone();
-    if (checkError(localGameInfo.response)) {
-        localGameInfo.isProcessing = false;
+    if (!localGameInfo.isProcessing) {
         return;
     }
-
     responseHandler(localGameInfo.response);
     checkEndGame(localGameInfo.response, setGameRunning, setWinner);
     switchColor();
     updateGameInfo(localGameInfo.response, gameInfo, setGameInfo);
-    if (IAMode) {
+    if (IAMode && localGameInfo.response.replay !== "true") {
         hideShadowStone();
     } else {
         swapColorShadowStone();
@@ -329,12 +361,23 @@ const handleClick = (IAMode: boolean, gameRunning: any, setGameRunning: any, set
         localGameInfo.isProcessing = false;
         return;
     }
-
+    if (localGameInfo.response.replay === "true") {
+        localGameInfo.isProcessing = false;
+        return;
+    }
+    if (localGameInfo.response.replay === "choice") {
+        await getIaSwapChoice();
+        if (localGameInfo.IAchoice === 'white') {
+            swapColorShadowStone();
+            showShadowStone();
+            localGameInfo.isProcessing = false;
+            return;
+        }
+    }
     if (IAMode) {
         // generate an ia stone
         await getIaStone(IAMode);
-        if (checkError(localGameInfo.response)) {
-            localGameInfo.isProcessing = false;
+        if (!localGameInfo.isProcessing) {
             return;
         }
         responseHandler(localGameInfo.response);
@@ -366,25 +409,65 @@ const Board : React.FC<BoardProps> = ({
     activateHintP2,
     depth,
     openingRule,
+    swapChoice,
+    setNeedSwapChoice,
 }) => {
     const [runFirstIa, setRunFirstIa] = useState(false);
 
     useEffect(() => {
         const playIa = async () => {
-            localGameInfo.isProcessing = true;
             while (true) {
+                localGameInfo.isProcessing = true;
                 await getIaStone(IAMode);
-                if (!checkError(localGameInfo.response)) {
+                if (localGameInfo.isProcessing) {
                     break;
                 }
                 sleep(1000);
             }
+
             responseHandler(localGameInfo.response);
             checkEndGame(localGameInfo.response, setGameRunning, setWinner);
             switchColor();
             updateGameInfo(localGameInfo.response, gameInfo, setGameInfo);
             swapColorShadowStone();
             showShadowStone();
+
+            localGameInfo.isProcessing = false;
+        }
+        if (localGameInfo.waitingForChoice === false) {
+            return;
+        }
+        localGameInfo.waitingForChoice = false;
+        if (localGameInfo.currentPlayer === "white") {
+            if (swapChoice === "black") {
+                playIa();
+            } 
+        }
+    }, [swapChoice]);
+
+
+    useEffect(() => {
+        const playIa = async () => {
+            while (true) {
+                localGameInfo.isProcessing = true;
+                await getIaStone(IAMode);
+                if (localGameInfo.isProcessing) {
+                    break;
+                }
+                sleep(1000);
+            }
+
+            responseHandler(localGameInfo.response);
+            checkEndGame(localGameInfo.response, setGameRunning, setWinner);
+            switchColor();
+            updateGameInfo(localGameInfo.response, gameInfo, setGameInfo);
+            swapColorShadowStone();
+            if (localGameInfo.openingRule === 'swap' || localGameInfo.openingRule === 'swap2') {
+                localGameInfo.waitingForChoice = true;
+                setNeedSwapChoice(true);
+            } else {
+                showShadowStone();
+            }
 
             localGameInfo.isProcessing = false;
         }
@@ -425,7 +508,7 @@ const Board : React.FC<BoardProps> = ({
     }, [gameRunning, firstPlayer]);
 
     return (
-        <div id='boardID' className='board' onClick={handleClick(IAMode, gameRunning, setGameRunning, setWinner, gameInfo, setGameInfo, activateHintP1, activateHintP2)} onMouseMove={handleMouseMove} onMouseEnter={handleMouseEnter(gameRunning)} onMouseLeave={handleMouseLeave}>
+        <div id='boardID' className='board' onClick={handleClick(IAMode, gameRunning, setGameRunning, setWinner, gameInfo, setGameInfo, setNeedSwapChoice, activateHintP1, activateHintP2)} onMouseMove={handleMouseMove} onMouseEnter={handleMouseEnter(gameRunning)} onMouseLeave={handleMouseLeave}>
             <div id='shadow-stone' className='white-shadow-stone'></div>
             <div id='hint-stone' className='white-hint-stone'></div>
         </div>
