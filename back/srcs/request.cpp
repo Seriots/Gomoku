@@ -108,6 +108,52 @@ void display_board(std::vector<int> &board, Game &game) {
 }
 
 /*
+    Request to choose if the IA should play Black or White
+*/
+void r_swap_ia(const httplib::Request &req, httplib::Response &res) {
+    t_request               request;
+    std::vector<t_stone>    added;
+    std::vector<int>        removed;
+    std::vector<int>        blocked_list;
+
+    res.set_header("Access-Control-Allow-Origin", "*"); // prevent CORS problems
+
+    request = create_new_ia_request(req);
+
+    Game game(request);
+    game.init_interesting_pos(request.color, request.allowed);
+
+    std::vector<int> board;
+    for (int i = 0; i < 19*19; i++)
+        board.push_back(-1);
+
+    game.set_depth(request.depth);
+    std::vector<int> threshold_by_layer = generate_thresholds(game.get_depth(), 60000, 10, 3);
+    game.set_threshold(threshold_by_layer);
+
+    auto start_time = std::chrono::high_resolution_clock::now();
+
+    int pos = game.negamax(INT_MIN, INT_MAX, game.get_depth(), 1, -1, board, std::chrono::steady_clock::now(), request.white_capture, request.black_capture).first;
+    auto end_time = std::chrono::high_resolution_clock::now();
+
+    auto time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+    std::cout << "Time: " << time << std::endl << std::endl;
+
+    display_board(board, game);
+
+    game.set(pos, color_to_cell(request.color));
+    removed = game.get_captured(pos);
+    game.unset(removed);
+
+    e_color choice = game.swap_choice(request.white_capture, request.black_capture);
+
+    t_endgame_info endgame_info = {choice, false, false, false, {}};
+
+    res.set_content(build_action_response(added, removed, endgame_info, {"time"}, {std::to_string(time)}), "application/json");
+}
+
+
+/*
     Request to try to place a stone on the board
     The request must contain the following parameters:
     - color: the color of the stone
@@ -128,31 +174,28 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     game.init_interesting_pos(request.color, request.allowed);
 
     // create board
-    std::vector<int> board1, board2, board3;
+    std::vector<int> board;
     for (int i = 0; i < 19*19; i++)
-        board2.push_back(-1);
+        board.push_back(-1);
 
     game.set_depth(request.depth);
-    std::cout << "start" << std::endl;
     std::vector<int> threshold_by_layer = generate_thresholds(game.get_depth(), 60000, 10, 3);
-    std::cout << "end" << std::endl;
+
     // display thresholds
     game.set_threshold(threshold_by_layer);
     /* logs */
     for (size_t i = 0; i < threshold_by_layer.size(); i++)
         std::cout << "depth " << i + 1  << ": " << threshold_by_layer[i] << std::endl;
 
-
-
     auto start_time = std::chrono::high_resolution_clock::now();
-    int pos = game.negamax(INT_MIN, INT_MAX, game.get_depth(), 1, -1, board2, std::chrono::steady_clock::now(), request.white_capture, request.black_capture).first;
+    int pos = game.negamax(INT_MIN, INT_MAX, game.get_depth(), 1, -1, board, std::chrono::steady_clock::now(), request.white_capture, request.black_capture).first;
     auto end_time = std::chrono::high_resolution_clock::now();
 
 
     auto time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
     std::cout << "Time: " << time << std::endl << std::endl;
 
-    display_board(board2, game);
+    display_board(board, game);
 
     game.set(pos, color_to_cell(request.color));
 

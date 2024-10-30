@@ -319,6 +319,15 @@ std::map<e_cell, std::vector<int> > Game::get_all_positions_stone() {
     return positions;
 }
 
+e_color Game::swap_choice(int const &white_capture, int const &black_capture) {
+    // game.set(pos, color_to_cell(request.color));
+    // removed = game.get_captured(pos);
+    // game.unset(removed);
+    int score1 = this->board_complex_heuristic(WHITESTONE, white_capture, black_capture);
+    int score2 = this->board_complex_heuristic(BLACKSTONE, white_capture, black_capture);
+    return (score1 > score2) ? WHITESTONE : BLACKSTONE;
+}
+
 
 /* ************************ TEST ************************** */
 

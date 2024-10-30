@@ -31,6 +31,7 @@ interface LocalGameInfoProps {
     listAllowed: string,
     moveCount: number,
     depth: number,
+    openingRule: string,
 }
 
 let currentPos = {
@@ -39,7 +40,7 @@ let currentPos = {
 }
 
 
-const initLocalGameInfo = (firstPlayer: string, depth: number = 6): LocalGameInfoProps => {
+const initLocalGameInfo = (firstPlayer: string, depth: number = 6, openingRule: string = 'standard'): LocalGameInfoProps => {
     return {
         currentPlayer: firstPlayer,
         isProcessing: false,
@@ -50,6 +51,7 @@ const initLocalGameInfo = (firstPlayer: string, depth: number = 6): LocalGameInf
         listAllowed: '',
         moveCount: 0,
         depth: depth,
+        openingRule: openingRule,
     }
 }
 
@@ -238,7 +240,7 @@ const getStone = async () => {
 
     console.log("lstWhite: ", listWhite, " lstBlack: ", listBlack);
 
-    await axios.get(build_request('http://localhost:6325/action', [pos, localGameInfo.currentPlayer, listWhite, listBlack, listBlocked, localGameInfo.listAllowed, localGameInfo.whiteCapture, localGameInfo.blackCapture]))
+    await axios.get(build_request('http://localhost:6325/action', [pos, localGameInfo.currentPlayer, listWhite, listBlack, listBlocked, localGameInfo.listAllowed, localGameInfo.whiteCapture, localGameInfo.blackCapture, localGameInfo.openingRule]))
     .then((res) => {
         localGameInfo.response = res.data;
         localGameInfo.moveCount++;
@@ -255,7 +257,7 @@ const getIaStone = async (IAMode: boolean) => {
     const listBlocked = getPositionList(document.getElementsByClassName('blocked-stone'));
     console.log("lstWhite: ", listWhite, " lstBlack: ", listBlack);
 
-    await axios.get(build_request('http://localhost:6325/ia', [localGameInfo.currentPlayer, listWhite, listBlack, listBlocked, localGameInfo.listAllowed, localGameInfo.whiteCapture, localGameInfo.blackCapture, localGameInfo.depth]))
+    await axios.get(build_request('http://localhost:6325/ia', [localGameInfo.currentPlayer, listWhite, listBlack, listBlocked, localGameInfo.listAllowed, localGameInfo.whiteCapture, localGameInfo.blackCapture, localGameInfo.depth, localGameInfo.openingRule]))
     .then((res) => {
         localGameInfo.response = res.data;
         localGameInfo.moveCount++;
@@ -396,7 +398,7 @@ const Board : React.FC<BoardProps> = ({
     useEffect(() => {
         if (gameRunning !== true)
             return ;
-        localGameInfo = initLocalGameInfo(firstPlayer.current, depth);
+        localGameInfo = initLocalGameInfo(firstPlayer.current, depth, openingRule);
 
         const board = document.getElementById('boardID');
         if (!board)
