@@ -9,6 +9,7 @@ import ActivateHintProp from "./Components/ActivateHintProp";
 import './GameStyle.css';
 import DepthProp from "./Components/DepthProp";
 import OpeningRulesProp from "./Components/OpeningRulesProp";
+import SwapSelection from "./Components/SwapSelection";
 
 const GameIn: GameInfoInterface = {
     currentPlayer: 'white',
@@ -44,6 +45,7 @@ function GameIA() {
                 <DepthProp depth={depth} setDepth={setDepth} gameRunning={gameRunning} />
                 <OpeningRulesProp openingRule={openingRule} setOpeningRule={setOpeningRule} gameRunning={gameRunning} />
             </ParamsBar>
+            <SwapSelection openingRule={openingRule} />
             <InfoBar gameInfo={gameInfo} />
             <Board IAMode={false} gameRunning={gameRunning} setGameRunning={setGameRunning} setWinner={setWinner} gameInfo={gameInfo} setGameInfo={setGameInfo} firstPlayer={firstPlayerRef} activateHintP1={activateHintP1} activateHintP2={activateHintP2} depth={depth} openingRule={openingRule}/>
             <BoardShadow gameRunning={gameRunning} winner={winner} setWinner={setWinner}/>

@@ -8,6 +8,7 @@ import StartButton from './Components/StartButton';
 import FirstPlayerProp from './Components/FirstPlayerProp';
 import DepthProp from './Components/DepthProp';
 import OpeningRulesProp from './Components/OpeningRulesProp';
+import SwapSelection from './Components/SwapSelection';
 
 export interface GameInfoInterface {
     currentPlayer: string,
@@ -60,6 +61,7 @@ function GameIA() {
                 <DepthProp depth={depth} setDepth={setDepth} gameRunning={gameRunning} />
                 <OpeningRulesProp openingRule={openingRule} setOpeningRule={setOpeningRule} gameRunning={gameRunning} />
             </ParamsBar>
+            <SwapSelection openingRule={openingRule} />
             <InfoBar gameInfo={gameInfo} />
             <Board IAMode={true} gameRunning={gameRunning} setGameRunning={setGameRunning} setWinner={setWinner} gameInfo={gameInfo} setGameInfo={setGameInfo} firstPlayer={firstPlayerRef} depth={depth} openingRule={openingRule}/>
             <BoardShadow gameRunning={gameRunning} winner={winner} setWinner={setWinner}/>

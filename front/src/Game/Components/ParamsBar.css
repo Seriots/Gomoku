@@ -96,11 +96,13 @@
     background-image: url("../../assets/whiteStone.png");
     background-size: 100% 100%;
     position: relative ;
+    cursor: pointer;
 }
 
 .first-player-selector.black {
     background-image: url("../../assets/blackStone.png");
     background-size: 100% 100%;
+    cursor: pointer;
 }
 
 .first-player-selector-white {
