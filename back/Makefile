@@ -31,7 +31,7 @@ DEPS			=	$(OBJS:.o=.d)
 DEPS_TRAINER	=	$(OBJS_TRAINER:.o=.d)
 
 CXX			=	c++
-CXXFLAGS	=	-Wall -Wextra -Werror -Iincludes -g -std=c++11
+CXXFLAGS	=	-Wall -Wextra -Werror -Iincludes -O3 -std=c++11
 
 # Color
 # -------------------------------------------------------------------------

@@ -89,7 +89,7 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     // create board
 
     game.set_depth(6);
-    std::vector<int> threshold_by_layer = generate_thresholds(game.get_depth(), 100000, 50, 3);
+    std::vector<int> threshold_by_layer = generate_thresholds(game.get_depth(), 50000, 50, 3);
     game.set_threshold(threshold_by_layer);
 
     for (std::vector<int>::iterator it = threshold_by_layer.begin(); it != threshold_by_layer.end(); it++) {

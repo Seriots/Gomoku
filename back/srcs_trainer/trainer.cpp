@@ -34,8 +34,8 @@ enum e_derivation_power {
 };
 
 int NB_DNA = 17;
-int POPULATION_NUMBER_BY_GEN = 6;
-int POPULATION_SAVED = 2;
+int POPULATION_NUMBER_BY_GEN = 50;
+int POPULATION_SAVED = 10;
 
 int NB_GENERATION = 100;
 
@@ -180,12 +180,12 @@ std::vector<int> generateRandonDna() {
     dna[8] = rand() % 4000;
     dna[9] = rand() % 8000;
     dna[10] = rand() % 15000;
-    dna[11] = rand() % 1000000;
+    dna[11] = 500000 + rand() % 1000000;
     dna[12] = rand() % 5000;
     dna[13] = rand() % 20000;
     dna[14] = rand() % 20000;
     dna[15] = rand() % 20000;
-    dna[16] = rand() % 1000000;
+    dna[16] = 500000 + rand() % 1000000;
 
     return dna;
 }
@@ -247,6 +247,7 @@ std::vector<t_population> generatePopulationFromLastGen(std::vector<t_population
         population[i].dna = generateValuesMaps(generateDnaFromParents(parent1.dna, parent2.dna, power));
         population[i].score = 0;
     }
+    std::shuffle(population.begin(), population.end(), std::default_random_engine(rand()));
     return population;
 }
 
@@ -299,6 +300,7 @@ void firstPhase(std::vector<t_population> &population) {
     std::vector<t_fight>        fights;
     std::vector<std::thread>    threadPool;
 
+
     for (size_t i = 0; i < population.size(); i+=2) {
         fights.push_back({(int)i, (int)i + 1});
     }
@@ -313,6 +315,7 @@ void firstPhase(std::vector<t_population> &population) {
             }
         }
     }
+
 
     for (int round = 0; round < POPULATION_NUMBER_BY_GEN - 1; round++) {
         std::cout << "Fight: " << round + 1 << std::endl;
@@ -360,6 +363,8 @@ void secondPhase(std::vector<t_population> &population) {
             }
         }
     }
+
+    fights.resize((POPULATION_NUMBER_BY_GEN / 2) * 20);
 
     auto processThread = [&m, &playerMutexes](std::vector<t_population> &population, std::vector<t_fight> &fights) {
         m.lock();
@@ -409,7 +414,8 @@ void train(std::vector<t_population> &population) {
 
 void create_directory(std::string name) {
     std::string command = "mkdir -p " + name;
-    system(command.c_str());
+    int v = system(command.c_str());
+    (void)v;
 }
 
 int main() {

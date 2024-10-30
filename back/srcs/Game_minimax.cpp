@@ -47,6 +47,7 @@ void Game::display_negamax_board(std::vector<int> &board) {
 }
 
 int Game::negamax(t_negamaxInformation info, t_captureCount capture, int currPos) {
+    (void)currPos;
     size_t              board_hash;
     std::vector<int>    tmp_interesting_pos;
     int                 score;
@@ -60,12 +61,21 @@ int Game::negamax(t_negamaxInformation info, t_captureCount capture, int currPos
     if (is_already_computed(board_hash)) {
         return this->_transposition_table[board_hash];
     }
-
-    if (info.depth == 0 || capture.white >= 10 || capture.black >= 10 || check_win_by_alignement(currPos, (info.is_maximizing == 1 ? WHITE : BLACK))) {
+    else if (info.depth == 0) {
         score = info.is_maximizing * this->board_complex_heuristic(_request.color, capture.white, capture.black);
         this->_transposition_table[board_hash] = score;
         return score;
     }
+    // else if (check_win_by_alignement(currPos, (info.is_maximizing == 1 ? WHITE : BLACK))) {
+    //     score = info.is_maximizing * this->board_complex_heuristic(_request.color, capture.white, capture.black) * ((info.depth) * 2);
+    //     this->_transposition_table[board_hash] = score;
+    //     return score;
+    // }
+    // else if ((info.is_maximizing == -1 && capture.white >= 10) || (info.is_maximizing == 1 && capture.black >= 10)) {
+    //     score = info.is_maximizing * this->board_complex_heuristic(_request.color, capture.white, capture.black) * ((info.depth) * 2);
+    //     this->_transposition_table[board_hash] = score;
+    //     return score;
+    // }
 
     max_eval = INT_MIN;
     
@@ -146,7 +156,7 @@ int Game::fdNegamax(t_negamaxInformation info, t_captureCount capture) {
 
         info.alpha = std::max(info.alpha, score);
     }
-    //this->display_negamax_board(board);
+    this->display_negamax_board(board);
 
     return best_pos;
 }
