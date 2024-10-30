@@ -133,13 +133,9 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     // create board
 
     game.set_depth(request.depth);
-    std::vector<int> threshold_by_layer = generate_thresholds(game.get_depth(), 50000, 50, 3);
+
+    std::vector<int> threshold_by_layer = generate_thresholds(game.get_depth(), 200000 - (20000 * std::max(0, game.get_depth() - 6)), 50, 3);
     game.set_threshold(threshold_by_layer);
-
-    for (std::vector<int>::iterator it = threshold_by_layer.begin(); it != threshold_by_layer.end(); it++) {
-        std::cout << *it << std::endl;
-    }
-
 
     auto start_time = std::chrono::high_resolution_clock::now();
     

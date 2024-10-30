@@ -27,12 +27,12 @@ void Game::init_sequenceDna(std::vector<int> *dna) {
         this->_valuesDna[VDNA_TWON2] = 32;
         this->_valuesDna[VDNA_TWON1] = 40;
         this->_valuesDna[VDNA_TWO] = 60;
-        this->_valuesDna[VDNA_THREEN2] = 160;
-        this->_valuesDna[VDNA_THREEN1] = 200;
-        this->_valuesDna[VDNA_THREE] = 1400;
-        this->_valuesDna[VDNA_FOURN1] = 3400;
-        this->_valuesDna[VDNA_FOUR] = 15100;
-        this->_valuesDna[VDNA_THREEFREE] = 22000;
+        this->_valuesDna[VDNA_THREEN2] = 1400;
+        this->_valuesDna[VDNA_THREEN1] = 2000;
+        this->_valuesDna[VDNA_THREE] = 2500;
+        this->_valuesDna[VDNA_THREEFREE] = 11000;
+        this->_valuesDna[VDNA_FOURN1] = 16000;
+        this->_valuesDna[VDNA_FOUR] = 52000;
         this->_valuesDna[VDNA_FIVE] = 2000000;
         this->_valuesDna[VDNA_POTENTIAL_CAPTURE] = 3400;
         this->_valuesDna[VDNA_EFFECTIVE_CAPTURE_0] = 5000;
@@ -273,12 +273,10 @@ std::vector<int> Game::get_interesting_pos() {
     std::vector<int> interesting_pos;
 
     for (int pos = 0; pos < 361; pos++) {
-        if (pos != NONE && pos != BLOCKED) {
-            int x = pos % 19;
-            int y = pos / 19;
-            if (this->get_board().get(x, y).get() == NONE && is_something_near(x, y)) {
-                interesting_pos.push_back(pos);
-            }
+        int x = pos % 19;
+        int y = pos / 19;
+        if (this->get_board().get(x, y).get() == NONE && is_something_near(x, y)) {
+            interesting_pos.push_back(pos);
         }
     }
 

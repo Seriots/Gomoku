@@ -221,7 +221,6 @@ int Board::compute_score_info(t_score_info score_info, t_captureCount capture, e
 }
 
 int Board::get_score_position(e_color color, int pos, t_captureCount capture) const {
-        std::cout << "Pos: " << pos << std::endl;
         int         score;
         t_score_info score_info; 
         t_position  grid_pos;
@@ -241,7 +240,6 @@ int Board::get_score_position(e_color color, int pos, t_captureCount capture) co
             t_direction_info diF = compute_direction_side(grid_pos, dx, dy, my, other);
             t_direction_info diB = compute_direction_side(grid_pos, -dx, -dy, my, other);
             score_info = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-            
 
             score_info.any_alignement += diF.my_free_alignement + diB.my_free_alignement;
 
