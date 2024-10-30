@@ -36,6 +36,7 @@ void    r_action(const httplib::Request &req, httplib::Response &res) {
     std::vector<t_stone>    added;          // the list of added stones returned
     std::vector<int>        removed;        // the list of removed stones returned
     std::vector<int>        blocked_list;   // the list of blocked positions returned
+    std::vector<int>        blocked_list_pro_mode = {};   // the list of blocked positions returned
 
     res.set_header("Access-Control-Allow-Origin", "*"); // prevent CORS errors
 
@@ -56,9 +57,16 @@ void    r_action(const httplib::Request &req, httplib::Response &res) {
 
     blocked_list = game.get_new_blocked_pos(request.color == WHITESTONE ? BLACKSTONE : WHITESTONE);
 
+    if (request.current_turn == 1 && (request.opening_rule == PRO || request.opening_rule == LONGPRO)) {
+        blocked_list_pro_mode = game.get_blocked_center(request.opening_rule == PRO ? 5 : 7);
+    }
+
     added.push_back({request.pos, request.color == WHITESTONE ? "white" : "black"});
     for (size_t i = 0; i < blocked_list.size(); i++)
         added.push_back({blocked_list[i], "blocked"});
+    for (size_t i = 0; i < blocked_list_pro_mode.size(); i++)
+        added.push_back({blocked_list_pro_mode[i], "blocked"});
+
 
     t_endgame_info endgame_info = game.check_end_game(request.pos, removed.size(), request.color);
 
@@ -80,7 +88,7 @@ void r_swap_ia(const httplib::Request &req, httplib::Response &res) {
     request = create_new_ia_request(req);
 
     Game game(request);
-    game.init_interesting_pos(request.color, request.allowed);
+    game.init_interesting_pos(request.color, request.allowed, request.blocked);
 
     std::vector<int> board;
     for (int i = 0; i < 19*19; i++)
@@ -122,15 +130,14 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     std::vector<t_stone>    added;
     std::vector<int>        removed;
     std::vector<int>        blocked_list;
+    std::vector<int>        blocked_list_pro_mode = {};   // the list of blocked positions returned
 
     res.set_header("Access-Control-Allow-Origin", "*"); // prevent CORS problems
 
     request = create_new_ia_request(req);
 
     Game game(request); // instantiate game object with the request
-    game.init_interesting_pos(request.color, request.allowed);
-
-    // create board
+    game.init_interesting_pos(request.color, request.allowed, request.blocked);
 
     game.set_depth(request.depth);
 
@@ -157,9 +164,15 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
 
     blocked_list = game.get_new_blocked_pos(request.color == WHITESTONE ? BLACKSTONE : WHITESTONE);
 
+    if (request.current_turn == 1 && (request.opening_rule == PRO || request.opening_rule == LONGPRO)) {
+        blocked_list_pro_mode = game.get_blocked_center(request.opening_rule == PRO ? 5 : 7);
+    }
+
     added.push_back({pos, request.color == WHITESTONE ? "white" : "black"});
     for (size_t i = 0; i < blocked_list.size(); i++)
         added.push_back({blocked_list[i], "blocked"});
+    for (size_t i = 0; i < blocked_list_pro_mode.size(); i++)
+        added.push_back({blocked_list_pro_mode[i], "blocked"});
 
     t_endgame_info endgame_info = game.check_end_game(pos, removed.size(), request.color);
 
@@ -181,7 +194,7 @@ void r_ia_with_dna(const httplib::Request &req, httplib::Response &res) {
     dna = get_request_dna(req);
 
     Game game(request, dna); // instantiate game object with the request
-    game.init_interesting_pos(request.color, request.allowed);
+    game.init_interesting_pos(request.color, request.allowed, request.blocked);
 
     game.set_depth(6);
     std::vector<int> threshold_by_layer = generate_thresholds(game.get_depth(), 40000, 10, 3);

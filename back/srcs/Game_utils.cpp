@@ -327,6 +327,18 @@ e_color Game::swap_choice(int const &white_capture, int const &black_capture) {
     return (score1 > score2) ? WHITESTONE : BLACKSTONE;
 }
 
+std::vector<int>    Game::get_blocked_center(int size) {
+    std::vector<int> blocked;
+    for (int y = 9 - size / 2; y <= 9 + size / 2; y++) {
+        for (int x = 9 - size / 2; x <= 9 + size / 2; x++) {
+            if (this->_board.get(x, y).get() == NONE)
+                blocked.push_back(x + y * 19);
+        }
+    }
+    return blocked;
+}
+
+
 
 /* ************************ TEST ************************** */
 

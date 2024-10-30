@@ -368,6 +368,7 @@ typedef struct s_request {
     int                 black_capture;
     int                 depth;
     e_opening_rule      opening_rule;
+    int                 current_turn;
 }   t_request;
 
 typedef struct s_negamaxInformation {

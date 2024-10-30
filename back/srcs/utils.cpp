@@ -34,6 +34,12 @@ bool check_error_request(t_request &request,  httplib::Response &res) {
         res.set_content("{"+build_json_content({"error"}, {"notAllowed"})+"}", "application/json");
         return true;
     }
+    if (request.current_turn == 0 && (request.opening_rule == PRO || request.opening_rule == LONGPRO)) {
+        if (request.pos != 180) {
+            res.set_content("{"+build_json_content({"error"}, {"notCenter"})+"}", "application/json");
+            return true;
+        }
+    } 
 
     if (std::find(request.white.begin(), request.white.end(), request.pos) != request.white.end()
         || std::find(request.black.begin(), request.black.end(), request.pos) != request.black.end()
@@ -123,8 +129,9 @@ t_request create_new_request(const httplib::Request &req) {
     int white_capture = std::stoi(req.path_params.at("whiteCapture"));
     int black_capture = std::stoi(req.path_params.at("blackCapture"));
     e_opening_rule opening_rule = parse_opening_rule(req.path_params.at("openingRule"));
+    int current_turn = std::stoi(req.path_params.at("currentTurn"));
 
-    return {pos, x, y, color, color_opponent, white, black, blocked, allowed, white_capture, black_capture, -1, opening_rule};
+    return {pos, x, y, color, color_opponent, white, black, blocked, allowed, white_capture, black_capture, -1, opening_rule, current_turn};
 }
 
 /*
@@ -143,8 +150,9 @@ t_request create_new_ia_request(const httplib::Request &req) {
     int black_capture = std::stoi(req.path_params.at("blackCapture"));
     int depth = std::stoi(req.path_params.at("depth"));
     e_opening_rule opening_rule = parse_opening_rule(req.path_params.at("openingRule"));
+    int current_turn = std::stoi(req.path_params.at("currentTurn"));
 
-    return {0, 0, 0, color, color_opponent, white, black, blocked, allowed, white_capture, black_capture, depth, opening_rule};
+    return {0, 0, 0, color, color_opponent, white, black, blocked, allowed, white_capture, black_capture, depth, opening_rule, current_turn};
 }
 
 std::vector<int> get_request_dna(const httplib::Request &req) {
