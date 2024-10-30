@@ -42,7 +42,7 @@ function GameIA() {
     const [winner, setWinner] = useState('');
     const [gameInfo, setGameInfo] = useState(GameInWhite);
     const [firstPlayer, setFirstPlayer] = useState('white');
-    const [depth, setDepth] = useState(5);
+    const [depth, setDepth] = useState(6);
     const [openingRule, setOpeningRule] = useState('standard');
     const [needSwapChoice, setNeedSwapChoice] = useState(false);
     const [swapChoice, setSwapChoice] = useState('none');

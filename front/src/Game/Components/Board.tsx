@@ -238,8 +238,6 @@ const switchColor = () => {
 
 const getStone = async () => {
     const hintStone = document.getElementById('hint-stone');
-    if (hintStone)
-        hintStone.style.display = 'none';
 
     const pos = computePositionFromPx(currentPos.x, currentPos.y);
     const listWhite = getPositionList(document.getElementsByClassName('white-stone'));
@@ -250,9 +248,16 @@ const getStone = async () => {
 
     await axios.get(build_request('http://localhost:6325/action', [pos, localGameInfo.currentPlayer, listWhite, listBlack, listBlocked, localGameInfo.listAllowed, localGameInfo.whiteCapture, localGameInfo.blackCapture, localGameInfo.openingRule, localGameInfo.moveCount]))
     .then((res) => {
+        if (checkError(res.data)) {
+            localGameInfo.isProcessing = false;
+            return;
+        }
+        if (hintStone)
+            hintStone.style.display = 'none';
         localGameInfo.response = res.data;
     })
     .catch((err) => {
+        localGameInfo.isProcessing = false;
         console.log(err);
     });
 }
@@ -267,12 +272,17 @@ const getIaStone = async (IAMode: boolean) => {
 
     await axios.get(build_request('http://localhost:6325/ia', [localGameInfo.currentPlayer, listWhite, listBlack, listBlocked, localGameInfo.listAllowed, localGameInfo.whiteCapture, localGameInfo.blackCapture, localGameInfo.depth, localGameInfo.openingRule, localGameInfo.moveCount]))
     .then((res) => {
+        if (checkError(res.data)) {
+            localGameInfo.isProcessing = false;
+            return;
+        }
         localGameInfo.response = res.data;
         if (!IAMode) {
             setHintIAStone(localGameInfo.response);
         }
     })
     .catch((err) => {
+        localGameInfo.isProcessing = false;
         console.log(err);
     });
 }
@@ -335,8 +345,7 @@ const handleClick = (IAMode: boolean, gameRunning: any, setGameRunning: any, set
     // place a stone at position currentPos
     localGameInfo.isProcessing = true;
     await getStone();
-    if (checkError(localGameInfo.response)) {
-        localGameInfo.isProcessing = false;
+    if (!localGameInfo.isProcessing) {
         return;
     }
     responseHandler(localGameInfo.response);
@@ -368,8 +377,7 @@ const handleClick = (IAMode: boolean, gameRunning: any, setGameRunning: any, set
     if (IAMode) {
         // generate an ia stone
         await getIaStone(IAMode);
-        if (checkError(localGameInfo.response)) {
-            localGameInfo.isProcessing = false;
+        if (!localGameInfo.isProcessing) {
             return;
         }
         responseHandler(localGameInfo.response);
@@ -408,10 +416,10 @@ const Board : React.FC<BoardProps> = ({
 
     useEffect(() => {
         const playIa = async () => {
-            localGameInfo.isProcessing = true;
             while (true) {
+                localGameInfo.isProcessing = true;
                 await getIaStone(IAMode);
-                if (!checkError(localGameInfo.response)) {
+                if (localGameInfo.isProcessing) {
                     break;
                 }
                 sleep(1000);
@@ -440,10 +448,10 @@ const Board : React.FC<BoardProps> = ({
 
     useEffect(() => {
         const playIa = async () => {
-            localGameInfo.isProcessing = true;
             while (true) {
+                localGameInfo.isProcessing = true;
                 await getIaStone(IAMode);
-                if (!checkError(localGameInfo.response)) {
+                if (localGameInfo.isProcessing) {
                     break;
                 }
                 sleep(1000);

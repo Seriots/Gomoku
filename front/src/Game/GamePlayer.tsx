@@ -26,7 +26,7 @@ function GameIA() {
     const [gameInfo, setGameInfo] = useState(GameIn);
     const [activateHintP1, setActivateHintP1] = useState(false);
     const [activateHintP2, setActivateHintP2] = useState(false);
-    const [depth, setDepth] = useState(5);
+    const [depth, setDepth] = useState(6);
     const [needSwapChoice, setNeedSwapChoice] = useState(false);
     const [swapChoice, setSwapChoice] = useState('none');
     const [openingRule, setOpeningRule] = useState('standard');
@@ -47,7 +47,9 @@ function GameIA() {
                 <DepthProp depth={depth} setDepth={setDepth} gameRunning={gameRunning} />
                 <OpeningRulesProp openingRule={openingRule} setOpeningRule={setOpeningRule} gameRunning={gameRunning} />
             </ParamsBar>
-            <SwapSelection openingRule={openingRule} setSwapChoice={setSwapChoice} setNeedSwapChoice={setNeedSwapChoice}/>
+            {needSwapChoice &&
+                <SwapSelection openingRule={openingRule} setSwapChoice={setSwapChoice} setNeedSwapChoice={setNeedSwapChoice} />
+            }
             <InfoBar gameInfo={gameInfo} />
             <Board IAMode={false} gameRunning={gameRunning} setGameRunning={setGameRunning} setWinner={setWinner} gameInfo={gameInfo} setGameInfo={setGameInfo} firstPlayer={firstPlayerRef} activateHintP1={activateHintP1} activateHintP2={activateHintP2} depth={depth} openingRule={openingRule} swapChoice={swapChoice} setNeedSwapChoice={setNeedSwapChoice}/>
             <BoardShadow gameRunning={gameRunning} winner={winner} setWinner={setWinner}/>
