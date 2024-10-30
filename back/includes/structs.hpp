@@ -305,9 +305,12 @@ typedef struct s_direction_info {
     int my_real_alignement;
     int other_real_alignement;
     bool capture;
-    bool setup_capture;
-    bool is_capturable;
+    bool is_capturable_O;
+    bool is_capturable_N;
     bool block_capture;
+    bool setup_capture;
+    e_cell start;
+    bool locked;
 } t_direction_info;
 
 typedef struct s_score_info {

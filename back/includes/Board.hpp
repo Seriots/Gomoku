@@ -27,7 +27,13 @@ class Board {
         void set(int x, int y, e_cell cell);
         void set(int pos, e_cell cell);
 
+        bool is_in_grid(int x, int y) const;
+
         bool isFull();
         void print();
         size_t get_hash_board() const;
+        int compute_score_info(t_score_info score_info, t_captureCount capture, e_cell my) const;
+        int get_score_position(e_color color, int pos, t_captureCount capture) const;
+        t_direction_info compute_direction_side(t_position &grid_pos, int dx, int dy, e_cell my, e_cell other) const;
+
 };

@@ -196,7 +196,7 @@ std::string build_action_response(std::vector<t_stone> added, std::vector<int> r
     return out + "]\n}";
 }
 
-int get_linear_distance(t_position &a, t_position &b) {
+int get_linear_distance(t_position const a, t_position const b) {
     return std::max(abs(a.x - b.x), abs(a.y - b.y));
 }
 

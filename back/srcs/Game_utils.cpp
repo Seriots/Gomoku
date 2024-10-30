@@ -23,22 +23,22 @@ void Game::init_sequenceDna(std::vector<int> *dna) {
 
     if (!dna) {
         this->_valuesDna[VDNA_ONE] = 1;
-        this->_valuesDna[VDNA_TWON3] = 15;
-        this->_valuesDna[VDNA_TWON2] = 20;
-        this->_valuesDna[VDNA_TWON1] = 25;
-        this->_valuesDna[VDNA_TWO] = 40;
-        this->_valuesDna[VDNA_THREEN2] = 110;
+        this->_valuesDna[VDNA_TWON3] = 24;
+        this->_valuesDna[VDNA_TWON2] = 32;
+        this->_valuesDna[VDNA_TWON1] = 40;
+        this->_valuesDna[VDNA_TWO] = 60;
+        this->_valuesDna[VDNA_THREEN2] = 160;
         this->_valuesDna[VDNA_THREEN1] = 200;
         this->_valuesDna[VDNA_THREE] = 1400;
-        this->_valuesDna[VDNA_FOURN1] = 7300;
+        this->_valuesDna[VDNA_FOURN1] = 3400;
         this->_valuesDna[VDNA_FOUR] = 15100;
-        this->_valuesDna[VDNA_THREEFREE] = 20000;
+        this->_valuesDna[VDNA_THREEFREE] = 22000;
         this->_valuesDna[VDNA_FIVE] = 2000000;
-        this->_valuesDna[VDNA_POTENTIAL_CAPTURE] = 30000;
-        this->_valuesDna[VDNA_EFFECTIVE_CAPTURE_0] = 50000;
-        this->_valuesDna[VDNA_EFFECTIVE_CAPTURE_1] = 70000;
-        this->_valuesDna[VDNA_EFFECTIVE_CAPTURE_2] = 85000;
-        this->_valuesDna[VDNA_EFFECTIVE_CAPTURE_3] = 3000000;
+        this->_valuesDna[VDNA_POTENTIAL_CAPTURE] = 3400;
+        this->_valuesDna[VDNA_EFFECTIVE_CAPTURE_0] = 5000;
+        this->_valuesDna[VDNA_EFFECTIVE_CAPTURE_1] = 7000;
+        this->_valuesDna[VDNA_EFFECTIVE_CAPTURE_2] = 10000;
+        this->_valuesDna[VDNA_EFFECTIVE_CAPTURE_3] = 1000000;
     } else {
         for (size_t i = 0; i < dna->size(); i++) {
             this->_valuesDna[(e_valueDna)i] = dna->at(i);
@@ -288,12 +288,12 @@ std::vector<int> Game::get_interesting_pos() {
     return interesting_pos;
 }
 
-void Game::sort_interesting_pos(e_color const &color, std::vector<int> &vec) {
+void Game::sort_interesting_pos(e_color const &color, std::vector<int> &vec, t_captureCount &capture) {
     std::map<int, int>  score_on_pos;
     std::vector<int>    captured;
 
     for (size_t i = 0; i < vec.size(); i++) {
-        score_on_pos[vec[i]] = this->complex_heuristic(color, vec[i]);
+        score_on_pos[vec[i]] = this->_board.get_score_position(color, vec[i], capture);
     }
     std::sort(vec.begin(), vec.end(), [&score_on_pos](int a, int b) {
         return score_on_pos[a] > score_on_pos[b];

@@ -123,5 +123,6 @@ void Game::init_interesting_pos(e_color color, std::vector<int> allowed_pos) {
         if (it != this->_interesting_pos.end())
             this->_interesting_pos.erase(it);
     }
-    this->sort_interesting_pos(color, this->_interesting_pos);
+    t_captureCount capture = {this->_request.white_capture, this->_request.black_capture};
+    this->sort_interesting_pos(color, this->_interesting_pos, capture);
 }

@@ -36,8 +36,8 @@ t_score_info Game::compute_score_information(std::vector<t_direction_info> &dir_
         score_info.setup_capture += dir_info[i].setup_capture ? 1 : 0;
         score_info.setup_capture += dir_info[i+1].setup_capture ? 1 : 0;
 
-        score_info.is_capturable += dir_info[i].is_capturable ? 1 : 0;
-        score_info.is_capturable += dir_info[i+1].is_capturable ? 1 : 0;
+        score_info.is_capturable += dir_info[i].is_capturable_N ? 1 : 0;
+        score_info.is_capturable += dir_info[i+1].is_capturable_N ? 1 : 0;
 
         score_info.block_capture += dir_info[i].block_capture ? 1 : 0;
         score_info.block_capture += dir_info[i+1].block_capture ? 1 : 0;
@@ -80,7 +80,7 @@ int Game::compute_score(t_score_info &score_info, int &my_captured) {
 }
 
 static t_direction_info init_direction_info() {
-    return {0, 0, 0, false, false, false, false};
+    return {0, 0, 0, false, false, false, false, false, NONE, false};
 }
 
 /*
@@ -138,7 +138,7 @@ std::vector<t_direction_info> Game::compute_dirs_info(t_position &grid_pos, e_ce
                     if (di.my_real_alignement == 2)
                         di.block_capture = true;
                     else if (di.my_real_alignement == 1)
-                        di.is_capturable = true;
+                        di.is_capturable_N = true;
                     break;
                 }
                 di.other_real_alignement++;
@@ -175,6 +175,11 @@ int Game::complex_heuristic(e_color color, int &pos) {
     score += compute_score(score_info, my_captured);
 
     return score;
+}
+
+int Game::score_heuristic(e_color color, int pos, t_captureCount capture) const {
+    
+    return this->_board.get_score_position(color, pos, capture);
 }
 
 /*

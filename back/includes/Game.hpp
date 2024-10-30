@@ -53,7 +53,7 @@ class Game {
         std::vector<int>                get_new_blocked_pos(e_color color);
         std::vector<int>                get_captured(int pos, e_color color);
         std::vector<int>                get_interesting_pos();
-        void                            sort_interesting_pos(e_color const &color, std::vector<int> &vec);
+        void                            sort_interesting_pos(e_color const &color, std::vector<int> &vec, t_captureCount &capture);
         void                            print_board();
         std::map<e_cell, std::vector<int> > get_all_positions_stone();
         bool                                is_something_near(int x, int y);
@@ -76,6 +76,7 @@ class Game {
         int                             add_capture_score(int current_capture);
         int                             simple_heuristic(e_color color, int pos);
         int                             complex_heuristic(e_color color, int &pos);
+        int                             score_heuristic(e_color color, int pos, t_captureCount capture) const;
         int                             full_simple_heuristic(e_color color);
         int                             board_complex_heuristic(e_color color, int new_white_capture, int new_black_capture);
         /* ******* Game minimax ******* */

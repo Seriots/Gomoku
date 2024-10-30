@@ -66,23 +66,14 @@ int Game::negamax(t_negamaxInformation info, t_captureCount capture, int currPos
         this->_transposition_table[board_hash] = score;
         return score;
     }
-    // else if (check_win_by_alignement(currPos, (info.is_maximizing == 1 ? WHITE : BLACK))) {
-    //     score = info.is_maximizing * this->board_complex_heuristic(_request.color, capture.white, capture.black) * ((info.depth) * 2);
-    //     this->_transposition_table[board_hash] = score;
-    //     return score;
-    // }
-    // else if ((info.is_maximizing == -1 && capture.white >= 10) || (info.is_maximizing == 1 && capture.black >= 10)) {
-    //     score = info.is_maximizing * this->board_complex_heuristic(_request.color, capture.white, capture.black) * ((info.depth) * 2);
-    //     this->_transposition_table[board_hash] = score;
-    //     return score;
-    // }
+
 
     max_eval = INT_MIN;
     
     tmp_interesting_pos = this->get_interesting_pos();
 
     if ((int)tmp_interesting_pos.size() > this->_threshold[info.depth - 1])
-        this->sort_interesting_pos((info.is_maximizing == 1) ? _request.color : _request.color_opponent, tmp_interesting_pos);
+        this->sort_interesting_pos((info.is_maximizing == 1) ? _request.color : _request.color_opponent, tmp_interesting_pos, capture);
     
     limit = this->_threshold[info.depth - 1];
     for (std::vector<int>::iterator it = tmp_interesting_pos.begin(); it != tmp_interesting_pos.end() && limit-- > 0; it++) {
@@ -140,6 +131,16 @@ int Game::fdNegamax(t_negamaxInformation info, t_captureCount capture) {
             tmp_capture.black += captured.size();
         else
             tmp_capture.white += captured.size();
+
+        if (tmp_capture.white >= 10 || tmp_capture.black >= 10) {
+            return pos;
+        }
+        if (check_win_by_alignement(pos, color_to_cell(_request.color))) {
+            std::vector<int>    prevent = get_capture_prevent_win_pos(pos, color_to_cell(_request.color));
+            if (!((prevent.size() + 1) * 2 + (_request.color == WHITESTONE ? tmp_capture.black : tmp_capture.white) >= 10)) {
+                return pos;
+            }
+        }
 
         this->set(pos, color_to_cell(_request.color));
         this->unset(captured);
