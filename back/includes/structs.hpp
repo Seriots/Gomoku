@@ -304,6 +304,7 @@ enum e_opening_rule {
     STANDARD,
     SWAP,
     SWAP2,
+    SWAP2_MORE,
     PRO,
     LONGPRO,
 };

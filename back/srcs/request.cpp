@@ -67,54 +67,17 @@ void    r_action(const httplib::Request &req, httplib::Response &res) {
     for (size_t i = 0; i < blocked_list_pro_mode.size(); i++)
         added.push_back({blocked_list_pro_mode[i], "blocked"});
 
+    std::string replay = "false";
+    if ((request.current_turn == 0 || request.current_turn == 1) && (request.opening_rule == SWAP || request.opening_rule == SWAP2))
+        replay = "true";
+    else if ((request.current_turn == 2) && (request.opening_rule == SWAP || request.opening_rule == SWAP2))
+        replay = "choice";
+    else if ((request.current_turn == 3) && (request.opening_rule == SWAP2_MORE))
+        replay = "true";
 
     t_endgame_info endgame_info = game.check_end_game(request.pos, removed.size(), request.color);
 
-    res.set_content(build_action_response(added, removed, endgame_info, {}, {}), "application/json"); // everything is send in a nicely formated json
-}
-
-
-/*
-    Request to choose if the IA should play Black or White
-*/
-void r_swap_ia(const httplib::Request &req, httplib::Response &res) {
-    t_request               request;
-    std::vector<t_stone>    added;
-    std::vector<int>        removed;
-    std::vector<int>        blocked_list;
-
-    res.set_header("Access-Control-Allow-Origin", "*"); // prevent CORS problems
-
-    request = create_new_ia_request(req);
-
-    Game game(request);
-    game.init_interesting_pos(request.color, request.allowed, request.blocked);
-
-    std::vector<int> board;
-    for (int i = 0; i < 19*19; i++)
-        board.push_back(-1);
-
-    game.set_depth(request.depth);
-    std::vector<int> threshold_by_layer = generate_thresholds(game.get_depth(), 60000, 10, 3);
-    game.set_threshold(threshold_by_layer);
-
-    auto start_time = std::chrono::high_resolution_clock::now();
-
-    int pos = game.fdNegamax({INT_MIN, INT_MAX, game.get_depth(), 1}, {request.white_capture, request.black_capture});
-    auto end_time = std::chrono::high_resolution_clock::now();
-
-    auto time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
-    std::cout << "Time: " << time << std::endl << std::endl;
-
-    game.set(pos, color_to_cell(request.color));
-    removed = game.get_captured(pos, request.color);
-    game.unset(removed);
-
-    e_color choice = game.swap_choice(request.white_capture, request.black_capture);
-
-    t_endgame_info endgame_info = {choice, false, false, false, {}};
-
-    res.set_content(build_action_response(added, removed, endgame_info, {"time"}, {std::to_string(time)}), "application/json");
+    res.set_content(build_action_response(added, removed, endgame_info, {"replay"}, {replay}), "application/json"); // everything is send in a nicely formated json
 }
 
 
@@ -131,10 +94,20 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     std::vector<int>        removed;
     std::vector<int>        blocked_list;
     std::vector<int>        blocked_list_pro_mode = {};   // the list of blocked positions returned
+    t_endgame_info          endgame_info;
 
     res.set_header("Access-Control-Allow-Origin", "*"); // prevent CORS problems
 
     request = create_new_ia_request(req);
+
+    if (request.current_turn == 0 && (request.opening_rule == SWAP || request.opening_rule == SWAP2)) {
+        endgame_info = {request.color, false, false, false, {}};
+        added = random_three_stone_pattern();
+        res.set_content(build_action_response(added, removed, endgame_info, {"time", "depthSearch"}, {std::to_string(0), std::to_string(0)}), "application/json");
+
+        return ;
+    }
+        
 
     Game game(request); // instantiate game object with the request
     game.init_interesting_pos(request.color, request.allowed, request.blocked);
@@ -174,10 +147,49 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
     for (size_t i = 0; i < blocked_list_pro_mode.size(); i++)
         added.push_back({blocked_list_pro_mode[i], "blocked"});
 
-    t_endgame_info endgame_info = game.check_end_game(pos, removed.size(), request.color);
+    endgame_info = game.check_end_game(pos, removed.size(), request.color);
 
     res.set_content(build_action_response(added, removed, endgame_info, {"time", "depthSearch"}, {std::to_string(time), std::to_string(game.get_depth())}), "application/json");
 }
+
+void r_swapChoice(const httplib::Request &req, httplib::Response &res) {
+    t_request               request;
+    std::vector<t_stone>    added;
+    std::vector<int>        removed;
+    std::vector<int>        blocked_list;
+    std::vector<int>        blocked_list_pro_mode = {};   // the list of blocked positions returned
+    t_endgame_info          endgame_info;
+
+    res.set_header("Access-Control-Allow-Origin", "*"); // prevent CORS problems
+
+    request = create_new_ia_request(req);
+
+    Game game(request); // instantiate game object with the request
+    game.init_interesting_pos(request.color, request.allowed, request.blocked);
+
+    game.set_depth(1);
+
+    std::vector<int> threshold_by_layer = generate_thresholds(game.get_depth(), 200000, 50, 3);
+    game.set_threshold(threshold_by_layer);
+    
+    int pos = game.fdNegamax({INT_MIN, INT_MAX, game.get_depth(), 1}, (t_captureCount){request.white_capture, request.black_capture});
+
+    game.set(pos, color_to_cell(request.color));
+
+    removed = game.get_captured(pos, request.color);
+
+    game.unset(removed);
+
+    request.white_capture = request.color == WHITESTONE ? request.white_capture + removed.size() : request.white_capture;
+    request.black_capture = request.color == BLACKSTONE ? request.black_capture + removed.size() : request.black_capture;
+
+    if (game.board_complex_heuristic(WHITESTONE, request.white_capture, request.black_capture) > 0) {
+        res.set_content("white", "text/plain");
+    } else {
+        res.set_content("black", "text/plain");
+    }
+}
+
 
 void r_ia_with_dna(const httplib::Request &req, httplib::Response &res) {
     t_request               request;

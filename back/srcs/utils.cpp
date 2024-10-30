@@ -79,6 +79,8 @@ e_opening_rule parse_opening_rule(const std::string &rule) {
         return PRO;
     if (rule == "longpro")
         return LONGPRO;
+    if (rule == "swap2_more")
+        return SWAP2_MORE;
     return STANDARD;
 }
 
@@ -289,4 +291,19 @@ std::vector<int> generate_thresholds(int max_depth, int max_calculations, int ma
 
         std::reverse(thresholds.begin(), thresholds.end());
         return thresholds;
+}
+
+std::vector<t_stone> random_three_stone_pattern() {
+    int rd = std::rand() % 6;
+    if (rd == 0)
+        return {{180, "black"}, {200, "white"}, {161, "black"}};
+    if (rd == 1)
+        return {{161, "black"}, {162, "white"}, {181, "black"}};
+    if (rd == 2)
+        return {{180, "black"}, {160, "white"}, {162, "black"}};
+    if (rd == 3)
+        return {{180, "black"}, {181, "white"}, {182, "black"}};
+    if (rd == 4)
+        return {{180, "black"}, {144, "white"}, {143, "black"}};
+    return {{180, "black"}, {142, "white"}, {181, "black"}};
 }

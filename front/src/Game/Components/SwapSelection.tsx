@@ -7,10 +7,20 @@ import './SwapSelection.css';
 
 interface SwapSelectionProps {
 	openingRule: string,
+    setSwapChoice: any,
+    setNeedSwapChoice: any,
+}
+
+
+const handleChoice = (choice: string, setSwapChoice: any, setNeedSwapChoice: any) => () => {
+  setSwapChoice(choice);
+  setNeedSwapChoice(false);
 }
 
 const SwapSelection : React.FC<SwapSelectionProps> = ({
   openingRule,
+  setSwapChoice,
+  setNeedSwapChoice,
 }) => {
     return (
         <div className='swap-selection'>
@@ -18,15 +28,15 @@ const SwapSelection : React.FC<SwapSelectionProps> = ({
           <div className='swap-selection-selection'>
             {openingRule === "swap" &&
               <React.Fragment>
-                <img src={whiteStone} alt='img'/>
-                <img src={blackStone} alt='img'/>
+                <img onClick={handleChoice("white", setSwapChoice, setNeedSwapChoice)}src={whiteStone} alt='img'/>
+                <img onClick={handleChoice("black", setSwapChoice, setNeedSwapChoice)} src={blackStone} alt='img'/>
               </React.Fragment>
             }
             {openingRule === "swap2" &&
               <React.Fragment>
-                <img src={whiteStone} alt='img'/>
-                <img src={blackStone} alt='img'/>
-                <p>+2</p>
+                <img onClick={handleChoice("white", setSwapChoice, setNeedSwapChoice)} src={whiteStone} alt='img'/>
+                <img onClick={handleChoice("black", setSwapChoice, setNeedSwapChoice)} src={blackStone} alt='img'/>
+                <p onClick={handleChoice("more", setSwapChoice, setNeedSwapChoice)}>+2</p>
               </React.Fragment>
             }
           </div>

@@ -15,7 +15,7 @@ const OpeningRulesProp : React.FC<OpeningRulesPropProps> = ({
     gameRunning,
 }) => {
     const [ruleNumber, setRuleNumber] = useState(0);
-    const openingRulesList = ['standard', 'swap', 'swap2', 'pro', 'longpro'];
+    const openingRulesList = ['standard', 'swap', 'pro', 'longpro'];
 
     useEffect(() => {
         setOpeningRule(openingRulesList[ruleNumber]);
@@ -23,7 +23,7 @@ const OpeningRulesProp : React.FC<OpeningRulesPropProps> = ({
 
     return (
       <div className='info-prop-slider'>
-        <p >{openingRule}</p>
+        <p>{openingRule}</p>
         {!gameRunning &&
           <Slider setter={setRuleNumber} initial={ruleNumber} min={0} max={openingRulesList.length - 1}/>
         }

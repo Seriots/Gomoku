@@ -44,6 +44,8 @@ function GameIA() {
     const [firstPlayer, setFirstPlayer] = useState('white');
     const [depth, setDepth] = useState(5);
     const [openingRule, setOpeningRule] = useState('standard');
+    const [needSwapChoice, setNeedSwapChoice] = useState(false);
+    const [swapChoice, setSwapChoice] = useState('none');
     const firstPlayerRef = useRef(firstPlayer);
 
     useEffect(() => {
@@ -61,9 +63,11 @@ function GameIA() {
                 <DepthProp depth={depth} setDepth={setDepth} gameRunning={gameRunning} />
                 <OpeningRulesProp openingRule={openingRule} setOpeningRule={setOpeningRule} gameRunning={gameRunning} />
             </ParamsBar>
-            <SwapSelection openingRule={openingRule} />
+            {needSwapChoice &&
+                <SwapSelection openingRule={openingRule} setSwapChoice={setSwapChoice} setNeedSwapChoice={setNeedSwapChoice} />
+            }
             <InfoBar gameInfo={gameInfo} />
-            <Board IAMode={true} gameRunning={gameRunning} setGameRunning={setGameRunning} setWinner={setWinner} gameInfo={gameInfo} setGameInfo={setGameInfo} firstPlayer={firstPlayerRef} depth={depth} openingRule={openingRule}/>
+            <Board IAMode={true} gameRunning={gameRunning} setGameRunning={setGameRunning} setWinner={setWinner} gameInfo={gameInfo} setGameInfo={setGameInfo} firstPlayer={firstPlayerRef} depth={depth} openingRule={openingRule} swapChoice={swapChoice} setNeedSwapChoice={setNeedSwapChoice}/>
             <BoardShadow gameRunning={gameRunning} winner={winner} setWinner={setWinner}/>
             {!gameRunning &&
                 <StartButton gameRunning={gameRunning} setGameRunning={setGameRunning} />
