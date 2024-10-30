@@ -20,7 +20,7 @@
         left: 50%;
         transform: translate(-50%, 230%);
     }
-    
+
 }
 
 .param-prop {
@@ -144,4 +144,18 @@
 .activate-hint.activate {
     background-image: url("../../assets/checkBoxTrue.png");
     background-size: 100% 100%;
+}
+
+.info-prop-slider {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 20px;
+}
+
+.info-prop-slider p {
+    padding-right: 0px;
+    margin-bottom: 10px;
+    color: #e9e9e9;
+    font-size: 22px;
 }

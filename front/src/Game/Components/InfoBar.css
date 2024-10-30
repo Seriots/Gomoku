@@ -20,7 +20,7 @@
         left: 50%;
         transform: translate(-50%, 124%);
     }
-    
+
 }
 
 .info-props-div {
@@ -74,7 +74,7 @@
         margin-bottom: 0px;
         /*border-bottom: 1px solid #090909;*/
     }
-    
+
 }
 
 .info-prop h2 {
@@ -90,6 +90,7 @@
     font-size: 24px;
     padding: 0;
     padding-right: 20px;
+    margin: 0;
 }
 
 .info-prop img {

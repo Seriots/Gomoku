@@ -17,6 +17,8 @@ interface BoardProps {
     IAMode: boolean,
     activateHintP1?: boolean,
     activateHintP2?: boolean,
+    depth: number,
+    openingRule: string,
 }
 
 interface LocalGameInfoProps {
@@ -28,6 +30,8 @@ interface LocalGameInfoProps {
     blackCapture: number,
     listAllowed: string,
     moveCount: number,
+    depth: number,
+    openingRule: string,
 }
 
 let currentPos = {
@@ -36,7 +40,7 @@ let currentPos = {
 }
 
 
-const initLocalGameInfo = (firstPlayer: string) => {
+const initLocalGameInfo = (firstPlayer: string, depth: number = 6, openingRule: string = 'standard'): LocalGameInfoProps => {
     return {
         currentPlayer: firstPlayer,
         isProcessing: false,
@@ -46,6 +50,8 @@ const initLocalGameInfo = (firstPlayer: string) => {
         blackCapture: 0,
         listAllowed: '',
         moveCount: 0,
+        depth: depth,
+        openingRule: openingRule,
     }
 }
 
@@ -234,7 +240,7 @@ const getStone = async () => {
 
     console.log("lstWhite: ", listWhite, " lstBlack: ", listBlack);
 
-    await axios.get(build_request('http://localhost:6325/action', [pos, localGameInfo.currentPlayer, listWhite, listBlack, listBlocked, localGameInfo.listAllowed, localGameInfo.whiteCapture, localGameInfo.blackCapture]))
+    await axios.get(build_request('http://localhost:6325/action', [pos, localGameInfo.currentPlayer, listWhite, listBlack, listBlocked, localGameInfo.listAllowed, localGameInfo.whiteCapture, localGameInfo.blackCapture, localGameInfo.openingRule]))
     .then((res) => {
         localGameInfo.response = res.data;
         localGameInfo.moveCount++;
@@ -251,7 +257,7 @@ const getIaStone = async (IAMode: boolean) => {
     const listBlocked = getPositionList(document.getElementsByClassName('blocked-stone'));
     console.log("lstWhite: ", listWhite, " lstBlack: ", listBlack);
 
-    await axios.get(build_request('http://localhost:6325/ia', [localGameInfo.currentPlayer, listWhite, listBlack, listBlocked, localGameInfo.listAllowed, localGameInfo.whiteCapture, localGameInfo.blackCapture]))
+    await axios.get(build_request('http://localhost:6325/ia', [localGameInfo.currentPlayer, listWhite, listBlack, listBlocked, localGameInfo.listAllowed, localGameInfo.whiteCapture, localGameInfo.blackCapture, localGameInfo.depth, localGameInfo.openingRule]))
     .then((res) => {
         localGameInfo.response = res.data;
         localGameInfo.moveCount++;
@@ -358,6 +364,8 @@ const Board : React.FC<BoardProps> = ({
     IAMode,
     activateHintP1,
     activateHintP2,
+    depth,
+    openingRule,
 }) => {
     const [runFirstIa, setRunFirstIa] = useState(false);
 
@@ -366,7 +374,7 @@ const Board : React.FC<BoardProps> = ({
             localGameInfo.isProcessing = true;
             while (true) {
                 await getIaStone(IAMode);
-                if (!checkError(localGameInfo.response)) {                    
+                if (!checkError(localGameInfo.response)) {
                     break;
                 }
                 sleep(1000);
@@ -375,8 +383,9 @@ const Board : React.FC<BoardProps> = ({
             checkEndGame(localGameInfo.response, setGameRunning, setWinner);
             switchColor();
             updateGameInfo(localGameInfo.response, gameInfo, setGameInfo);
+            swapColorShadowStone();
             showShadowStone();
-            
+
             localGameInfo.isProcessing = false;
         }
         if (runFirstIa) {
@@ -389,7 +398,7 @@ const Board : React.FC<BoardProps> = ({
     useEffect(() => {
         if (gameRunning !== true)
             return ;
-        localGameInfo = initLocalGameInfo(firstPlayer.current);
+        localGameInfo = initLocalGameInfo(firstPlayer.current, depth, openingRule);
 
         const board = document.getElementById('boardID');
         if (!board)
@@ -404,6 +413,7 @@ const Board : React.FC<BoardProps> = ({
         const shadowStone = document.getElementById('shadow-stone');
         if (shadowStone)
             shadowStone.className = firstPlayer.current === 'white' ? 'white-shadow-stone' : 'black-shadow-stone';
+
         const hintStone = document.getElementById('hint-stone');
         if (hintStone)
             hintStone.className = firstPlayer.current === 'white' ? 'white-hint-stone' : 'black-hint-stone';

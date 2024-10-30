@@ -57,6 +57,9 @@ class Game {
         void                            print_board();
         std::map<e_cell, std::vector<int> > get_all_positions_stone();
         bool                                is_something_near(int x, int y);
+        e_color                             swap_choice(int const &white_capture, int const &black_capture);
+
+
 
 
 

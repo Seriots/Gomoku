@@ -48,7 +48,7 @@ void    r_action(const httplib::Request &req, httplib::Response &res) {
 
     // game.set(request.blocked, BLOCKED);
 
-    game.set(request.pos, request.color == WHITESTONE ? WHITE : BLACK);
+    game.set(request.pos, color_to_cell(request.color));
     // game.print_board();
     removed = game.get_captured(request.pos, request.color);
 
@@ -63,6 +63,50 @@ void    r_action(const httplib::Request &req, httplib::Response &res) {
     t_endgame_info endgame_info = game.check_end_game(request.pos, removed.size(), request.color);
 
     res.set_content(build_action_response(added, removed, endgame_info, {}, {}), "application/json"); // everything is send in a nicely formated json
+}
+
+
+/*
+    Request to choose if the IA should play Black or White
+*/
+void r_swap_ia(const httplib::Request &req, httplib::Response &res) {
+    t_request               request;
+    std::vector<t_stone>    added;
+    std::vector<int>        removed;
+    std::vector<int>        blocked_list;
+
+    res.set_header("Access-Control-Allow-Origin", "*"); // prevent CORS problems
+
+    request = create_new_ia_request(req);
+
+    Game game(request);
+    game.init_interesting_pos(request.color, request.allowed);
+
+    std::vector<int> board;
+    for (int i = 0; i < 19*19; i++)
+        board.push_back(-1);
+
+    game.set_depth(request.depth);
+    std::vector<int> threshold_by_layer = generate_thresholds(game.get_depth(), 60000, 10, 3);
+    game.set_threshold(threshold_by_layer);
+
+    auto start_time = std::chrono::high_resolution_clock::now();
+
+    int pos = game.fdNegamax({INT_MIN, INT_MAX, game.get_depth(), 1}, {request.white_capture, request.black_capture});
+    auto end_time = std::chrono::high_resolution_clock::now();
+
+    auto time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+    std::cout << "Time: " << time << std::endl << std::endl;
+
+    game.set(pos, color_to_cell(request.color));
+    removed = game.get_captured(pos, request.color);
+    game.unset(removed);
+
+    e_color choice = game.swap_choice(request.white_capture, request.black_capture);
+
+    t_endgame_info endgame_info = {choice, false, false, false, {}};
+
+    res.set_content(build_action_response(added, removed, endgame_info, {"time"}, {std::to_string(time)}), "application/json");
 }
 
 
@@ -104,7 +148,7 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
 
     auto end_time = std::chrono::high_resolution_clock::now();
 
-    
+
     auto time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
     std::cout << "Time: " << time << std::endl << std::endl;
     

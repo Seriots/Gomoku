@@ -64,6 +64,18 @@ std::vector<int> parse_board_input(std::string input) {
     return board;
 }
 
+e_opening_rule parse_opening_rule(const std::string &rule) {
+    if (rule == "swap")
+        return SWAP;
+    if (rule == "swap2")
+        return SWAP2;
+    if (rule == "pro")
+        return PRO;
+    if (rule == "longpro")
+        return LONGPRO;
+    return STANDARD;
+}
+
 /*
     Build a json content from a list of key and a list of value
     @param key: the list of key
@@ -110,8 +122,9 @@ t_request create_new_request(const httplib::Request &req) {
     std::vector<int> allowed = parse_board_input(req.path_params.at("allowed"));
     int white_capture = std::stoi(req.path_params.at("whiteCapture"));
     int black_capture = std::stoi(req.path_params.at("blackCapture"));
+    e_opening_rule opening_rule = parse_opening_rule(req.path_params.at("openingRule"));
 
-    return {pos, x, y, color, color_opponent, white, black, blocked, allowed, white_capture, black_capture};
+    return {pos, x, y, color, color_opponent, white, black, blocked, allowed, white_capture, black_capture, -1, opening_rule};
 }
 
 /*
@@ -128,7 +141,10 @@ t_request create_new_ia_request(const httplib::Request &req) {
     std::vector<int> allowed = parse_board_input(req.path_params.at("allowed"));
     int white_capture = std::stoi(req.path_params.at("whiteCapture"));
     int black_capture = std::stoi(req.path_params.at("blackCapture"));
-    return {0, 0, 0, color, color_opponent, white, black, blocked, allowed, white_capture, black_capture};
+    int depth = std::stoi(req.path_params.at("depth"));
+    e_opening_rule opening_rule = parse_opening_rule(req.path_params.at("openingRule"));
+
+    return {0, 0, 0, color, color_opponent, white, black, blocked, allowed, white_capture, black_capture, depth, opening_rule};
 }
 
 std::vector<int> get_request_dna(const httplib::Request &req) {
@@ -243,7 +259,12 @@ std::vector<int> generate_thresholds(int max_depth, int max_calculations, int ma
                 calculations = compute_calculations(thresholds);
                 index = index_to_increment(thresholds, max_thresholds);
                 if (calculations < max_calculations) {
-                    thresholds[index]++;
+                    if (thresholds[index] < max_thresholds)
+                        thresholds[index]++;
+                    else {
+                        done = true;
+                        break;
+                    }
                 }
                 if (calculations > max_calculations) {
                     int e;

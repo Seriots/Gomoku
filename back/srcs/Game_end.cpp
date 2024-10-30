@@ -170,7 +170,7 @@ bool   Game::check_no_winner() {
 t_endgame_info  Game::check_end_game(int pos, size_t captured, e_color color) {
     t_endgame_info endgame_info = {this->_request.color, false, false, false, {}};
 
-    e_cell cell = this->_request.color == WHITESTONE ? WHITE : BLACK;
+    e_cell cell = color_to_cell(this->_request.color);
 
     endgame_info.win_by_capture = check_win_by_capture(captured, color);
     endgame_info.win_by_alignement = check_win_by_alignement(pos, cell);

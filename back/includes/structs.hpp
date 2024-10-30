@@ -300,6 +300,14 @@ enum e_color {
     BLACKSTONE
 };
 
+enum e_opening_rule {
+    STANDARD,
+    SWAP,
+    SWAP2,
+    PRO,
+    LONGPRO,
+};
+
 typedef struct s_direction_info {
     int my_free_alignement;
     int my_real_alignement;
@@ -358,6 +366,8 @@ typedef struct s_request {
     std::vector<int>    allowed;
     int                 white_capture;
     int                 black_capture;
+    int                 depth;
+    e_opening_rule      opening_rule;
 }   t_request;
 
 typedef struct s_negamaxInformation {
