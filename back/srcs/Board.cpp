@@ -6,6 +6,7 @@
 #include "utils.hpp"
 #include "Board.hpp"
 #include "Cell.hpp"
+#include "structs.hpp"
 
 Board::Board() {
     for (int i = 0; i < 19; i++) {
@@ -13,6 +14,25 @@ Board::Board() {
             _board[i][j] = Cell();
         }
     }
+    this->init_dna();
+}
+
+void Board::init_dna() {
+    _dna[ANY_ALIGNEMENT] = 25;
+    _dna[FREE_THREE] = 1000;
+    _dna[FREE_FOUR] = 20000;
+    _dna[ALIGN_FIVE] = 1000000;
+    _dna[CAPTURE_TOTAL_2] = 150000;
+    _dna[CAPTURE_TOTAL_4] = 150000;
+    _dna[CAPTURE_TOTAL_6] = 150000;
+    _dna[CAPTURE_TOTAL_8] = 150000;
+    _dna[CAPTURE_TOTAL_10] = 150000;
+    _dna[BLOCK_FREE_THREE] = 10000;
+    _dna[BLOCK_FREE_FOUR] = 400000;
+    _dna[BLOCK_CAPTURE] = 140000;
+    _dna[BLOCK_WIN] = 10850000;
+    _dna[SETUP_CAPTURE] = 15000;
+    _dna[IS_CAPTURABLE] = -60000;
 }
 
 Board::Board(std::vector <int> white, std::vector <int> black) {
@@ -28,6 +48,7 @@ Board::Board(std::vector <int> white, std::vector <int> black) {
         }
     }
     compute_board_center();
+    this->init_dna();
 }
 
 Board::Board(const Board &b) {
@@ -37,6 +58,7 @@ Board::Board(const Board &b) {
         }
     }
     _center = b.get_center_pos();
+    this->init_dna();
 }
 
 Board::~Board() { }
@@ -48,6 +70,7 @@ void Board::operator= (const Board &b) {
         }
     }
     _center = b.get_center_pos();
+    this->init_dna();
 }
 
 void Board::compute_board_center() {
@@ -205,17 +228,17 @@ t_direction_info Board::compute_direction_side(t_position &grid_pos, int dx, int
 
 int Board::compute_score_info(t_score_info score_info, t_captureCount capture, e_cell my) const {
     int score = 0;
-    score += score_info.any_alignement * 25;
-    score += score_info.free_three * 1000;
-    score += score_info.free_four * 20000;
-    score += score_info.capture * 150000 * (1 + (my == WHITE ? capture.white : capture.black));
-    score += score_info.align_five * 1000000;
-    score += score_info.block_capture * 140000 *  (1 + (my == WHITE ? capture.black : capture.white));
-    score += score_info.is_capturable * -60000;
-    score += score_info.setup_capture * 15000;
-    score += score_info.block_win * 10850000;
-    score += score_info.block_free_four * 200000;
-    score += score_info.block_free_three * 10000;
+    score += score_info.any_alignement * this->_dna.at(ANY_ALIGNEMENT);
+    score += score_info.free_three * this->_dna.at(FREE_THREE);
+    score += score_info.free_four * this->_dna.at(FREE_FOUR);
+    score += score_info.capture * this->_dna.at(CAPTURE_TOTAL_2) * (1 + (my == WHITE ? capture.white : capture.black));
+    score += score_info.align_five * this->_dna.at(ALIGN_FIVE);
+    score += score_info.block_capture * this->_dna.at(BLOCK_CAPTURE) *  (1 + (my == WHITE ? capture.black : capture.white));
+    score += score_info.is_capturable * this->_dna.at(IS_CAPTURABLE);
+    score += score_info.setup_capture * this->_dna.at(SETUP_CAPTURE);
+    score += score_info.block_win * this->_dna.at(BLOCK_WIN);
+    score += score_info.block_free_four * this->_dna.at(BLOCK_FREE_FOUR);
+    score += score_info.block_free_three * this->_dna.at(BLOCK_FREE_THREE);
     return score;
 
 }

@@ -114,12 +114,15 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
 
     game.set_depth(request.depth);
 
-    std::vector<int> threshold_by_layer = generate_thresholds(game.get_depth(), 200000 - (20000 * std::max(0, game.get_depth() - 6)), 50, 3);
+    std::vector<int> threshold_by_layer = generate_thresholds(game.get_depth(), 20000 - (2000 * std::max(0, game.get_depth() - 6)), 50, 3);
     game.set_threshold(threshold_by_layer);
+
+    for (auto &treshold : threshold_by_layer)
+        std::cout << treshold << std::endl;
 
     auto start_time = std::chrono::high_resolution_clock::now();
     
-    int pos = game.fdNegamax({INT_MIN, INT_MAX, game.get_depth(), 1}, (t_captureCount){request.white_capture, request.black_capture});
+    int pos = game.fdNegamax({INT_MIN + 1, INT_MAX - 1, game.get_depth(), 1}, (t_captureCount){request.white_capture, request.black_capture});
 
 
     auto end_time = std::chrono::high_resolution_clock::now();

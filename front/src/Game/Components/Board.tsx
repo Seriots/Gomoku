@@ -244,8 +244,6 @@ const getStone = async () => {
     const listBlack = getPositionList(document.getElementsByClassName('black-stone'));
     const listBlocked = getPositionList(document.getElementsByClassName('blocked-stone'));
 
-    console.log("lstWhite: ", listWhite, " lstBlack: ", listBlack, " move count: ", localGameInfo.moveCount);
-
     await axios.get(build_request('http://localhost:6325/action', [pos, localGameInfo.currentPlayer, listWhite, listBlack, listBlocked, localGameInfo.listAllowed, localGameInfo.whiteCapture, localGameInfo.blackCapture, localGameInfo.openingRule, localGameInfo.moveCount]))
     .then((res) => {
         if (checkError(res.data)) {
@@ -262,13 +260,11 @@ const getStone = async () => {
     });
 }
 
-const getIaStone = async (IAMode: boolean) => {
+const getIaStone = async (IAMode: boolean, gameInfo?: any, setGameInfo?: any) => {
 
     const listWhite = getPositionList(document.getElementsByClassName('white-stone'));
     const listBlack = getPositionList(document.getElementsByClassName('black-stone'));
     const listBlocked = getPositionList(document.getElementsByClassName('blocked-stone'));
-    console.log("lstWhite: ", listWhite, " lstBlack: ", listBlack, " move count: ", localGameInfo.moveCount);
-
 
     await axios.get(build_request('http://localhost:6325/ia', [localGameInfo.currentPlayer, listWhite, listBlack, listBlocked, localGameInfo.listAllowed, localGameInfo.whiteCapture, localGameInfo.blackCapture, localGameInfo.depth, localGameInfo.openingRule, localGameInfo.moveCount]))
     .then((res) => {
@@ -277,8 +273,10 @@ const getIaStone = async (IAMode: boolean) => {
             return;
         }
         localGameInfo.response = res.data;
+        console.log(localGameInfo.response);
         if (!IAMode) {
             setHintIAStone(localGameInfo.response);
+            updateGameInfo(localGameInfo.response, gameInfo, setGameInfo);
         }
     })
     .catch((err) => {
@@ -292,8 +290,6 @@ const getIaSwapChoice = async () => {
     const listWhite = getPositionList(document.getElementsByClassName('white-stone'));
     const listBlack = getPositionList(document.getElementsByClassName('black-stone'));
     const listBlocked = getPositionList(document.getElementsByClassName('blocked-stone'));
-    console.log("lstWhite: ", listWhite, " lstBlack: ", listBlack, " move count: ", localGameInfo.moveCount);
-
 
     await axios.get(build_request('http://localhost:6325/swapChoice', [localGameInfo.currentPlayer, listWhite, listBlack, listBlocked, localGameInfo.listAllowed, localGameInfo.whiteCapture, localGameInfo.blackCapture, localGameInfo.depth, localGameInfo.openingRule, localGameInfo.moveCount]))
     .then((res) => {
@@ -326,7 +322,6 @@ const setHintIAStone = (data: any) => {
         return;
 
     const pos = data.added[0].pos;
-    console.log(pos);
     hintStone.style.left = (pos % 19) * CASESIZE + BORDERSIZE + 'px';
     hintStone.style.top = Math.floor(pos / 19) * CASESIZE + BORDERSIZE + 'px';
     hintStone.className = localGameInfo.currentPlayer === 'white' ? 'white-hint-stone' : 'black-hint-stone';
@@ -389,7 +384,8 @@ const handleClick = (IAMode: boolean, gameRunning: any, setGameRunning: any, set
     localGameInfo.isProcessing = false;
 
     if (!IAMode && ((activateHintP1 && localGameInfo.currentPlayer === 'white') || (activateHintP2 && localGameInfo.currentPlayer === 'black'))) {
-        getIaStone(IAMode);
+        getIaStone(IAMode, gameInfo, setGameInfo);
+        updateGameInfo(localGameInfo.response, gameInfo, setGameInfo);
     }
 }
 
@@ -443,7 +439,7 @@ const Board : React.FC<BoardProps> = ({
                 playIa();
             } 
         }
-    }, [swapChoice]);
+    }, [swapChoice, IAMode, gameInfo, setGameInfo, setGameRunning,setWinner]);
 
 
     useEffect(() => {
@@ -476,7 +472,7 @@ const Board : React.FC<BoardProps> = ({
             playIa();
         }
     }
-    , [runFirstIa, gameInfo, setGameInfo, setGameRunning, setWinner, IAMode]);
+    , [runFirstIa, gameInfo, setGameInfo, setGameRunning, setWinner, IAMode, setNeedSwapChoice]);
 
     useEffect(() => {
         if (gameRunning !== true)
@@ -505,7 +501,7 @@ const Board : React.FC<BoardProps> = ({
             setRunFirstIa(true);
         }
 
-    }, [gameRunning, firstPlayer]);
+    }, [gameRunning, firstPlayer, depth, openingRule]);
 
     return (
         <div id='boardID' className='board' onClick={handleClick(IAMode, gameRunning, setGameRunning, setWinner, gameInfo, setGameInfo, setNeedSwapChoice, activateHintP1, activateHintP2)} onMouseMove={handleMouseMove} onMouseEnter={handleMouseEnter(gameRunning)} onMouseLeave={handleMouseLeave}>
