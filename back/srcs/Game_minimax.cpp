@@ -46,8 +46,6 @@ void Game::display_negamax_board(std::vector<int> &board) {
     }
 }
 
-int a = 0;
-
 int Game::negamax(t_negamaxInformation info, t_captureCount capture, int currPos) {
     (void)currPos;
     size_t              board_hash;
@@ -59,7 +57,6 @@ int Game::negamax(t_negamaxInformation info, t_captureCount capture, int currPos
     int                 limit;
 
     board_hash = this->_board.get_hash_board();
-    a++;
     if (is_already_computed(board_hash)) {
         return this->_transposition_table[board_hash];
     }
@@ -69,9 +66,6 @@ int Game::negamax(t_negamaxInformation info, t_captureCount capture, int currPos
         this->_transposition_table[board_hash] = score;
         return score;
     }
-
-
-
 
     max_eval = INT_MIN;
     
@@ -123,7 +117,6 @@ int Game::fdNegamax(t_negamaxInformation info, t_captureCount capture) {
     t_captureCount      tmp_capture;
     int                 best_pos;
     int                 limit;
-    a = 0;
     if (info.depth == 0) {
         return (this->_interesting_pos.size() > 0 ? *this->_interesting_pos.begin() : -1);
     }
@@ -139,7 +132,7 @@ int Game::fdNegamax(t_negamaxInformation info, t_captureCount capture) {
         
         captured = this->get_captured(pos, _request.color);
         tmp_capture = capture;
-        if (_request.color == WHITESTONE)
+        if (_request.color == BLACKSTONE)
             tmp_capture.black += captured.size();
         else
             tmp_capture.white += captured.size();
@@ -172,7 +165,6 @@ int Game::fdNegamax(t_negamaxInformation info, t_captureCount capture) {
 
         info.alpha = std::max(info.alpha, score);
     }
-    std::cout << a << std::endl;
     this->display_negamax_board(board);
     return best_pos;
 }

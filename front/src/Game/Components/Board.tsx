@@ -273,7 +273,6 @@ const getIaStone = async (IAMode: boolean, gameInfo?: any, setGameInfo?: any) =>
             return;
         }
         localGameInfo.response = res.data;
-        console.log(localGameInfo.response);
         if (!IAMode) {
             setHintIAStone(localGameInfo.response);
             updateGameInfo(localGameInfo.response, gameInfo, setGameInfo);
@@ -433,7 +432,6 @@ const Board : React.FC<BoardProps> = ({
         if (localGameInfo.waitingForChoice === false) {
             return;
         }
-        console.log('end waiting for choice');
         localGameInfo.waitingForChoice = false;
         if (localGameInfo.currentPlayer === "white") {
             if (swapChoice === "black") {
@@ -462,7 +460,6 @@ const Board : React.FC<BoardProps> = ({
             if (localGameInfo.openingRule === 'swap' || localGameInfo.openingRule === 'swap2') {
                 localGameInfo.waitingForChoice = true;
                 setNeedSwapChoice(true);
-                console.log('waiting for choice');
             } else {
                 showShadowStone();
             }
