@@ -438,8 +438,9 @@ const Board : React.FC<BoardProps> = ({
         if (localGameInfo.currentPlayer === "white") {
             if (swapChoice === "black") {
                 playIa();
-            } 
+            }
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [swapChoice, IAMode, setGameInfo, setGameRunning,setWinner]);
 
 
