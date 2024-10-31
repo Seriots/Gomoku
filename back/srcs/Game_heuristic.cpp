@@ -268,6 +268,10 @@ int Game::add_capture_score(int current_capture) {
     return 0;
 }
 
+/*
+    Compute the value of the board. That look on each 5 stones sequence and compute the score of the sequence
+    @args: color -> the color of the player
+*/
 int Game::board_complex_heuristic(e_color color, int white_capture, int black_capture) {
     e_cell my = color == WHITESTONE ? WHITE : BLACK;
     e_cell other = (my == WHITE) ? BLACK : WHITE;

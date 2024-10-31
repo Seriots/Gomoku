@@ -8,20 +8,6 @@
 
 
 /*
-    Basic test request, does nothing nice
-*/
-void    r_game(const httplib::Request &req, httplib::Response &res) {
-    (void)req;
-    res.set_header("Access-Control-Allow-Origin", "*");
-
-    Game game;
-
-    int score = game.board_complex_heuristic(BLACKSTONE, 0, 0);
-    std::cout << score << std::endl;
-    res.set_content("{"+ std::to_string(score) + "}", "application/json");
-}
-
-/*
     Request to try to place a stone on the board
     The request must contain the following parameters:
     - pos: the position where the stone should be placed
@@ -114,7 +100,7 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
 
     game.set_depth(request.depth);
 
-    std::vector<int> threshold_by_layer = generate_thresholds(game.get_depth(), 20000 - (2000 * std::max(0, game.get_depth() - 6)), 50, 3);
+    std::vector<int> threshold_by_layer = generate_thresholds(game.get_depth(), 20000 - (2000 * std::max(0, game.get_depth() - 6)), 50, 2);
     game.set_threshold(threshold_by_layer);
 
     for (auto &treshold : threshold_by_layer)
@@ -239,14 +225,4 @@ void r_ia_with_dna(const httplib::Request &req, httplib::Response &res) {
 
     std::cout << "Send: " << time << std::endl;
     res.set_content(build_action_response(added, removed, endgame_info, {"time", "depthSearch"}, {std::to_string(time), std::to_string(game.get_depth())}), "application/json");
-}
-
-/*
-    Request to end the game
-*/
-void r_end(const httplib::Request &req, httplib::Response &res) {
-    (void)req;
-    (void)res;
-    res.set_header("Access-Control-Allow-Origin", "*");
-    res.set_content("end", "text/plain");
 }

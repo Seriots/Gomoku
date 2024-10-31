@@ -12,14 +12,9 @@ int main() {
 
 	srand(time(NULL));
 
-	svr.Get("/game", r_game);
-
-	svr.Get("/end", r_end);
-
     svr.Get("/action/:pos/:color/:white/:black/:blocked/:allowed/:whiteCapture/:blackCapture/:openingRule/:currentTurn", r_action);
     svr.Get("/ia/:color/:white/:black/:blocked/:allowed/:whiteCapture/:blackCapture/:depth/:openingRule/:currentTurn", r_ia);
     svr.Get("/swapChoice/:color/:white/:black/:blocked/:allowed/:whiteCapture/:blackCapture/:depth/:openingRule/:currentTurn", r_swapChoice);
-    //svr.Get("/swap/:color/:white/:black/:blocked/:allowed/:whiteCapture/:blackCapture/:depth/:openingRule", r_swap_ia);
     svr.Get("/iaWithDna/:color/:white/:black/:blocked/:whiteCapture/:blackCapture/:dna", r_ia_with_dna);
 
 	svr.listen("localhost", 6325);
