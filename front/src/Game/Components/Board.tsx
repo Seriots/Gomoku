@@ -433,13 +433,14 @@ const Board : React.FC<BoardProps> = ({
         if (localGameInfo.waitingForChoice === false) {
             return;
         }
+        console.log('end waiting for choice');
         localGameInfo.waitingForChoice = false;
         if (localGameInfo.currentPlayer === "white") {
             if (swapChoice === "black") {
                 playIa();
             } 
         }
-    }, [swapChoice, IAMode, gameInfo, setGameInfo, setGameRunning,setWinner]);
+    }, [swapChoice, IAMode, setGameInfo, setGameRunning,setWinner]);
 
 
     useEffect(() => {
@@ -461,6 +462,7 @@ const Board : React.FC<BoardProps> = ({
             if (localGameInfo.openingRule === 'swap' || localGameInfo.openingRule === 'swap2') {
                 localGameInfo.waitingForChoice = true;
                 setNeedSwapChoice(true);
+                console.log('waiting for choice');
             } else {
                 showShadowStone();
             }
