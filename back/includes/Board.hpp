@@ -1,13 +1,15 @@
 #pragma once
 
 #include <vector>
+#include <map>
 
 #include "Cell.hpp"
 
 class Board {
     private:
-        Cell _board[19][19];
-        int _center;
+        Cell                    _board[19][19];
+        int                     _center;
+        std::map<e_dna, int>    _dna;
 
     public:
         Board();
@@ -17,6 +19,7 @@ class Board {
 
         void operator= (const Board &b);
 
+        void init_dna();
 
         void compute_board_center();
 

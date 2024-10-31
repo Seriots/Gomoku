@@ -94,7 +94,6 @@ function Game() {
         is_processing = is_processing + 1
 		await axios.get(build_request('http://localhost:6325/ia', [color, listWhite, listBlack, listBlocked, captured_count.white, captured_count.black]))
 			.then((res) => {
-                console.log(res.data);
                 handleBackData(res);
                 if (color === 'white')
                     captured_count.white += res.data.removed.length;
@@ -104,7 +103,6 @@ function Game() {
                 handleEndGame(res.data, color);
                 color = color === 'white' ? 'black' : 'white';
                 shadowStone.className = color + "-shadow-stone";
-                console.log(captured_count);
                 is_processing = is_processing - 1
 			})
 			.catch((err) => {
@@ -128,7 +126,6 @@ function Game() {
         is_processing = is_processing + 1
 		await axios.get(build_request('http://localhost:6325/action', [pos, color, listWhite, listBlack, listBlocked, captured_count.white, captured_count.black]))
 			.then((res) => {
-                console.log(res.data);
                 if (res.data.error === undefined) {
                     handleBackData(res);
                     if (color === 'white')
@@ -138,7 +135,6 @@ function Game() {
                     handleEndGame(res.data, color);
                     color = color === 'white' ? 'black' : 'white';
                     shadowStone.className = color + "-shadow-stone";
-                    console.log(captured_count);
                     placeIAStone();
                 }
                 is_processing = is_processing - 1

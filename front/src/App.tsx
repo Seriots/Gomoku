@@ -14,10 +14,6 @@ function App() {
 		<div className="App">
 			<Routes>
                 <Route path="/" element={<Homepage />} />
-                <Route path="/game" element={<Game />} />
-                <Route path="/ia" element={<Ia />} />
-                <Route path="/player" element={<Player />} />
-                <Route path="/test" element={<Test />} />
                 <Route path="/GameIA" element={<GameIA />} />
                 <Route path="/GamePlayer" element={<GamePlayer />} />
 

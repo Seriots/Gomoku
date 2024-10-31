@@ -93,34 +93,34 @@
     all: unset;
     height: 50px;
     width: 50px;
-    background-image: url("../../assets/whiteStone.png");
+    background-image: url("../../assets/blackStone.png");
     background-size: 100% 100%;
     position: relative ;
     cursor: pointer;
 }
 
-.first-player-selector.black {
-    background-image: url("../../assets/blackStone.png");
+.first-player-selector.white {
+    background-image: url("../../assets/whiteStone.png");
     background-size: 100% 100%;
     cursor: pointer;
 }
 
 .first-player-selector-white {
     color: #e9e9e9;
-    display: block;
+    display: none;
 }
 
 .first-player-selector-black {
     color: #1f1f1f;
-    display: none;
+    display: block;
 }
 
 .first-player-selector-white.toggle {
-    display: none;
+    display: block;
 }
 
 .first-player-selector-black.toggle {
-    display: block;
+    display: none;
 }
 
 .activate-hint-wrapper {

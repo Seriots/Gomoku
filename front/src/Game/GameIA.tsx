@@ -40,8 +40,8 @@ const GameInBlack: GameInfoInterface = {
 function GameIA() {
     const [gameRunning, setGameRunning] = useState(false);
     const [winner, setWinner] = useState('');
-    const [gameInfo, setGameInfo] = useState(GameInWhite);
-    const [firstPlayer, setFirstPlayer] = useState('white');
+    const [gameInfo, setGameInfo] = useState(GameInBlack);
+    const [firstPlayer, setFirstPlayer] = useState('black');
     const [depth, setDepth] = useState(6);
     const [openingRule, setOpeningRule] = useState('standard');
     const [needSwapChoice, setNeedSwapChoice] = useState(false);

@@ -15,7 +15,7 @@ const handleClick = (firstPlayer: string, setFirstPlayer: any, gameRunning: bool
     const blackText = document.getElementById('BlackTextID') as HTMLElement; 
     if (!firstPlayerIMG || !whiteText || !blackText)
         return;
-    firstPlayerIMG.classList.toggle('black');
+    firstPlayerIMG.classList.toggle('white');
     whiteText.classList.toggle('toggle');
     blackText.classList.toggle('toggle');
 

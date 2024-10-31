@@ -46,6 +46,7 @@ void Game::display_negamax_board(std::vector<int> &board) {
     }
 }
 
+int a = 0;
 
 int Game::negamax(t_negamaxInformation info, t_captureCount capture, int currPos) {
     (void)currPos;
@@ -58,7 +59,7 @@ int Game::negamax(t_negamaxInformation info, t_captureCount capture, int currPos
     int                 limit;
 
     board_hash = this->_board.get_hash_board();
-
+    a++;
     if (is_already_computed(board_hash)) {
         return this->_transposition_table[board_hash];
     }
@@ -94,9 +95,9 @@ int Game::negamax(t_negamaxInformation info, t_captureCount capture, int currPos
         this->unset(captured);
 
         if (tmp_capture.white >= 10 || tmp_capture.black >= 10)
-            score = -this->board_complex_heuristic(_request.color, tmp_capture.white, tmp_capture.black);
+            score = info.is_maximizing * this->board_complex_heuristic(_request.color, tmp_capture.white, tmp_capture.black);
         else if (check_win_by_alignement(pos, (info.is_maximizing == 1 ? color_to_cell(_request.color) : color_to_cell(_request.color_opponent))))
-            score = -this->board_complex_heuristic(_request.color, tmp_capture.white, tmp_capture.black);
+            score = info.is_maximizing * this->board_complex_heuristic(_request.color, tmp_capture.white, tmp_capture.black);
         else 
             score = -this->negamax({-info.beta, -info.alpha, info.depth - 1, -info.is_maximizing}, tmp_capture, pos);
 
@@ -110,7 +111,6 @@ int Game::negamax(t_negamaxInformation info, t_captureCount capture, int currPos
         if (info.alpha >= info.beta)
             break;
     }
-
     this->_transposition_table[board_hash] = max_eval;
     return max_eval;
 }
@@ -123,10 +123,13 @@ int Game::fdNegamax(t_negamaxInformation info, t_captureCount capture) {
     t_captureCount      tmp_capture;
     int                 best_pos;
     int                 limit;
-    
+    a = 0;
     if (info.depth == 0) {
         return (this->_interesting_pos.size() > 0 ? *this->_interesting_pos.begin() : -1);
     }
+
+    if (this->_interesting_pos.size() == 1)
+        return *this->_interesting_pos.begin();
     
     limit = this->_threshold[info.depth - 1];
 
@@ -144,11 +147,15 @@ int Game::fdNegamax(t_negamaxInformation info, t_captureCount capture) {
         this->set(pos, color_to_cell(_request.color));
         this->unset(captured);
         if (tmp_capture.white >= 10 || tmp_capture.black >= 10) {
+            this->set(captured, color_to_cell(_request.color_opponent));
+            this->unset(pos);
             return pos;
         }
         if (check_win_by_alignement(pos, color_to_cell(_request.color))) {
             std::vector<int>    prevent = get_capture_prevent_win_pos(pos, color_to_cell(_request.color));
             if (!((prevent.size() + 1) * 2 + (_request.color == WHITESTONE ? tmp_capture.black : tmp_capture.white) >= 10)) {
+                this->set(captured, color_to_cell(_request.color_opponent));
+                this->unset(pos);
                 return pos;
             }
         }
@@ -165,6 +172,7 @@ int Game::fdNegamax(t_negamaxInformation info, t_captureCount capture) {
 
         info.alpha = std::max(info.alpha, score);
     }
+    std::cout << a << std::endl;
     this->display_negamax_board(board);
     return best_pos;
 }
