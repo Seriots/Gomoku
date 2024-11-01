@@ -1,5 +1,4 @@
 import './ParamsBar.css';
-import FirstPlayerProp from './FirstPlayerProp';
 import { Children } from 'react';
 
 
