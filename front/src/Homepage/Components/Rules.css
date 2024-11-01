@@ -1,0 +1,49 @@
+
+.rules-button {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 10vw;
+    height: 4vw;
+    font-size: 1.5vw;
+    font-weight: 300;
+    border: solid;
+    border-color: #632f02;
+    border-width: 8px;
+    border-radius: 1vw;
+    cursor: pointer;
+    background-color: #ce9400;
+    /*background-image: url("../../assets/WoodCartoon.webp");*/
+    font-family: "Kaph";
+    color: #a84f03;
+}
+
+.rules-screen-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.rules-screen {
+    width: 68vw;
+    height: 68vh;
+    background-color: #ce9400;
+    border: solid;
+    border-color: #632f02;
+    border-width: 8px;
+    border-radius: 1vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    font-family: "Kaph";
+    color: #a84f03;
+    padding: 20px;
+}

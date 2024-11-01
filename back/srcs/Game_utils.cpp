@@ -30,14 +30,14 @@ void Game::init_sequenceDna(std::vector<int> *dna) {
         this->_valuesDna[VDNA_THREEN2] = 1400;
         this->_valuesDna[VDNA_THREEN1] = 2000;
         this->_valuesDna[VDNA_THREE] = 2500;
-        this->_valuesDna[VDNA_THREEFREE] = 23000;
-        this->_valuesDna[VDNA_FOURN1] = 39000;
-        this->_valuesDna[VDNA_FOUR] = 52000;
+        this->_valuesDna[VDNA_THREEFREE] = 15000;
+        this->_valuesDna[VDNA_FOURN1] = 18000;
+        this->_valuesDna[VDNA_FOUR] = 27000;
         this->_valuesDna[VDNA_FIVE] = 2000000;
-        this->_valuesDna[VDNA_POTENTIAL_CAPTURE] = 35000;
+        this->_valuesDna[VDNA_POTENTIAL_CAPTURE] = 6200;
         this->_valuesDna[VDNA_EFFECTIVE_CAPTURE_0] = 11000;
-        this->_valuesDna[VDNA_EFFECTIVE_CAPTURE_1] = 19000;
-        this->_valuesDna[VDNA_EFFECTIVE_CAPTURE_2] = 25000;
+        this->_valuesDna[VDNA_EFFECTIVE_CAPTURE_1] = 13000;
+        this->_valuesDna[VDNA_EFFECTIVE_CAPTURE_2] = 29000;
         this->_valuesDna[VDNA_EFFECTIVE_CAPTURE_3] = 1000000;
     } else {
         for (size_t i = 0; i < dna->size(); i++) {
@@ -45,7 +45,7 @@ void Game::init_sequenceDna(std::vector<int> *dna) {
         }
     }
 
-    float minusFactor = -1.7;
+    float minusFactor = -1.0;
 
     _sequenceDna[SDNA_NNNNM] = this->_valuesDna[VDNA_ONE];
     _sequenceDna[SDNA_NNNNY] = minusFactor * this->_valuesDna[VDNA_ONE];

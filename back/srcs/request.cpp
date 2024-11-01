@@ -100,7 +100,7 @@ void r_ia(const httplib::Request &req, httplib::Response &res) {
 
     game.set_depth(request.depth);
 
-    std::vector<int> threshold_by_layer = generate_thresholds(game.get_depth(), 20000 - (3500 * std::max(0, game.get_depth() - 6)), 50, 2);
+    std::vector<int> threshold_by_layer = generate_thresholds(game.get_depth(), 40000 - (5000 * std::max(0, game.get_depth() - 6)), 50, 3);
     game.set_threshold(threshold_by_layer);
 
     auto start_time = std::chrono::high_resolution_clock::now();

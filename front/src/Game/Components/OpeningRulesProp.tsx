@@ -19,6 +19,7 @@ const OpeningRulesProp : React.FC<OpeningRulesPropProps> = ({
 
     useEffect(() => {
         setOpeningRule(openingRulesList[ruleNumber]);
+        // eslint-disable-next-line
     }, [ruleNumber]);
 
     return (
