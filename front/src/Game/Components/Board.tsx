@@ -43,6 +43,7 @@ let currentPos = {
     y: 0,
 }
 
+const request_root = process.env.REACT_APP_BACKHOST + ':' + process.env.REACT_APP_BACKPORT; 
 
 const initLocalGameInfo = (firstPlayer: string, depth: number = 6, openingRule: string = 'standard'): LocalGameInfoProps => {
     return {
@@ -237,14 +238,47 @@ const switchColor = () => {
 }
 
 const getStone = async () => {
+    const board = document.getElementById('boardID');
+    if (!board)
+        return;
     const hintStone = document.getElementById('hint-stone');
 
     const pos = computePositionFromPx(currentPos.x, currentPos.y);
+    if (pos < 0 || pos >= 361) {
+        console.log('Error: out of board');
+        localGameInfo.isProcessing = false;
+        return;
+    }
+    if (localGameInfo.listAllowed !== '' && !document.getElementById('allowed-stone-' + pos)) {
+        console.log('Error: not allowed');
+        localGameInfo.isProcessing = false;
+        return;
+    }
+    if (document.getElementById('stone-' + pos)) {
+        console.log('Error: already a stone');
+        localGameInfo.isProcessing = false;
+        return;
+    }
+    if (localGameInfo.moveCount === 0 && (localGameInfo.openingRule === 'pro' || localGameInfo.openingRule === 'longpro')) {
+        if (pos !== 180) {
+            console.log('Error: first stone must be at position 180');
+            localGameInfo.isProcessing = false;
+            return;
+        }
+    }
+
     const listWhite = getPositionList(document.getElementsByClassName('white-stone'));
     const listBlack = getPositionList(document.getElementsByClassName('black-stone'));
     const listBlocked = getPositionList(document.getElementsByClassName('blocked-stone'));
 
-    await axios.get(build_request('http://localhost:6325/action', [pos, localGameInfo.currentPlayer, listWhite, listBlack, listBlocked, localGameInfo.listAllowed, localGameInfo.whiteCapture, localGameInfo.blackCapture, localGameInfo.openingRule, localGameInfo.moveCount]))
+    let newStone = document.createElement('div');
+    newStone.className = localGameInfo.currentPlayer + '-stone';
+    newStone.style.left = currentPos.x + 'px';
+    newStone.style.top = currentPos.y + 'px';
+    newStone.id = "stone-" + pos;
+    board.appendChild(newStone);
+
+    await axios.get(build_request('http://' + request_root + '/api/action', [pos, localGameInfo.currentPlayer, listWhite, listBlack, listBlocked, localGameInfo.listAllowed, localGameInfo.whiteCapture, localGameInfo.blackCapture, localGameInfo.openingRule, localGameInfo.moveCount]))
     .then((res) => {
         if (checkError(res.data)) {
             localGameInfo.isProcessing = false;
@@ -266,7 +300,7 @@ const getIaStone = async (IAMode: boolean, gameInfo?: any, setGameInfo?: any) =>
     const listBlack = getPositionList(document.getElementsByClassName('black-stone'));
     const listBlocked = getPositionList(document.getElementsByClassName('blocked-stone'));
 
-    await axios.get(build_request('http://localhost:6325/ia', [localGameInfo.currentPlayer, listWhite, listBlack, listBlocked, localGameInfo.listAllowed, localGameInfo.whiteCapture, localGameInfo.blackCapture, localGameInfo.depth, localGameInfo.openingRule, localGameInfo.moveCount]))
+    await axios.get(build_request('http://' + request_root + '/api/ia', [localGameInfo.currentPlayer, listWhite, listBlack, listBlocked, localGameInfo.listAllowed, localGameInfo.whiteCapture, localGameInfo.blackCapture, localGameInfo.depth, localGameInfo.openingRule, localGameInfo.moveCount]))
     .then((res) => {
         if (checkError(res.data)) {
             localGameInfo.isProcessing = false;
@@ -290,7 +324,7 @@ const getIaSwapChoice = async () => {
     const listBlack = getPositionList(document.getElementsByClassName('black-stone'));
     const listBlocked = getPositionList(document.getElementsByClassName('blocked-stone'));
 
-    await axios.get(build_request('http://localhost:6325/swapChoice', [localGameInfo.currentPlayer, listWhite, listBlack, listBlocked, localGameInfo.listAllowed, localGameInfo.whiteCapture, localGameInfo.blackCapture, localGameInfo.depth, localGameInfo.openingRule, localGameInfo.moveCount]))
+    await axios.get(build_request('http://' + request_root + '/api/swapChoice', [localGameInfo.currentPlayer, listWhite, listBlack, listBlocked, localGameInfo.listAllowed, localGameInfo.whiteCapture, localGameInfo.blackCapture, localGameInfo.depth, localGameInfo.openingRule, localGameInfo.moveCount]))
     .then((res) => {
         localGameInfo.IAchoice = res.data;
     })

@@ -47,7 +47,7 @@ void    r_action(const httplib::Request &req, httplib::Response &res) {
         blocked_list_pro_mode = game.get_blocked_center(request.opening_rule == PRO ? 5 : 7);
     }
 
-    added.push_back({request.pos, request.color == WHITESTONE ? "white" : "black"});
+    // added.push_back({request.pos, request.color == WHITESTONE ? "white" : "black"});
     for (size_t i = 0; i < blocked_list.size(); i++)
         added.push_back({blocked_list[i], "blocked"});
     for (size_t i = 0; i < blocked_list_pro_mode.size(); i++)

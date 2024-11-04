@@ -89,9 +89,9 @@ int Game::negamax(t_negamaxInformation info, t_captureCount capture, int currPos
         this->unset(captured);
 
         if (tmp_capture.white >= 10 || tmp_capture.black >= 10)
-            score = info.is_maximizing * this->board_complex_heuristic(_request.color, tmp_capture.white, tmp_capture.black) * (info.depth + 1);
+            score = info.is_maximizing * this->board_complex_heuristic(_request.color, tmp_capture.white, tmp_capture.black) * (info.depth + 5);
         else if (check_win_by_alignement(pos, (info.is_maximizing == 1 ? color_to_cell(_request.color) : color_to_cell(_request.color_opponent))))
-            score = info.is_maximizing * this->board_complex_heuristic(_request.color, tmp_capture.white, tmp_capture.black) * (info.depth + 1);
+            score = info.is_maximizing * this->board_complex_heuristic(_request.color, tmp_capture.white, tmp_capture.black) * (info.depth + 5);
         else 
             score = -this->negamax({-info.beta, -info.alpha, info.depth - 1, -info.is_maximizing}, tmp_capture, pos);
 

@@ -37,3 +37,5 @@ Gomoku
 log
 trainer
 back/logs/*
+
+front/.env
