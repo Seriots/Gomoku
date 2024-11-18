@@ -34,6 +34,10 @@ npm install
 npm start
 ```
 
+### Run
+
+Now you can go to `localhost:3000` to access to the website
+
 ## 🔭 Minimax
 
 Minimax is a decision-making algorithm commonly used in turn-based games, where players take alternate moves aiming to maximize their advantage while minimizing the opponent's. To make this process efficient, you've implemented several optimizations:
@@ -89,11 +93,27 @@ int negamax(Node* node, int depth, int alpha, int beta, int color) {
 
 5. **Move Ordering**: Sorting moves to prioritize the most promising options first speeds up the Alpha-Beta pruning. By focusing on moves more likely to lead to favorable outcomes, this technique makes the search process faster and more directed. To sort out the most interesting moves, we have a little heuristic that allows us to evaluate each move that falls within the zone of interest.
 
+6. **End Game Cutting**: During the creation of the tree, we checks if any player win in any matters, if so we stop the process from this branch and return a high value dependent from the depth of the actual search. If we are in an early step, the value is going to be higher than from an end leaf. 
+
 These optimizations make your Gomoku AI faster and more capable of handling the complex game space efficiently, focusing on strong, strategic moves and reducing computational load.
 
 ## 🧠 Heuristic
 
-TODO
+The heuristic is the process used to evaluate the value of a board. It's represent nothing in particular and can take very varied forms. So it's always a bias choosen by the developper often in the search of a balance between optimisation and accuracy.
+
+For this project our method to evaluate the value of the board is simple, but strong. We take every alignement of `five stones` and capture during `minimax` to gave to the board a value 
+
+1. **Define a DNA**: From biology, `DNA` is the system used to encode any living thing and can describe is construction. Here our `DNA` is the system that we used to describe each interesting alignement of five stones. To do so, we declare some abstract values ​​which together gives an optimized result. 
+
+**_DNA of our Heuristic_**
+
+2. **Associate DNA with alignements**: Next, we search for all interesting alignement of `five stones` that can be interesting in our process such as `White-White-White-White-Wwhite` that is a win alignement or `White-Black-Black-Nothing-Nothing` which is an alignement that can lead to a capture for `White`.
+
+**_Part of all associated values_**
+   
+3. **Check the board**: To process the calculation, we need to check on every row, column and diagonal, on every alignement of `five stones`. If the alignement is known, the given value is added to the total value of the board. When every alignement is checked, the result is added with the value of `capture` found during `minimax` process and all of this is the value associated with this board.
+
+With that, we can perform our `minimax` calculation with a great accuracy, without losing to much time 
 
 # 🧑 Authors ‍
 
