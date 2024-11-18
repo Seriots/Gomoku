@@ -77,18 +77,20 @@ int negamax(Node* node, int depth, int alpha, int beta, int color) {
 }
 ```
 
-**_Visualization of the Alpha-Beta Pruning algorithm (from [Wikipedia](https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning)):_**
+**_Visualization of the Alpha-Beta Pruning algorithm (from [Wikipedia](https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning)):_** 
 
 <img src="https://i.imgur.com/xvGtOh1.gif" style="width: 80%; height: auto;" />
 
 3. **Transposition Tables**: By storing previously evaluated positions, transposition tables prevent redundant calculations for recurring game states. This is especially beneficial in Gomoku, where similar board states can arise frequently.
 
 **_Diagram of the Transposition Tables optimization:_**
+
 <img src="https://i.imgur.com/8VMlpBZ.png" style="width: 60%; height: auto;" />
 
 4. **Zone of Interest**: To further narrow down the search, this optimization considers only moves within a distance of 1 from already played stones. By limiting the focus to this area, the algorithm reduces unnecessary calculations and concentrates on moves that are more likely to impact the game’s progression.
 
 **_Visualization of the Zone of Interest optimization:_**
+
 <img src="https://i.imgur.com/nqvIUlc.png" style="width: 60%; height: auto;" />
 
 5. **Move Ordering**: Sorting moves to prioritize the most promising options first speeds up the Alpha-Beta pruning. By focusing on moves more likely to lead to favorable outcomes, this technique makes the search process faster and more directed. To sort out the most interesting moves, we have a little heuristic that allows us to evaluate each move that falls within the zone of interest.
