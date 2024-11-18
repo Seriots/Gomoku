@@ -109,11 +109,20 @@ For this project our method to evaluate the value of the board is simple, but st
 
 **_DNA of our Heuristic_**
 
+<img src="https://github.com/user-attachments/assets/9dbf6f31-c954-4431-b101-ba137975d744" style="width: 60%; height: auto;" />
+
+
 2. **Associate DNA with alignements**: Next, we search for all interesting alignement of `five stones` that can be interesting in our process such as `White-White-White-White-Wwhite` that is a win alignement or `White-Black-Black-Nothing-Nothing` which is an alignement that can lead to a capture for `White`.
 
 **_Part of all associated values_**
-   
+
+<img src="https://github.com/user-attachments/assets/49fca551-e20a-43c3-b08b-f0852a888ecc" style="width: 60%; height: auto;" />
+
 3. **Check the board**: To process the calculation, we need to check on every row, column and diagonal, on every alignement of `five stones`. If the alignement is known, the given value is added to the total value of the board. When every alignement is checked, the result is added with the value of `capture` found during `minimax` process and all of this is the value associated with this board.
+
+**_ Exemple of a board value calculation :_**
+
+<img src="https://github.com/user-attachments/assets/deb19a87-2924-4947-86c5-dc1c5092882a" style="width: 60%; height: auto;" />
 
 With that, we can perform our `minimax` calculation with a great accuracy, without losing to much time 
 
