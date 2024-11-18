@@ -101,24 +101,24 @@ These optimizations make your Gomoku AI faster and more capable of handling the 
 
 ## 🧠 Heuristic
 
-The heuristic is the process used to evaluate the value of a board. It's represent nothing in particular and can take very varied forms. So it's always a bias choosen by the developper often in the search of a balance between optimisation and accuracy.
+The heuristic is the process used to evaluate the value of a board. It's represent nothing in particular and can take very varied forms. So it's always a bias chosen by the developer often in the search of a balance between optimisation and accuracy.
 
-For this project our method to evaluate the value of the board is simple, but strong. We take every alignement of `five stones` and capture during `minimax` to gave to the board a value 
+For this project, our method to evaluate the value of the board is simple, but strong. We take every alignment of `five stones` and capture during `minimax` to give to the board a value 
 
-1. **Define a DNA**: From biology, `DNA` is the system used to encode any living thing and can describe is construction. Here our `DNA` is the system that we used to describe each interesting alignement of five stones. To do so, we declare some abstract values ​​which together gives an optimized result. 
+1. **Define a DNA**: From biology, `DNA` is the system used to encode any living thing and can describe is constructed. Here our `DNA` is the system that we used to describe each interesting alignment of five stones. To do so, we declare some abstract values ​​which together give an optimized result. 
 
 **_DNA of our Heuristic_**
 
 <img src="https://github.com/user-attachments/assets/9dbf6f31-c954-4431-b101-ba137975d744" style="width: 60%; height: auto;" />
 
 
-2. **Associate DNA with alignements**: Next, we search for all interesting alignement of `five stones` that can be interesting in our process such as `White-White-White-White-Wwhite` that is a win alignement or `White-Black-Black-Nothing-Nothing` which is an alignement that can lead to a capture for `White`.
+2. **Associate DNA with alignements**: Next, we search for all interesting alignment of `five stones` that can be interesting in our process such as `White-White-White-White-White` that is a win alignment or `White-Black-Black-Nothing-Nothing` which is an aligement that can lead to a capture for `White`.
 
 **_Part of all associated values_**
 
 <img src="https://github.com/user-attachments/assets/49fca551-e20a-43c3-b08b-f0852a888ecc" style="width: 60%; height: auto;" />
 
-3. **Check the board**: To process the calculation, we need to check on every row, column and diagonal, on every alignement of `five stones`. If the alignement is known, the given value is added to the total value of the board. When every alignement is checked, the result is added with the value of `capture` found during `minimax` process and all of this is the value associated with this board.
+3. **Check the board**: To process the calculation, we need to check on every row, column and diagonal, on every alignment of five stones. If the alignment is known, the given value is added to the total value of the board. When every alignment is checked, the result is added to the value of the capture found during minimax process and all of this is the value associated with this board.
 
 **_Exemple of a board value calculation :_**
 
