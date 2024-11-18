@@ -120,7 +120,7 @@ For this project our method to evaluate the value of the board is simple, but st
 
 3. **Check the board**: To process the calculation, we need to check on every row, column and diagonal, on every alignement of `five stones`. If the alignement is known, the given value is added to the total value of the board. When every alignement is checked, the result is added with the value of `capture` found during `minimax` process and all of this is the value associated with this board.
 
-**_ Exemple of a board value calculation :_**
+**_Exemple of a board value calculation :_**
 
 <img src="https://github.com/user-attachments/assets/deb19a87-2924-4947-86c5-dc1c5092882a" style="width: 60%; height: auto;" />
 
