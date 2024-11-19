@@ -4,7 +4,7 @@
 
 ## 📝 Description
 
-This project aims to create a competitive Gomoku AI that evaluates and plays the best moves based on the board's current state.
+This project aims to create a competitive Gomoku AI that evaluates and plays the best moves based on the board's current state. The game can be played [here](gomoku.leo-giband.com), where you can challenge the AI or play against another player.
 
 The AI relies on the [MiniMax](https://en.wikipedia.org/wiki/Minimax) algorithm, enhanced with many optimisations for optimal performance. The back-end, written in **C++**, handles the game logic and AI computations, while the **React** front-end provides an intuitive interface for players to interact with the game.
 
@@ -26,7 +26,7 @@ make
 
 ### Front
 
-To setup the front-end, you need to install the dependencies and launch the server.
+To set up the front-end, install the dependencies, configure the `.env` file with the back-end URL in the `front` folder, and then launch the server.
 
 ```bash
 cd front
@@ -77,7 +77,7 @@ int negamax(Node* node, int depth, int alpha, int beta, int color) {
 }
 ```
 
-**_Visualization of the Alpha-Beta Pruning algorithm (from [Wikipedia](https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning)):_** 
+**_Visualization of the Alpha-Beta Pruning algorithm (from [Wikipedia](https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning)):_**
 
 <img src="https://i.imgur.com/xvGtOh1.gif" style="width: 80%; height: auto;" />
 
@@ -95,7 +95,7 @@ int negamax(Node* node, int depth, int alpha, int beta, int color) {
 
 5. **Move Ordering**: Sorting moves to prioritize the most promising options first speeds up the Alpha-Beta pruning. By focusing on moves more likely to lead to favorable outcomes, this technique makes the search process faster and more directed. To sort out the most interesting moves, we have a little heuristic that allows us to evaluate each move that falls within the zone of interest.
 
-6. **End Game Cutting**: During the creation of the tree, we checks if any player win in any matters, if so we stop the process from this branch and return a high value dependent from the depth of the actual search. If we are in an early step, the value is going to be higher than from an end leaf. 
+6. **End Game Cutting**: During the creation of the tree, we checks if any player win in any matters, if so we stop the process from this branch and return a high value dependent from the depth of the actual search. If we are in an early step, the value is going to be higher than from an end leaf.
 
 These optimizations make your Gomoku AI faster and more capable of handling the complex game space efficiently, focusing on strong, strategic moves and reducing computational load.
 
@@ -103,14 +103,13 @@ These optimizations make your Gomoku AI faster and more capable of handling the 
 
 The heuristic is the process used to evaluate the value of a board. It's represent nothing in particular and can take very varied forms. So it's always a bias chosen by the developer often in the search of a balance between optimisation and accuracy.
 
-For this project, our method to evaluate the value of the board is simple, but strong. We take every alignment of `five stones` and capture during `minimax` to give to the board a value 
+For this project, our method to evaluate the value of the board is simple, but strong. We take every alignment of `five stones` and capture during `minimax` to give to the board a value
 
-1. **Define a DNA**: From biology, `DNA` is the system used to encode any living thing and can describe is constructed. Here our `DNA` is the system that we used to describe each interesting alignment of five stones. To do so, we declare some abstract values ​​which together give an optimized result. 
+1. **Define a DNA**: From biology, `DNA` is the system used to encode any living thing and can describe is constructed. Here our `DNA` is the system that we used to describe each interesting alignment of five stones. To do so, we declare some abstract values ​​which together give an optimized result.
 
 **_DNA of our Heuristic_**
 
 <img src="https://github.com/user-attachments/assets/9dbf6f31-c954-4431-b101-ba137975d744" style="width: 60%; height: auto;" />
-
 
 2. **Associate DNA with alignements**: Next, we search for all interesting alignment of `five stones` that can be interesting in our process such as `White-White-White-White-White` that is a win alignment or `White-Black-Black-Nothing-Nothing` which is an aligement that can lead to a capture for `White`.
 
@@ -124,7 +123,7 @@ For this project, our method to evaluate the value of the board is simple, but s
 
 <img src="https://github.com/user-attachments/assets/deb19a87-2924-4947-86c5-dc1c5092882a" style="width: 60%; height: auto;" />
 
-With that, we can perform our `minimax` calculation with a great accuracy, without losing to much time 
+With that, we can perform our `minimax` calculation with a great accuracy, without losing to much time
 
 # 🧑 Authors ‍
 
