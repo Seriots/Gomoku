@@ -4,7 +4,7 @@
 
 ## 📝 Description
 
-This project aims to create a competitive Gomoku AI that evaluates and plays the best moves based on the board's current state. The game can be played [here](gomoku.leo-giband.com), where you can challenge the AI or play against another player.
+This project aims to create a competitive Gomoku AI that evaluates and plays the best moves based on the board's current state. The game can be played [here](https://gomoku.leo-giband.com/), where you can challenge the AI or play against another player.
 
 The AI relies on the [MiniMax](https://en.wikipedia.org/wiki/Minimax) algorithm, enhanced with many optimisations for optimal performance. The back-end, written in **C++**, handles the game logic and AI computations, while the **React** front-end provides an intuitive interface for players to interact with the game.
 
