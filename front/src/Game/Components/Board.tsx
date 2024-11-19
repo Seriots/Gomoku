@@ -43,7 +43,9 @@ let currentPos = {
     y: 0,
 }
 
-const request_root = process.env.REACT_APP_BACKHOST + ':' + process.env.REACT_APP_BACKPORT; 
+const backhost = process.env.REACT_APP_BACKHOST === undefined ? 'localhost' : process.env.REACT_APP_BACKHOST;
+const backport = process.env.REACT_APP_BACKPORT === undefined ? '6325' : process.env.REACT_APP_BACKPORT;
+const request_root = backhost + ':' + backport;
 
 const initLocalGameInfo = (firstPlayer: string, depth: number = 6, openingRule: string = 'standard'): LocalGameInfoProps => {
     return {
